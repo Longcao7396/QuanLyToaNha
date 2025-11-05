@@ -31,6 +31,7 @@ public class LoginForm extends Application {
             String role = verifyLogin(username, password);
             if (role != null) {
                 messageLabel.setText("✅ Đăng nhập thành công! (Vai trò: " + role + ")");
+                Dashboard.show(primaryStage, role); // mở cửa sổ mới và ẩn login
             } else {
                 messageLabel.setText("❌ Sai tên đăng nhập hoặc mật khẩu!");
             }
