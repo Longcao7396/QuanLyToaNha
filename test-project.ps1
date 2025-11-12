@@ -96,3 +96,4 @@ if ($ideaMissing.Count -eq 0) {
 Write-Host ""
 Write-Host "=== Test Complete ===" -ForegroundColor Cyan
 
+

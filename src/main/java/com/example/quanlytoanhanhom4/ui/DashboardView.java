@@ -72,16 +72,20 @@ public final class DashboardView {
         content.getChildren().addAll(technicalLabel, bmsBtn, maintenanceBtn, securityBtn, cleaningBtn, adminBtn, customerBtn);
         root.setCenter(content);
 
-        HBox footer = new HBox();
-        footer.setAlignment(Pos.CENTER_RIGHT);
+        HBox footer = new HBox(10);
+        footer.setAlignment(Pos.CENTER);
         footer.setPadding(new Insets(15));
         footer.setStyle("-fx-background-color: #e0e0e0;");
 
+        Button backBtn = new Button("← Quay lại");
+        backBtn.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 8 20; -fx-font-weight: bold; -fx-background-radius: 5;");
+        backBtn.setOnAction(e -> handleBack());
+
         Button logoutBtn = new Button("Đăng xuất");
-        logoutBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-padding: 8 20;");
+        logoutBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-padding: 8 20; -fx-font-weight: bold; -fx-background-radius: 5;");
         logoutBtn.setOnAction(e -> handleLogout());
 
-        footer.getChildren().add(logoutBtn);
+        footer.getChildren().addAll(backBtn, logoutBtn);
         root.setBottom(footer);
 
         Scene scene = new Scene(root, 800, 600);
@@ -135,6 +139,22 @@ public final class DashboardView {
         messageStage.setScene(scene);
         messageStage.setTitle("Thông báo");
         messageStage.show();
+    }
+
+    private static void handleBack() {
+        try {
+            if (primaryStage != null) {
+                // Quay lại màn hình chính (main.fxml)
+                FXMLLoader loader = new FXMLLoader(DashboardView.class.getResource("/com/example/quanlytoanhanhom4/fxml/main.fxml"));
+                Scene scene = new Scene(loader.load(), 1080, 640);
+                primaryStage.setTitle("Quản lý kỹ thuật tòa nhà");
+                primaryStage.setScene(scene);
+                primaryStage.show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            showMessage("Không thể quay lại màn hình chính: " + e.getMessage());
+        }
     }
 
     private static void handleLogout() {

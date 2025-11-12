@@ -146,3 +146,4 @@ INSERT INTO user (username, role, password, email)
 VALUES ('admin', 'admin', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'admin@example.com')
 ON DUPLICATE KEY UPDATE username=username;
 
+
