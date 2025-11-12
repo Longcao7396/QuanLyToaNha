@@ -1,4 +1,4 @@
-package com.example.quanlytoanhanhom15;
+package com.example.quanlytoanhanhom4.config;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -9,6 +9,10 @@ public class DatabaseConnection {
     private static final String USER = "root";
     private static final String PASSWORD = "";
 
+    private DatabaseConnection() {
+        // Utility class
+    }
+
     public static Connection getConnection() throws SQLException {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -18,3 +22,5 @@ public class DatabaseConnection {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 }
+
+

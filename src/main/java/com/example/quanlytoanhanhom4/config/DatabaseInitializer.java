@@ -1,25 +1,27 @@
-package com.example.quanlytoanhanhom15;
+package com.example.quanlytoanhanhom4.config;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class DatabaseInitializer {
+public final class DatabaseInitializer {
 
     private static final String DB_NAME = "Quanlytoanha";
     private static final String URL = "jdbc:mysql://localhost:3306/";
     private static final String USER = "root";
-    private static final String PASSWORD = ""; // XAMPP mặc định là rỗng
+    private static final String PASSWORD = "";
 
     private static Connection connection;
 
-    // Hàm khởi tạo database + bảng
+    private DatabaseInitializer() {
+        // Utility class
+    }
+
     public static void initialize() {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              Statement stmt = conn.createStatement()) {
 
-            // Tạo database nếu chưa có
             stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS " + DB_NAME);
             System.out.println("✅ Database đã sẵn sàng!");
 
@@ -28,13 +30,11 @@ public class DatabaseInitializer {
             System.out.println("❌ Lỗi khi tạo database!");
         }
 
-        // Kết nối tới database vừa tạo
         try {
             connection = DriverManager.getConnection(URL + DB_NAME, USER, PASSWORD);
             System.out.println("✅ Kết nối tới database thành công!");
 
             try (Statement stmt = connection.createStatement()) {
-                // Tạo các bảng nếu chưa có
                 stmt.execute("""
                     CREATE TABLE IF NOT EXISTS user (
                         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -89,7 +89,6 @@ public class DatabaseInitializer {
         }
     }
 
-    // Lấy Connection cho các class khác dùng
     public static Connection getConnection() {
         if (connection == null) {
             initialize();
@@ -97,9 +96,9 @@ public class DatabaseInitializer {
         return connection;
     }
 
-    // Test riêng
     public static void main(String[] args) {
         DatabaseInitializer.initialize();
     }
 }
+
 
