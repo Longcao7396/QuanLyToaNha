@@ -38,7 +38,7 @@ if ($configMissing.Count -eq 0) {
 
 # Test 3: Check for old package references
 Write-Host "[3/6] Checking for old package references..." -ForegroundColor Yellow
-$oldRefs = Select-String -Path "src\**\*.java", "src\**\*.fxml", "pom.xml" -Pattern "quanlytoanhanhom15" -ErrorAction SilentlyContinue
+$oldRefs = Select-String -Path "src\**\*.java", "src\**\*.fxml", "pom.xml" -Pattern "quanlytoanhanhom15|QuanLyToaNha-Nhom15" -ErrorAction SilentlyContinue
 if ($oldRefs.Count -eq 0) {
     Write-Host "   OK: No old package references found" -ForegroundColor Green
 } else {
@@ -63,7 +63,7 @@ if (Test-Path "src\main\java\module-info.java") {
 Write-Host "[5/6] Checking pom.xml..." -ForegroundColor Yellow
 if (Test-Path "pom.xml") {
     $pomContent = Get-Content "pom.xml" -Raw
-    if ($pomContent -match "QuanLyToaNha-Nhom4" -and $pomContent -notmatch "QuanLyToaNha-Nhom15") {
+    if ($pomContent -match "QuanLyToaNha-Nhom4" -and $pomContent -notmatch "QuanLyToaNha-Nhom15|Nhom15") {
         Write-Host "   OK: pom.xml configured correctly" -ForegroundColor Green
     } else {
         Write-Host "   ERROR: pom.xml has issues" -ForegroundColor Red
