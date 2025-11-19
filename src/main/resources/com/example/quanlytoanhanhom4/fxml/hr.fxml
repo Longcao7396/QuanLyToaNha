@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.quanlytoanhanhom4.controller.HRController">
+    <top>
+        <HBox spacing="10" style="-fx-background-color: #1F618D; -fx-padding: 14;">
+            <children>
+                <Label text="Quản lý Hành chính - Nhân sự" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Đóng" onAction="#handleBack" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold;"/>
+            </children>
+        </HBox>
+    </top>
+    <center>
+        <TabPane tabClosingPolicy="UNAVAILABLE">
+            <tabs>
+                <Tab text="Danh sách nhân viên">
+                    <BorderPane>
+                        <center>
+                            <TableView fx:id="staffTable" prefHeight="400">
+                                <columns>
+                                    <TableColumn fx:id="colStaffCode" text="Mã NV" prefWidth="90"/>
+                                    <TableColumn fx:id="colStaffName" text="Họ tên" prefWidth="150"/>
+                                    <TableColumn fx:id="colStaffPosition" text="Chức vụ" prefWidth="120"/>
+                                    <TableColumn fx:id="colStaffDepartment" text="Phòng ban" prefWidth="120"/>
+                                    <TableColumn fx:id="colStaffPhone" text="Liên hệ" prefWidth="110"/>
+                                    <TableColumn fx:id="colStaffStatus" text="Trạng thái" prefWidth="110"/>
+                                </columns>
+                            </TableView>
+                        </center>
+                        <right>
+                            <VBox spacing="8" style="-fx-padding: 14; -fx-background-color: #f5f6fa; -fx-min-width: 320;">
+                                <children>
+                                    <Label text="Thông tin nhân viên" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                                    <Label text="Mã nhân viên"/>
+                                    <TextField fx:id="staffCodeField"/>
+                                    <Label text="Họ tên"/>
+                                    <TextField fx:id="staffNameField"/>
+                                    <Label text="Chức vụ"/>
+                                    <TextField fx:id="positionField"/>
+                                    <Label text="Phòng ban"/>
+                                    <TextField fx:id="departmentField"/>
+                                    <Label text="Điện thoại"/>
+                                    <TextField fx:id="phoneField"/>
+                                    <Label text="Email"/>
+                                    <TextField fx:id="emailField"/>
+                                    <Label text="Ngày vào làm"/>
+                                    <DatePicker fx:id="staffStartDatePicker"/>
+                                    <Label text="Trạng thái"/>
+                                    <ComboBox fx:id="staffStatusCombo"/>
+                                    <Label text="Lương cơ bản"/>
+                                    <TextField fx:id="salaryField"/>
+                                    <Label text="Ghi chú"/>
+                                    <TextArea fx:id="staffNotesArea" prefRowCount="3"/>
+                                    <HBox spacing="10">
+                                        <children>
+                                            <Button text="Thêm" onAction="#handleAddStaff" style="-fx-background-color:#27ae60; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                                            <Button text="Cập nhật" onAction="#handleUpdateStaff" style="-fx-background-color:#2980b9; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                                        </children>
+                                    </HBox>
+                                    <HBox spacing="10">
+                                        <children>
+                                            <Button text="Xóa" onAction="#handleDeleteStaff" style="-fx-background-color:#c0392b; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                                            <Button text="Làm mới" onAction="#handleClearStaff" style="-fx-background-color:#7f8c8d; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                                        </children>
+                                    </HBox>
+                                </children>
+                            </VBox>
+                        </right>
+                    </BorderPane>
+                </Tab>
+
+                <Tab text="Chấm công">
+                    <BorderPane>
+                        <center>
+                            <TableView fx:id="attendanceTable" prefHeight="400">
+                                <columns>
+                                    <TableColumn fx:id="colAttendanceStaff" text="Nhân viên" prefWidth="150"/>
+                                    <TableColumn fx:id="colAttendanceDate" text="Ngày" prefWidth="110"/>
+                                    <TableColumn fx:id="colAttendanceShift" text="Ca" prefWidth="80"/>
+                                    <TableColumn fx:id="colAttendanceCheckIn" text="Giờ vào" prefWidth="90"/>
+                                    <TableColumn fx:id="colAttendanceCheckOut" text="Giờ ra" prefWidth="90"/>
+                                    <TableColumn fx:id="colAttendanceStatus" text="Trạng thái" prefWidth="110"/>
+                                </columns>
+                            </TableView>
+                        </center>
+                        <right>
+                            <VBox spacing="8" style="-fx-padding: 14; -fx-background-color: #f5f6fa; -fx-min-width: 320;">
+                                <children>
+                                    <Label text="Ghi nhận chấm công" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                                    <Label text="Nhân viên"/>
+                                    <ComboBox fx:id="attendanceStaffCombo"/>
+                                    <Label text="Ngày"/>
+                                    <DatePicker fx:id="attendanceDatePicker"/>
+                                    <Label text="Ca làm việc"/>
+                                    <ComboBox fx:id="attendanceShiftCombo"/>
+                                    <Label text="Giờ vào (HH:mm)"/>
+                                    <TextField fx:id="checkInField"/>
+                                    <Label text="Giờ ra (HH:mm)"/>
+                                    <TextField fx:id="checkOutField"/>
+                                    <Label text="Trạng thái"/>
+                                    <ComboBox fx:id="attendanceStatusCombo"/>
+                                    <Label text="Ghi chú"/>
+                                    <TextArea fx:id="attendanceNotesArea" prefRowCount="3"/>
+                                    <HBox spacing="10">
+                                        <children>
+                                            <Button text="Thêm" onAction="#handleAddAttendance" style="-fx-background-color:#27ae60; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                                            <Button text="Cập nhật" onAction="#handleUpdateAttendance" style="-fx-background-color:#2980b9; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                                        </children>
+                                    </HBox>
+                                    <HBox spacing="10">
+                                        <children>
+                                            <Button text="Xóa" onAction="#handleDeleteAttendance" style="-fx-background-color:#c0392b; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                                            <Button text="Làm mới" onAction="#handleClearAttendance" style="-fx-background-color:#7f8c8d; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                                        </children>
+                                    </HBox>
+                                </children>
+                            </VBox>
+                        </right>
+                    </BorderPane>
+                </Tab>
+
+                <Tab text="Phân ca">
+                    <BorderPane>
+                        <center>
+                            <TableView fx:id="shiftTable" prefHeight="400">
+                                <columns>
+                                    <TableColumn fx:id="colShiftStaff" text="Nhân viên" prefWidth="150"/>
+                                    <TableColumn fx:id="colShiftName" text="Ca làm việc" prefWidth="120"/>
+                                    <TableColumn fx:id="colShiftStart" text="Bắt đầu" prefWidth="110"/>
+                                    <TableColumn fx:id="colShiftEnd" text="Kết thúc" prefWidth="110"/>
+                                    <TableColumn fx:id="colShiftAssignedBy" text="Người phân" prefWidth="120"/>
+                                </columns>
+                            </TableView>
+                        </center>
+                        <right>
+                            <VBox spacing="8" style="-fx-padding: 14; -fx-background-color: #f5f6fa; -fx-min-width: 320;">
+                                <children>
+                                    <Label text="Thông tin phân ca" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                                    <Label text="Nhân viên"/>
+                                    <ComboBox fx:id="shiftStaffCombo"/>
+                                    <Label text="Tên ca"/>
+                                    <TextField fx:id="shiftNameField"/>
+                                    <HBox spacing="10">
+                                        <children>
+                                            <VBox spacing="6">
+                                                <children>
+                                                    <Label text="Ngày bắt đầu"/>
+                                                    <DatePicker fx:id="shiftStartDatePicker"/>
+                                                </children>
+                                            </VBox>
+                                            <VBox spacing="6">
+                                                <children>
+                                                    <Label text="Ngày kết thúc"/>
+                                                    <DatePicker fx:id="shiftEndDatePicker"/>
+                                                </children>
+                                            </VBox>
+                                        </children>
+                                    </HBox>
+                                    <Label text="Người phân ca"/>
+                                    <TextField fx:id="assignedByField"/>
+                                    <Label text="Ghi chú"/>
+                                    <TextArea fx:id="shiftNotesArea" prefRowCount="3"/>
+                                    <HBox spacing="10">
+                                        <children>
+                                            <Button text="Thêm" onAction="#handleAddShift" style="-fx-background-color:#27ae60; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                                            <Button text="Cập nhật" onAction="#handleUpdateShift" style="-fx-background-color:#2980b9; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                                        </children>
+                                    </HBox>
+                                    <HBox spacing="10">
+                                        <children>
+                                            <Button text="Xóa" onAction="#handleDeleteShift" style="-fx-background-color:#c0392b; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                                            <Button text="Làm mới" onAction="#handleClearShift" style="-fx-background-color:#7f8c8d; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                                        </children>
+                                    </HBox>
+                                </children>
+                            </VBox>
+                        </right>
+                    </BorderPane>
+                </Tab>
+
+                <Tab text="Hợp đồng">
+                    <BorderPane>
+                        <center>
+                            <TableView fx:id="contractTable" prefHeight="400">
+                                <columns>
+                                    <TableColumn fx:id="colContractStaff" text="Nhân viên" prefWidth="150"/>
+                                    <TableColumn fx:id="colContractType" text="Loại hợp đồng" prefWidth="140"/>
+                                    <TableColumn fx:id="colContractStart" text="Hiệu lực" prefWidth="110"/>
+                                    <TableColumn fx:id="colContractEnd" text="Hết hạn" prefWidth="110"/>
+                                    <TableColumn fx:id="colContractSalary" text="Lương" prefWidth="110"/>
+                                    <TableColumn fx:id="colContractStatus" text="Trạng thái" prefWidth="110"/>
+                                </columns>
+                            </TableView>
+                        </center>
+                        <right>
+                            <VBox spacing="8" style="-fx-padding: 14; -fx-background-color: #f5f6fa; -fx-min-width: 320;">
+                                <children>
+                                    <Label text="Thông tin hợp đồng" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                                    <Label text="Nhân viên"/>
+                                    <ComboBox fx:id="contractStaffCombo"/>
+                                    <Label text="Loại hợp đồng"/>
+                                    <TextField fx:id="contractTypeField"/>
+                                    <HBox spacing="10">
+                                        <children>
+                                            <VBox spacing="6">
+                                                <children>
+                                                    <Label text="Ngày hiệu lực"/>
+                                                    <DatePicker fx:id="contractStartDatePicker"/>
+                                                </children>
+                                            </VBox>
+                                            <VBox spacing="6">
+                                                <children>
+                                                    <Label text="Ngày hết hạn"/>
+                                                    <DatePicker fx:id="contractEndDatePicker"/>
+                                                </children>
+                                            </VBox>
+                                        </children>
+                                    </HBox>
+                                    <Label text="Lương"/>
+                                    <TextField fx:id="contractSalaryField"/>
+                                    <Label text="Trạng thái"/>
+                                    <ComboBox fx:id="contractStatusCombo"/>
+                                    <Label text="Mô tả"/>
+                                    <TextArea fx:id="contractDescriptionArea" prefRowCount="3"/>
+                                    <HBox spacing="10">
+                                        <children>
+                                            <Button text="Thêm" onAction="#handleAddContract" style="-fx-background-color:#27ae60; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                                            <Button text="Cập nhật" onAction="#handleUpdateContract" style="-fx-background-color:#2980b9; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                                        </children>
+                                    </HBox>
+                                    <HBox spacing="10">
+                                        <children>
+                                            <Button text="Xóa" onAction="#handleDeleteContract" style="-fx-background-color:#c0392b; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                                            <Button text="Làm mới" onAction="#handleClearContract" style="-fx-background-color:#7f8c8d; -fx-text-fill:white; -fx-font-weight:bold;"/>
+                                        </children>
+                                    </HBox>
+                                </children>
+                            </VBox>
+                        </right>
+                    </BorderPane>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+</BorderPane>
+

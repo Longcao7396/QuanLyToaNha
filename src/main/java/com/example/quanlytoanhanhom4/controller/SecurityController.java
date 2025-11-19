@@ -78,9 +78,7 @@ public class SecurityController implements Initializable {
             "OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"
         );
         statusCombo.setItems(statuses);
-        filterStatusCombo.setItems(statuses);
-        filterStatusCombo.getItems().add(0, "TẤT CẢ");
-        filterStatusCombo.setValue("TẤT CẢ");
+        filterStatusCombo.setItems(FXCollections.observableArrayList(statuses));
         
         ObservableList<String> priorities = FXCollections.observableArrayList(
             "LOW", "MEDIUM", "HIGH", "URGENT"
@@ -92,7 +90,7 @@ public class SecurityController implements Initializable {
         incidents.clear();
         String filterStatus = filterStatusCombo.getValue();
         
-        if (filterStatus == null || filterStatus.equals("TẤT CẢ")) {
+        if (filterStatus == null) {
             incidents.addAll(SecurityService.getAllIncidents());
         } else {
             incidents.addAll(SecurityService.getIncidentsByStatus(filterStatus));

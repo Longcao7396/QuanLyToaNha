@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<fx:root type="BorderPane" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.quanlytoanhanhom4.controller.AdminController">
+<BorderPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.quanlytoanhanhom4.controller.AdminController">
    <top>
       <HBox spacing="10" style="-fx-background-color: #2874A6; -fx-padding: 15;">
          <children>
@@ -71,4 +71,4 @@
          </children>
       </VBox>
    </right>
-</fx:root>
+</BorderPane>

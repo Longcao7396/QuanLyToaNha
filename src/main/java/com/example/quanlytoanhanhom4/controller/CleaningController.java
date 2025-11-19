@@ -80,9 +80,7 @@ public class CleaningController implements Initializable {
             "PENDING", "IN_PROGRESS", "COMPLETED", "CANCELLED"
         );
         statusCombo.setItems(statuses);
-        filterStatusCombo.setItems(statuses);
-        filterStatusCombo.getItems().add(0, "TẤT CẢ");
-        filterStatusCombo.setValue("TẤT CẢ");
+        filterStatusCombo.setItems(FXCollections.observableArrayList(statuses));
     }
     
     private void initializeSpinner() {
@@ -94,7 +92,7 @@ public class CleaningController implements Initializable {
         cleanings.clear();
         String filterStatus = filterStatusCombo.getValue();
         
-        if (filterStatus == null || filterStatus.equals("TẤT CẢ")) {
+        if (filterStatus == null) {
             cleanings.addAll(CleaningService.getAllCleanings());
         } else {
             cleanings.addAll(CleaningService.getCleaningsByStatus(filterStatus));

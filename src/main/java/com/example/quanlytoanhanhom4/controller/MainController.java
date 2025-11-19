@@ -23,9 +23,6 @@ public class MainController implements Initializable {
     private Label adminLabel;
     
     @FXML
-    private Label roleLabel;
-    
-    @FXML
     private Button dashboardBtn;
     
     @FXML
@@ -39,7 +36,10 @@ public class MainController implements Initializable {
     
     @FXML
     private Button baoTriBtn;
-    
+
+    @FXML
+    private Button hrBtn;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Lấy thông tin từ UserSession
@@ -49,10 +49,6 @@ public class MainController implements Initializable {
         // Cập nhật label chào mừng
         if (adminLabel != null) {
             adminLabel.setText("CHÀO " + (username != null ? username.toUpperCase() : "ADMIN"));
-        }
-        
-        if (roleLabel != null) {
-            roleLabel.setText(role != null ? role.toUpperCase() : "ADMIN");
         }
         
     }
@@ -124,7 +120,12 @@ public class MainController implements Initializable {
     private void handleAdmin() {
         openModule("/com/example/quanlytoanhanhom4/fxml/admin.fxml", "Quản lý Hành chính & Nhân sự");
     }
-    
+
+    @FXML
+    private void handleHR() {
+        openModule("/com/example/quanlytoanhanhom4/fxml/hr.fxml", "Quản lý Nhân sự & Chấm công");
+    }
+
     @FXML
     private void handleLogout() {
         try {

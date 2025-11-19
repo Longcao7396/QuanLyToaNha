@@ -61,6 +61,8 @@ public class LoginController {
             Scene scene = new Scene(loader.load(), 1080, 640);
             currentStage.setTitle("Quản lý kỹ thuật tòa nhà");
             currentStage.setScene(scene);
+            currentStage.setResizable(true);
+            currentStage.setMaximized(true);
             currentStage.show();
         } catch (Exception e) {
             statusLabel.setStyle("-fx-text-fill: red;");

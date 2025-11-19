@@ -80,9 +80,7 @@ public class AdminController implements Initializable {
             "PENDING", "IN_PROGRESS", "COMPLETED", "CANCELLED"
         );
         statusCombo.setItems(statuses);
-        filterStatusCombo.setItems(statuses);
-        filterStatusCombo.getItems().add(0, "TẤT CẢ");
-        filterStatusCombo.setValue("TẤT CẢ");
+        filterStatusCombo.setItems(FXCollections.observableArrayList(statuses));
         
         ObservableList<String> priorities = FXCollections.observableArrayList(
             "LOW", "MEDIUM", "HIGH", "URGENT"
@@ -94,7 +92,7 @@ public class AdminController implements Initializable {
         tasks.clear();
         String filterStatus = filterStatusCombo.getValue();
         
-        if (filterStatus == null || filterStatus.equals("TẤT CẢ")) {
+        if (filterStatus == null) {
             tasks.addAll(AdminTaskService.getAllTasks());
         } else {
             tasks.addAll(AdminTaskService.getTasksByStatus(filterStatus));

@@ -80,9 +80,7 @@ public class CustomerController implements Initializable {
             "PENDING", "IN_PROGRESS", "RESOLVED", "CLOSED"
         );
         statusCombo.setItems(statuses);
-        filterStatusCombo.setItems(statuses);
-        filterStatusCombo.getItems().add(0, "TẤT CẢ");
-        filterStatusCombo.setValue("TẤT CẢ");
+        filterStatusCombo.setItems(FXCollections.observableArrayList(statuses));
         
         ObservableList<String> priorities = FXCollections.observableArrayList(
             "LOW", "MEDIUM", "HIGH", "URGENT"
@@ -99,7 +97,7 @@ public class CustomerController implements Initializable {
         requests.clear();
         String filterStatus = filterStatusCombo.getValue();
         
-        if (filterStatus == null || filterStatus.equals("TẤT CẢ")) {
+        if (filterStatus == null) {
             requests.addAll(CustomerRequestService.getAllRequests());
         } else {
             requests.addAll(CustomerRequestService.getRequestsByStatus(filterStatus));

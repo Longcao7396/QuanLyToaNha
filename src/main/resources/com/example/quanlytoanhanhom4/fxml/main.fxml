@@ -10,7 +10,6 @@
          <children>
             <VBox alignment="CENTER_LEFT" spacing="6.0">
                <Label style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" text="PHẦN MỀM QUẢN LÝ TOÀ NHÀ" />
-               <Label fx:id="roleLabel" style="-fx-text-fill: #E8F6FF; -fx-font-size: 13px;" text="ADMIN" />
             </VBox>
             <Region HBox.hgrow="ALWAYS" />
             <VBox alignment="CENTER_RIGHT" spacing="6.0">
@@ -34,6 +33,7 @@
             <Button mnemonicParsing="false" onAction="#handleCleaning" prefHeight="40.0" prefWidth="180.0" style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;" text="Vệ sinh &amp; môi trường" />
             <Button mnemonicParsing="false" onAction="#handleCustomer" prefHeight="40.0" prefWidth="180.0" style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;" text="Chăm sóc khách hàng" />
             <Button mnemonicParsing="false" onAction="#handleAdmin" prefHeight="40.0" prefWidth="180.0" style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;" text="Hành chính &amp; nhân sự" />
+            <Button fx:id="hrBtn" mnemonicParsing="false" onAction="#handleHR" prefHeight="40.0" prefWidth="180.0" style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;" text="Nhân sự &amp; chấm công" />
          </children>
       </VBox>
    </left>

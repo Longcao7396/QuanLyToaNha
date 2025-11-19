@@ -54,6 +54,7 @@ public final class DashboardView {
         Button cleaningBtn = new Button("Quản lý Vệ sinh");
         Button adminBtn = new Button("Quản lý Hành chính & Nhân sự");
         Button customerBtn = new Button("Quản lý Khách hàng");
+        Button hrBtn = new Button("Nhân sự & Chấm công");
 
         styleButton(bmsBtn);
         styleButton(maintenanceBtn);
@@ -61,15 +62,17 @@ public final class DashboardView {
         styleButton(cleaningBtn);
         styleButton(adminBtn);
         styleButton(customerBtn);
+        styleButton(hrBtn);
 
         bmsBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/bms.fxml", "Giám sát & Điều khiển BMS"));
         maintenanceBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/maintenance.fxml", "Bảo trì & Bảo dưỡng"));
         securityBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/security.fxml", "Quản lý An ninh"));
         cleaningBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/cleaning.fxml", "Quản lý Vệ sinh"));
         adminBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/admin.fxml", "Quản lý Hành chính & Nhân sự"));
+        hrBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/hr.fxml", "Nhân sự & Chấm công"));
         customerBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/customer.fxml", "Quản lý Khách hàng"));
 
-        content.getChildren().addAll(technicalLabel, bmsBtn, maintenanceBtn, securityBtn, cleaningBtn, adminBtn, customerBtn);
+        content.getChildren().addAll(technicalLabel, bmsBtn, maintenanceBtn, securityBtn, cleaningBtn, adminBtn, hrBtn, customerBtn);
         root.setCenter(content);
 
         HBox footer = new HBox(10);
