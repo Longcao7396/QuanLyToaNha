@@ -11,6 +11,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class CustomerController implements Initializable {
@@ -36,7 +38,29 @@ public class CustomerController implements Initializable {
     @FXML private Button resolveButton;
     @FXML private Button deleteButton;
     @FXML private Label statusLabel;
-    
+
+    private static final LinkedHashMap<String, String> REQUEST_TYPE_OPTIONS = new LinkedHashMap<>();
+    private static final LinkedHashMap<String, String> STATUS_OPTIONS = new LinkedHashMap<>();
+    private static final LinkedHashMap<String, String> PRIORITY_OPTIONS = new LinkedHashMap<>();
+    private static final String ALL_LABEL = "Tất cả";
+
+    static {
+        REQUEST_TYPE_OPTIONS.put("COMPLAINT", "Khiếu nại");
+        REQUEST_TYPE_OPTIONS.put("REQUEST", "Yêu cầu");
+        REQUEST_TYPE_OPTIONS.put("FEEDBACK", "Góp ý");
+        REQUEST_TYPE_OPTIONS.put("EMERGENCY", "Khẩn cấp");
+
+        STATUS_OPTIONS.put("PENDING", "Chờ xử lý");
+        STATUS_OPTIONS.put("IN_PROGRESS", "Đang xử lý");
+        STATUS_OPTIONS.put("RESOLVED", "Đã giải quyết");
+        STATUS_OPTIONS.put("CLOSED", "Đã đóng");
+
+        PRIORITY_OPTIONS.put("LOW", "Thấp");
+        PRIORITY_OPTIONS.put("MEDIUM", "Trung bình");
+        PRIORITY_OPTIONS.put("HIGH", "Cao");
+        PRIORITY_OPTIONS.put("URGENT", "Khẩn cấp");
+    }
+
     private ObservableList<CustomerRequest> requests;
     private CustomerRequest selectedRequest;
     
@@ -71,21 +95,21 @@ public class CustomerController implements Initializable {
     }
     
     private void initializeComboBoxes() {
-        ObservableList<String> requestTypes = FXCollections.observableArrayList(
-            "COMPLAINT", "REQUEST", "FEEDBACK", "EMERGENCY"
-        );
+        ObservableList<String> requestTypes = FXCollections.observableArrayList(REQUEST_TYPE_OPTIONS.values());
         requestTypeCombo.setItems(requestTypes);
-        
-        ObservableList<String> statuses = FXCollections.observableArrayList(
-            "PENDING", "IN_PROGRESS", "RESOLVED", "CLOSED"
-        );
+
+        ObservableList<String> statuses = FXCollections.observableArrayList(STATUS_OPTIONS.values());
         statusCombo.setItems(statuses);
-        filterStatusCombo.setItems(FXCollections.observableArrayList(statuses));
-        
-        ObservableList<String> priorities = FXCollections.observableArrayList(
-            "LOW", "MEDIUM", "HIGH", "URGENT"
-        );
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "PENDING"));
+
+        ObservableList<String> filterStatuses = FXCollections.observableArrayList(statuses);
+        filterStatuses.add(0, ALL_LABEL);
+        filterStatusCombo.setItems(filterStatuses);
+        filterStatusCombo.setValue(ALL_LABEL);
+
+        ObservableList<String> priorities = FXCollections.observableArrayList(PRIORITY_OPTIONS.values());
         priorityCombo.setItems(priorities);
+        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "MEDIUM"));
     }
     
     private void initializeSpinner() {
@@ -96,21 +120,22 @@ public class CustomerController implements Initializable {
     private void loadRequests() {
         requests.clear();
         String filterStatus = filterStatusCombo.getValue();
-        
-        if (filterStatus == null) {
+
+        if (filterStatus == null || filterStatus.equals(ALL_LABEL)) {
             requests.addAll(CustomerRequestService.getAllRequests());
         } else {
-            requests.addAll(CustomerRequestService.getRequestsByStatus(filterStatus));
+            String statusValue = toValue(STATUS_OPTIONS, filterStatus);
+            requests.addAll(CustomerRequestService.getRequestsByStatus(statusValue));
         }
     }
     
     private void loadRequestToForm(CustomerRequest request) {
         residentIdField.setText(String.valueOf(request.getResidentId()));
-        requestTypeCombo.setValue(request.getRequestType());
+        requestTypeCombo.setValue(toDisplay(REQUEST_TYPE_OPTIONS, request.getRequestType()));
         titleField.setText(request.getTitle());
         contentArea.setText(request.getContent());
-        statusCombo.setValue(request.getStatus());
-        priorityCombo.setValue(request.getPriority());
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, request.getStatus()));
+        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, request.getPriority()));
         resolutionArea.setText(request.getResolution());
         if (request.getSatisfactionRating() != null) {
             ratingSpinner.getValueFactory().setValue(request.getSatisfactionRating());
@@ -132,10 +157,11 @@ public class CustomerController implements Initializable {
                 showAlert("Lỗi", "ID cư dân không hợp lệ!", Alert.AlertType.ERROR);
                 return;
             }
-            request.setRequestType(requestTypeCombo.getValue());
+            request.setRequestType(toValue(REQUEST_TYPE_OPTIONS, requestTypeCombo.getValue()));
             request.setTitle(titleField.getText().trim());
             request.setContent(contentArea.getText().trim());
-            request.setPriority(priorityCombo.getValue());
+            request.setStatus(toValue(STATUS_OPTIONS, statusCombo.getValue()));
+            request.setPriority(toValue(PRIORITY_OPTIONS, priorityCombo.getValue()));
             
             if (CustomerRequestService.addRequest(request)) {
                 statusLabel.setText("✅ Thêm yêu cầu thành công!");
@@ -152,11 +178,11 @@ public class CustomerController implements Initializable {
         if (selectedRequest == null) return;
         
         if (validateInput()) {
-            selectedRequest.setRequestType(requestTypeCombo.getValue());
+            selectedRequest.setRequestType(toValue(REQUEST_TYPE_OPTIONS, requestTypeCombo.getValue()));
             selectedRequest.setTitle(titleField.getText().trim());
             selectedRequest.setContent(contentArea.getText().trim());
-            selectedRequest.setStatus(statusCombo.getValue());
-            selectedRequest.setPriority(priorityCombo.getValue());
+            selectedRequest.setStatus(toValue(STATUS_OPTIONS, statusCombo.getValue()));
+            selectedRequest.setPriority(toValue(PRIORITY_OPTIONS, priorityCombo.getValue()));
             selectedRequest.setResolution(resolutionArea.getText().trim());
             
             if (CustomerRequestService.updateRequest(selectedRequest)) {
@@ -219,8 +245,8 @@ public class CustomerController implements Initializable {
         requestTypeCombo.setValue(null);
         titleField.clear();
         contentArea.clear();
-        statusCombo.setValue("PENDING");
-        priorityCombo.setValue("MEDIUM");
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "PENDING"));
+        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "MEDIUM"));
         resolutionArea.clear();
         ratingSpinner.getValueFactory().setValue(3);
         statusLabel.setText("");
@@ -257,6 +283,25 @@ public class CustomerController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private String toDisplay(Map<String, String> options, String value) {
+        if (value == null) {
+            return null;
+        }
+        return options.getOrDefault(value, value);
+    }
+
+    private String toValue(Map<String, String> options, String display) {
+        if (display == null) {
+            return null;
+        }
+        return options.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().equals(display))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(display);
     }
 }
 

@@ -11,6 +11,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class BMSController implements Initializable {
@@ -35,7 +37,25 @@ public class BMSController implements Initializable {
     @FXML private Button updateButton;
     @FXML private Button deleteButton;
     @FXML private Label statusLabel;
-    
+
+    private static final LinkedHashMap<String, String> SYSTEM_TYPE_OPTIONS = new LinkedHashMap<>();
+    private static final LinkedHashMap<String, String> STATUS_OPTIONS = new LinkedHashMap<>();
+    private static final String ALL_LABEL = "Tất cả";
+
+    static {
+        SYSTEM_TYPE_OPTIONS.put("ĐIỆN", "Điện");
+        SYSTEM_TYPE_OPTIONS.put("NƯỚC", "Nước");
+        SYSTEM_TYPE_OPTIONS.put("HVAC", "HVAC (Điều hòa)");
+        SYSTEM_TYPE_OPTIONS.put("PCCC", "Phòng cháy chữa cháy");
+        SYSTEM_TYPE_OPTIONS.put("AN_NINH", "An ninh");
+        SYSTEM_TYPE_OPTIONS.put("CHIEU_SANG", "Chiếu sáng");
+
+        STATUS_OPTIONS.put("NORMAL", "Bình thường");
+        STATUS_OPTIONS.put("WARNING", "Cảnh báo");
+        STATUS_OPTIONS.put("ERROR", "Lỗi");
+        STATUS_OPTIONS.put("MAINTENANCE", "Đang bảo trì");
+    }
+
     private ObservableList<BMSSystem> systems;
     private BMSSystem selectedSystem;
     
@@ -69,36 +89,35 @@ public class BMSController implements Initializable {
     }
     
     private void initializeComboBoxes() {
-        ObservableList<String> systemTypes = FXCollections.observableArrayList(
-            "ĐIỆN", "NƯỚC", "HVAC", "PCCC", "AN_NINH", "CHIEU_SANG"
-        );
+        ObservableList<String> systemTypes = FXCollections.observableArrayList(SYSTEM_TYPE_OPTIONS.values());
         systemTypeCombo.setItems(systemTypes);
-        filterTypeCombo.setItems(systemTypes);
-        filterTypeCombo.getItems().add(0, "TẤT CẢ");
-        filterTypeCombo.setValue("TẤT CẢ");
-        
-        ObservableList<String> statuses = FXCollections.observableArrayList(
-            "NORMAL", "WARNING", "ERROR", "MAINTENANCE"
-        );
+        ObservableList<String> filterTypes = FXCollections.observableArrayList(systemTypes);
+        filterTypes.add(0, ALL_LABEL);
+        filterTypeCombo.setItems(filterTypes);
+        filterTypeCombo.setValue(ALL_LABEL);
+
+        ObservableList<String> statuses = FXCollections.observableArrayList(STATUS_OPTIONS.values());
         statusCombo.setItems(statuses);
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "NORMAL"));
     }
     
     private void loadSystems() {
         systems.clear();
         String filterType = filterTypeCombo.getValue();
-        
-        if (filterType == null || filterType.equals("TẤT CẢ")) {
+
+        if (filterType == null || filterType.equals(ALL_LABEL)) {
             systems.addAll(BMSService.getAllSystems());
         } else {
-            systems.addAll(BMSService.getSystemsByType(filterType));
+            String systemTypeValue = toValue(SYSTEM_TYPE_OPTIONS, filterType);
+            systems.addAll(BMSService.getSystemsByType(systemTypeValue));
         }
     }
     
     private void loadSystemToForm(BMSSystem system) {
-        systemTypeCombo.setValue(system.getSystemType());
+        systemTypeCombo.setValue(toDisplay(SYSTEM_TYPE_OPTIONS, system.getSystemType()));
         systemNameField.setText(system.getSystemName());
         locationField.setText(system.getLocation());
-        statusCombo.setValue(system.getStatus());
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, system.getStatus()));
         valueField.setText(system.getCurrentValue() != null ? system.getCurrentValue().toString() : "");
         unitField.setText(system.getUnit());
         descriptionArea.setText(system.getDescription());
@@ -113,10 +132,10 @@ public class BMSController implements Initializable {
     private void handleAdd() {
         if (validateInput()) {
             BMSSystem system = new BMSSystem();
-            system.setSystemType(systemTypeCombo.getValue());
+            system.setSystemType(toValue(SYSTEM_TYPE_OPTIONS, systemTypeCombo.getValue()));
             system.setSystemName(systemNameField.getText().trim());
             system.setLocation(locationField.getText().trim());
-            system.setStatus(statusCombo.getValue());
+            system.setStatus(toValue(STATUS_OPTIONS, statusCombo.getValue()));
             system.setUnit(unitField.getText().trim());
             system.setDescription(descriptionArea.getText().trim());
             
@@ -145,10 +164,10 @@ public class BMSController implements Initializable {
         }
         
         if (validateInput()) {
-            selectedSystem.setSystemType(systemTypeCombo.getValue());
+            selectedSystem.setSystemType(toValue(SYSTEM_TYPE_OPTIONS, systemTypeCombo.getValue()));
             selectedSystem.setSystemName(systemNameField.getText().trim());
             selectedSystem.setLocation(locationField.getText().trim());
-            selectedSystem.setStatus(statusCombo.getValue());
+            selectedSystem.setStatus(toValue(STATUS_OPTIONS, statusCombo.getValue()));
             selectedSystem.setUnit(unitField.getText().trim());
             selectedSystem.setDescription(descriptionArea.getText().trim());
             
@@ -220,7 +239,7 @@ public class BMSController implements Initializable {
         systemTypeCombo.setValue(null);
         systemNameField.clear();
         locationField.clear();
-        statusCombo.setValue("NORMAL");
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "NORMAL"));
         valueField.clear();
         unitField.clear();
         descriptionArea.clear();
@@ -249,6 +268,25 @@ public class BMSController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private String toDisplay(Map<String, String> options, String value) {
+        if (value == null) {
+            return null;
+        }
+        return options.getOrDefault(value, value);
+    }
+
+    private String toValue(Map<String, String> options, String display) {
+        if (display == null) {
+            return null;
+        }
+        return options.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().equals(display))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(display);
     }
 }
 

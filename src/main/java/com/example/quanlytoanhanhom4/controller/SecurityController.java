@@ -12,6 +12,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class SecurityController implements Initializable {
@@ -35,7 +37,30 @@ public class SecurityController implements Initializable {
     @FXML private Button resolveButton;
     @FXML private Button deleteButton;
     @FXML private Label statusLabel;
-    
+
+    private static final LinkedHashMap<String, String> INCIDENT_TYPE_OPTIONS = new LinkedHashMap<>();
+    private static final LinkedHashMap<String, String> STATUS_OPTIONS = new LinkedHashMap<>();
+    private static final LinkedHashMap<String, String> PRIORITY_OPTIONS = new LinkedHashMap<>();
+    private static final String ALL_LABEL = "Tất cả";
+
+    static {
+        INCIDENT_TYPE_OPTIONS.put("CAMERA", "Camera");
+        INCIDENT_TYPE_OPTIONS.put("ACCESS_CONTROL", "Kiểm soát ra vào");
+        INCIDENT_TYPE_OPTIONS.put("EMERGENCY", "Khẩn cấp");
+        INCIDENT_TYPE_OPTIONS.put("THEFT", "Trộm cắp");
+        INCIDENT_TYPE_OPTIONS.put("OTHER", "Khác");
+
+        STATUS_OPTIONS.put("OPEN", "Mới ghi nhận");
+        STATUS_OPTIONS.put("IN_PROGRESS", "Đang xử lý");
+        STATUS_OPTIONS.put("RESOLVED", "Đã giải quyết");
+        STATUS_OPTIONS.put("CLOSED", "Đã đóng");
+
+        PRIORITY_OPTIONS.put("LOW", "Thấp");
+        PRIORITY_OPTIONS.put("MEDIUM", "Trung bình");
+        PRIORITY_OPTIONS.put("HIGH", "Cao");
+        PRIORITY_OPTIONS.put("URGENT", "Khẩn cấp");
+    }
+
     private ObservableList<Security> incidents;
     private Security selectedIncident;
     
@@ -69,40 +94,41 @@ public class SecurityController implements Initializable {
     }
     
     private void initializeComboBoxes() {
-        ObservableList<String> incidentTypes = FXCollections.observableArrayList(
-            "CAMERA", "ACCESS_CONTROL", "EMERGENCY", "THEFT", "OTHER"
-        );
+        ObservableList<String> incidentTypes = FXCollections.observableArrayList(INCIDENT_TYPE_OPTIONS.values());
         incidentTypeCombo.setItems(incidentTypes);
-        
-        ObservableList<String> statuses = FXCollections.observableArrayList(
-            "OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"
-        );
+
+        ObservableList<String> statuses = FXCollections.observableArrayList(STATUS_OPTIONS.values());
         statusCombo.setItems(statuses);
-        filterStatusCombo.setItems(FXCollections.observableArrayList(statuses));
-        
-        ObservableList<String> priorities = FXCollections.observableArrayList(
-            "LOW", "MEDIUM", "HIGH", "URGENT"
-        );
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "OPEN"));
+
+        ObservableList<String> filterStatuses = FXCollections.observableArrayList(statuses);
+        filterStatuses.add(0, ALL_LABEL);
+        filterStatusCombo.setItems(filterStatuses);
+        filterStatusCombo.setValue(ALL_LABEL);
+
+        ObservableList<String> priorities = FXCollections.observableArrayList(PRIORITY_OPTIONS.values());
         priorityCombo.setItems(priorities);
+        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "MEDIUM"));
     }
     
     private void loadIncidents() {
         incidents.clear();
         String filterStatus = filterStatusCombo.getValue();
-        
-        if (filterStatus == null) {
+
+        if (filterStatus == null || filterStatus.equals(ALL_LABEL)) {
             incidents.addAll(SecurityService.getAllIncidents());
         } else {
-            incidents.addAll(SecurityService.getIncidentsByStatus(filterStatus));
+            String statusValue = toValue(STATUS_OPTIONS, filterStatus);
+            incidents.addAll(SecurityService.getIncidentsByStatus(statusValue));
         }
     }
     
     private void loadIncidentToForm(Security incident) {
-        incidentTypeCombo.setValue(incident.getIncidentType());
+        incidentTypeCombo.setValue(toDisplay(INCIDENT_TYPE_OPTIONS, incident.getIncidentType()));
         locationField.setText(incident.getLocation());
         descriptionArea.setText(incident.getDescription());
-        statusCombo.setValue(incident.getStatus());
-        priorityCombo.setValue(incident.getPriority());
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, incident.getStatus()));
+        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, incident.getPriority()));
         resolutionArea.setText(incident.getResolution());
     }
     
@@ -115,10 +141,11 @@ public class SecurityController implements Initializable {
     private void handleAdd() {
         if (validateInput()) {
             Security incident = new Security();
-            incident.setIncidentType(incidentTypeCombo.getValue());
+            incident.setIncidentType(toValue(INCIDENT_TYPE_OPTIONS, incidentTypeCombo.getValue()));
             incident.setLocation(locationField.getText().trim());
             incident.setDescription(descriptionArea.getText().trim());
-            incident.setPriority(priorityCombo.getValue());
+            incident.setStatus(toValue(STATUS_OPTIONS, statusCombo.getValue()));
+            incident.setPriority(toValue(PRIORITY_OPTIONS, priorityCombo.getValue()));
             incident.setReportedBy(UserSession.getCurrentUserId() != null ? UserSession.getCurrentUserId() : 1);
             
             if (SecurityService.addIncident(incident)) {
@@ -136,11 +163,11 @@ public class SecurityController implements Initializable {
         if (selectedIncident == null) return;
         
         if (validateInput()) {
-            selectedIncident.setIncidentType(incidentTypeCombo.getValue());
+            selectedIncident.setIncidentType(toValue(INCIDENT_TYPE_OPTIONS, incidentTypeCombo.getValue()));
             selectedIncident.setLocation(locationField.getText().trim());
             selectedIncident.setDescription(descriptionArea.getText().trim());
-            selectedIncident.setStatus(statusCombo.getValue());
-            selectedIncident.setPriority(priorityCombo.getValue());
+            selectedIncident.setStatus(toValue(STATUS_OPTIONS, statusCombo.getValue()));
+            selectedIncident.setPriority(toValue(PRIORITY_OPTIONS, priorityCombo.getValue()));
             selectedIncident.setResolution(resolutionArea.getText().trim());
             
             if (SecurityService.updateIncident(selectedIncident)) {
@@ -208,8 +235,8 @@ public class SecurityController implements Initializable {
         incidentTypeCombo.setValue(null);
         locationField.clear();
         descriptionArea.clear();
-        statusCombo.setValue("OPEN");
-        priorityCombo.setValue("MEDIUM");
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "OPEN"));
+        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "MEDIUM"));
         resolutionArea.clear();
         statusLabel.setText("");
     }
@@ -241,6 +268,25 @@ public class SecurityController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private String toDisplay(Map<String, String> options, String value) {
+        if (value == null) {
+            return null;
+        }
+        return options.getOrDefault(value, value);
+    }
+
+    private String toValue(Map<String, String> options, String display) {
+        if (display == null) {
+            return null;
+        }
+        return options.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().equals(display))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(display);
     }
 }
 

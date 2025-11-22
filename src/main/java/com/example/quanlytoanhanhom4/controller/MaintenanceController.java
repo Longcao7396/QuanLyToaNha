@@ -12,6 +12,8 @@ import javafx.stage.Stage;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class MaintenanceController implements Initializable {
@@ -37,7 +39,36 @@ public class MaintenanceController implements Initializable {
     @FXML private Button completeButton;
     @FXML private Button deleteButton;
     @FXML private Label statusLabel;
-    
+
+    private static final LinkedHashMap<String, String> SYSTEM_TYPE_OPTIONS = new LinkedHashMap<>();
+    private static final LinkedHashMap<String, String> MAINTENANCE_TYPE_OPTIONS = new LinkedHashMap<>();
+    private static final LinkedHashMap<String, String> STATUS_OPTIONS = new LinkedHashMap<>();
+    private static final LinkedHashMap<String, String> PRIORITY_OPTIONS = new LinkedHashMap<>();
+    private static final String ALL_LABEL = "Tất cả";
+
+    static {
+        SYSTEM_TYPE_OPTIONS.put("ĐIỆN", "Điện");
+        SYSTEM_TYPE_OPTIONS.put("NƯỚC", "Nước");
+        SYSTEM_TYPE_OPTIONS.put("HVAC", "HVAC (Điều hòa)");
+        SYSTEM_TYPE_OPTIONS.put("PCCC", "Phòng cháy chữa cháy");
+        SYSTEM_TYPE_OPTIONS.put("AN_NINH", "An ninh");
+        SYSTEM_TYPE_OPTIONS.put("CHIEU_SANG", "Chiếu sáng");
+
+        MAINTENANCE_TYPE_OPTIONS.put("PREVENTIVE", "Bảo trì định kỳ");
+        MAINTENANCE_TYPE_OPTIONS.put("CORRECTIVE", "Bảo trì sửa chữa");
+        MAINTENANCE_TYPE_OPTIONS.put("EMERGENCY", "Bảo trì khẩn cấp");
+
+        STATUS_OPTIONS.put("PENDING", "Chờ xử lý");
+        STATUS_OPTIONS.put("IN_PROGRESS", "Đang thực hiện");
+        STATUS_OPTIONS.put("COMPLETED", "Hoàn thành");
+        STATUS_OPTIONS.put("CANCELLED", "Đã hủy");
+
+        PRIORITY_OPTIONS.put("LOW", "Thấp");
+        PRIORITY_OPTIONS.put("MEDIUM", "Trung bình");
+        PRIORITY_OPTIONS.put("HIGH", "Cao");
+        PRIORITY_OPTIONS.put("URGENT", "Khẩn cấp");
+    }
+
     private ObservableList<Maintenance> maintenances;
     private Maintenance selectedMaintenance;
     
@@ -72,46 +103,45 @@ public class MaintenanceController implements Initializable {
     }
     
     private void initializeComboBoxes() {
-        ObservableList<String> systemTypes = FXCollections.observableArrayList(
-            "ĐIỆN", "NƯỚC", "HVAC", "PCCC", "AN_NINH", "CHIEU_SANG"
-        );
+        ObservableList<String> systemTypes = FXCollections.observableArrayList(SYSTEM_TYPE_OPTIONS.values());
         systemTypeCombo.setItems(systemTypes);
-        
-        ObservableList<String> maintenanceTypes = FXCollections.observableArrayList(
-            "PREVENTIVE", "CORRECTIVE", "EMERGENCY"
-        );
+
+        ObservableList<String> maintenanceTypes = FXCollections.observableArrayList(MAINTENANCE_TYPE_OPTIONS.values());
         maintenanceTypeCombo.setItems(maintenanceTypes);
-        
-        ObservableList<String> statuses = FXCollections.observableArrayList(
-            "PENDING", "IN_PROGRESS", "COMPLETED", "CANCELLED"
-        );
+
+        ObservableList<String> statuses = FXCollections.observableArrayList(STATUS_OPTIONS.values());
         statusCombo.setItems(statuses);
-        filterStatusCombo.setItems(FXCollections.observableArrayList(statuses));
-        
-        ObservableList<String> priorities = FXCollections.observableArrayList(
-            "LOW", "MEDIUM", "HIGH", "URGENT"
-        );
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "PENDING"));
+
+        ObservableList<String> filterStatuses = FXCollections.observableArrayList(statuses);
+        filterStatuses.add(0, ALL_LABEL);
+        filterStatusCombo.setItems(filterStatuses);
+        filterStatusCombo.setValue(ALL_LABEL);
+
+        ObservableList<String> priorities = FXCollections.observableArrayList(PRIORITY_OPTIONS.values());
         priorityCombo.setItems(priorities);
+        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "MEDIUM"));
     }
     
     private void loadMaintenances() {
         maintenances.clear();
         String filterStatus = filterStatusCombo.getValue();
-        
-        if (filterStatus == null) {
+
+        if (filterStatus == null || filterStatus.equals(ALL_LABEL)) {
             maintenances.addAll(MaintenanceService.getAllMaintenances());
         } else {
-            maintenances.addAll(MaintenanceService.getMaintenancesByStatus(filterStatus));
+            String statusValue = toValue(STATUS_OPTIONS, filterStatus);
+            maintenances.addAll(MaintenanceService.getMaintenancesByStatus(statusValue));
         }
     }
     
     private void loadMaintenanceToForm(Maintenance maintenance) {
-        systemTypeCombo.setValue(maintenance.getSystemType());
-        maintenanceTypeCombo.setValue(maintenance.getMaintenanceType());
+        systemTypeCombo.setValue(toDisplay(SYSTEM_TYPE_OPTIONS, maintenance.getSystemType()));
+        maintenanceTypeCombo.setValue(toDisplay(MAINTENANCE_TYPE_OPTIONS, maintenance.getMaintenanceType()));
         descriptionArea.setText(maintenance.getDescription());
         scheduledDatePicker.setValue(maintenance.getScheduledDate());
-        statusCombo.setValue(maintenance.getStatus());
-        priorityCombo.setValue(maintenance.getPriority());
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, maintenance.getStatus()));
+        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, maintenance.getPriority()));
         notesArea.setText(maintenance.getNotes());
     }
     
@@ -124,11 +154,12 @@ public class MaintenanceController implements Initializable {
     private void handleAdd() {
         if (validateInput()) {
             Maintenance maintenance = new Maintenance();
-            maintenance.setSystemType(systemTypeCombo.getValue());
-            maintenance.setMaintenanceType(maintenanceTypeCombo.getValue());
+            maintenance.setSystemType(toValue(SYSTEM_TYPE_OPTIONS, systemTypeCombo.getValue()));
+            maintenance.setMaintenanceType(toValue(MAINTENANCE_TYPE_OPTIONS, maintenanceTypeCombo.getValue()));
             maintenance.setDescription(descriptionArea.getText().trim());
             maintenance.setScheduledDate(scheduledDatePicker.getValue());
-            maintenance.setPriority(priorityCombo.getValue());
+            maintenance.setStatus(toValue(STATUS_OPTIONS, statusCombo.getValue()));
+            maintenance.setPriority(toValue(PRIORITY_OPTIONS, priorityCombo.getValue()));
             maintenance.setNotes(notesArea.getText().trim());
             
             if (MaintenanceService.addMaintenance(maintenance)) {
@@ -146,12 +177,12 @@ public class MaintenanceController implements Initializable {
         if (selectedMaintenance == null) return;
         
         if (validateInput()) {
-            selectedMaintenance.setSystemType(systemTypeCombo.getValue());
-            selectedMaintenance.setMaintenanceType(maintenanceTypeCombo.getValue());
+            selectedMaintenance.setSystemType(toValue(SYSTEM_TYPE_OPTIONS, systemTypeCombo.getValue()));
+            selectedMaintenance.setMaintenanceType(toValue(MAINTENANCE_TYPE_OPTIONS, maintenanceTypeCombo.getValue()));
             selectedMaintenance.setDescription(descriptionArea.getText().trim());
             selectedMaintenance.setScheduledDate(scheduledDatePicker.getValue());
-            selectedMaintenance.setStatus(statusCombo.getValue());
-            selectedMaintenance.setPriority(priorityCombo.getValue());
+            selectedMaintenance.setStatus(toValue(STATUS_OPTIONS, statusCombo.getValue()));
+            selectedMaintenance.setPriority(toValue(PRIORITY_OPTIONS, priorityCombo.getValue()));
             selectedMaintenance.setNotes(notesArea.getText().trim());
             
             if (MaintenanceService.updateMaintenance(selectedMaintenance)) {
@@ -220,8 +251,8 @@ public class MaintenanceController implements Initializable {
         maintenanceTypeCombo.setValue(null);
         descriptionArea.clear();
         scheduledDatePicker.setValue(null);
-        statusCombo.setValue("PENDING");
-        priorityCombo.setValue("MEDIUM");
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "PENDING"));
+        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "MEDIUM"));
         notesArea.clear();
         statusLabel.setText("");
     }
@@ -257,6 +288,25 @@ public class MaintenanceController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private String toDisplay(Map<String, String> options, String value) {
+        if (value == null) {
+            return null;
+        }
+        return options.getOrDefault(value, value);
+    }
+
+    private String toValue(Map<String, String> options, String display) {
+        if (display == null) {
+            return null;
+        }
+        return options.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().equals(display))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(display);
     }
 }
 

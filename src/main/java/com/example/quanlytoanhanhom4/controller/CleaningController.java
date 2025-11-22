@@ -13,6 +13,8 @@ import javafx.stage.Stage;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class CleaningController implements Initializable {
@@ -36,7 +38,23 @@ public class CleaningController implements Initializable {
     @FXML private Button completeButton;
     @FXML private Button deleteButton;
     @FXML private Label statusLabel;
-    
+
+    private static final LinkedHashMap<String, String> CLEANING_TYPE_OPTIONS = new LinkedHashMap<>();
+    private static final LinkedHashMap<String, String> STATUS_OPTIONS = new LinkedHashMap<>();
+    private static final String ALL_LABEL = "Tất cả";
+
+    static {
+        CLEANING_TYPE_OPTIONS.put("DAILY", "Hàng ngày");
+        CLEANING_TYPE_OPTIONS.put("WEEKLY", "Hàng tuần");
+        CLEANING_TYPE_OPTIONS.put("DEEP_CLEAN", "Tổng vệ sinh");
+        CLEANING_TYPE_OPTIONS.put("SPECIAL", "Đặc biệt");
+
+        STATUS_OPTIONS.put("PENDING", "Chờ xử lý");
+        STATUS_OPTIONS.put("IN_PROGRESS", "Đang thực hiện");
+        STATUS_OPTIONS.put("COMPLETED", "Hoàn thành");
+        STATUS_OPTIONS.put("CANCELLED", "Đã hủy");
+    }
+
     private ObservableList<Cleaning> cleanings;
     private Cleaning selectedCleaning;
     
@@ -71,16 +89,17 @@ public class CleaningController implements Initializable {
     }
     
     private void initializeComboBoxes() {
-        ObservableList<String> cleaningTypes = FXCollections.observableArrayList(
-            "DAILY", "WEEKLY", "DEEP_CLEAN", "SPECIAL"
-        );
+        ObservableList<String> cleaningTypes = FXCollections.observableArrayList(CLEANING_TYPE_OPTIONS.values());
         cleaningTypeCombo.setItems(cleaningTypes);
-        
-        ObservableList<String> statuses = FXCollections.observableArrayList(
-            "PENDING", "IN_PROGRESS", "COMPLETED", "CANCELLED"
-        );
+
+        ObservableList<String> statuses = FXCollections.observableArrayList(STATUS_OPTIONS.values());
         statusCombo.setItems(statuses);
-        filterStatusCombo.setItems(FXCollections.observableArrayList(statuses));
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "PENDING"));
+
+        ObservableList<String> filterStatuses = FXCollections.observableArrayList(statuses);
+        filterStatuses.add(0, ALL_LABEL);
+        filterStatusCombo.setItems(filterStatuses);
+        filterStatusCombo.setValue(ALL_LABEL);
     }
     
     private void initializeSpinner() {
@@ -91,19 +110,20 @@ public class CleaningController implements Initializable {
     private void loadCleanings() {
         cleanings.clear();
         String filterStatus = filterStatusCombo.getValue();
-        
-        if (filterStatus == null) {
+
+        if (filterStatus == null || filterStatus.equals(ALL_LABEL)) {
             cleanings.addAll(CleaningService.getAllCleanings());
         } else {
-            cleanings.addAll(CleaningService.getCleaningsByStatus(filterStatus));
+            String statusValue = toValue(STATUS_OPTIONS, filterStatus);
+            cleanings.addAll(CleaningService.getCleaningsByStatus(statusValue));
         }
     }
     
     private void loadCleaningToForm(Cleaning cleaning) {
         areaField.setText(cleaning.getArea());
-        cleaningTypeCombo.setValue(cleaning.getCleaningType());
+        cleaningTypeCombo.setValue(toDisplay(CLEANING_TYPE_OPTIONS, cleaning.getCleaningType()));
         scheduledDatePicker.setValue(cleaning.getScheduledDate());
-        statusCombo.setValue(cleaning.getStatus());
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, cleaning.getStatus()));
         notesArea.setText(cleaning.getNotes());
         if (cleaning.getQualityRating() != null) {
             ratingSpinner.getValueFactory().setValue(cleaning.getQualityRating());
@@ -120,8 +140,9 @@ public class CleaningController implements Initializable {
         if (validateInput()) {
             Cleaning cleaning = new Cleaning();
             cleaning.setArea(areaField.getText().trim());
-            cleaning.setCleaningType(cleaningTypeCombo.getValue());
+            cleaning.setCleaningType(toValue(CLEANING_TYPE_OPTIONS, cleaningTypeCombo.getValue()));
             cleaning.setScheduledDate(scheduledDatePicker.getValue());
+            cleaning.setStatus(toValue(STATUS_OPTIONS, statusCombo.getValue()));
             cleaning.setNotes(notesArea.getText().trim());
             cleaning.setCreatedBy(UserSession.getCurrentUserId() != null ? UserSession.getCurrentUserId() : 1);
             
@@ -141,9 +162,9 @@ public class CleaningController implements Initializable {
         
         if (validateInput()) {
             selectedCleaning.setArea(areaField.getText().trim());
-            selectedCleaning.setCleaningType(cleaningTypeCombo.getValue());
+            selectedCleaning.setCleaningType(toValue(CLEANING_TYPE_OPTIONS, cleaningTypeCombo.getValue()));
             selectedCleaning.setScheduledDate(scheduledDatePicker.getValue());
-            selectedCleaning.setStatus(statusCombo.getValue());
+            selectedCleaning.setStatus(toValue(STATUS_OPTIONS, statusCombo.getValue()));
             selectedCleaning.setNotes(notesArea.getText().trim());
             
             if (CleaningService.updateCleaning(selectedCleaning)) {
@@ -205,7 +226,7 @@ public class CleaningController implements Initializable {
         areaField.clear();
         cleaningTypeCombo.setValue(null);
         scheduledDatePicker.setValue(null);
-        statusCombo.setValue("PENDING");
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "PENDING"));
         notesArea.clear();
         ratingSpinner.getValueFactory().setValue(3);
         statusLabel.setText("");
@@ -242,6 +263,25 @@ public class CleaningController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private String toDisplay(Map<String, String> options, String value) {
+        if (value == null) {
+            return null;
+        }
+        return options.getOrDefault(value, value);
+    }
+
+    private String toValue(Map<String, String> options, String display) {
+        if (display == null) {
+            return null;
+        }
+        return options.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().equals(display))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(display);
     }
 }
 
