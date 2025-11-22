@@ -19,6 +19,8 @@ import javafx.stage.Stage;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class HRController implements Initializable {
@@ -98,6 +100,42 @@ public class HRController implements Initializable {
     private ShiftSchedule selectedShift;
     private Contract selectedContract;
 
+    // Vietnamese label mappings
+    private static final LinkedHashMap<String, String> STAFF_STATUS_OPTIONS = new LinkedHashMap<>();
+    private static final LinkedHashMap<String, String> ATTENDANCE_STATUS_OPTIONS = new LinkedHashMap<>();
+    private static final LinkedHashMap<String, String> CONTRACT_STATUS_OPTIONS = new LinkedHashMap<>();
+
+    static {
+        STAFF_STATUS_OPTIONS.put("ACTIVE", "Đang làm việc");
+        STAFF_STATUS_OPTIONS.put("ON_LEAVE", "Nghỉ phép");
+        STAFF_STATUS_OPTIONS.put("INACTIVE", "Ngừng làm việc");
+
+        ATTENDANCE_STATUS_OPTIONS.put("PRESENT", "Có mặt");
+        ATTENDANCE_STATUS_OPTIONS.put("LATE", "Đi muộn");
+        ATTENDANCE_STATUS_OPTIONS.put("ABSENT", "Vắng mặt");
+        ATTENDANCE_STATUS_OPTIONS.put("REMOTE", "Làm việc từ xa");
+
+        CONTRACT_STATUS_OPTIONS.put("ACTIVE", "Đang hiệu lực");
+        CONTRACT_STATUS_OPTIONS.put("EXPIRED", "Hết hạn");
+        CONTRACT_STATUS_OPTIONS.put("TERMINATED", "Đã chấm dứt");
+        CONTRACT_STATUS_OPTIONS.put("ON_HOLD", "Tạm hoãn");
+    }
+
+    private String toDisplay(LinkedHashMap<String, String> map, String value) {
+        if (value == null) return null;
+        return map.getOrDefault(value, value);
+    }
+
+    private String toValue(LinkedHashMap<String, String> map, String display) {
+        if (display == null) return null;
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            if (entry.getValue().equals(display)) {
+                return entry.getKey();
+            }
+        }
+        return display;
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         initializeStaffTab();
@@ -119,7 +157,8 @@ public class HRController implements Initializable {
         colStaffStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
         staffTable.setItems(staffData);
 
-        staffStatusCombo.setItems(FXCollections.observableArrayList("ACTIVE", "ON_LEAVE", "INACTIVE"));
+        staffStatusCombo.setItems(FXCollections.observableArrayList(STAFF_STATUS_OPTIONS.values()));
+        staffStatusCombo.setValue(toDisplay(STAFF_STATUS_OPTIONS, "ACTIVE"));
 
         staffTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             selectedStaff = newSelection;
@@ -139,7 +178,7 @@ public class HRController implements Initializable {
         attendanceTable.setItems(attendanceData);
 
         attendanceShiftCombo.setItems(FXCollections.observableArrayList("SÁNG", "CHIỀU", "ĐÊM"));
-        attendanceStatusCombo.setItems(FXCollections.observableArrayList("PRESENT", "LATE", "ABSENT", "REMOTE"));
+        attendanceStatusCombo.setItems(FXCollections.observableArrayList(ATTENDANCE_STATUS_OPTIONS.values()));
 
         attendanceTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             selectedAttendanceRecord = newSel;
@@ -174,7 +213,7 @@ public class HRController implements Initializable {
         colContractStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
         contractTable.setItems(contractData);
 
-        contractStatusCombo.setItems(FXCollections.observableArrayList("ACTIVE", "EXPIRED", "TERMINATED", "ON_HOLD"));
+        contractStatusCombo.setItems(FXCollections.observableArrayList(CONTRACT_STATUS_OPTIONS.values()));
 
         contractTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             selectedContract = newSel;
@@ -233,7 +272,7 @@ public class HRController implements Initializable {
         phoneField.setText(staff.getPhone());
         emailField.setText(staff.getEmail());
         staffStartDatePicker.setValue(staff.getStartDate());
-        staffStatusCombo.setValue(staff.getStatus());
+        staffStatusCombo.setValue(toDisplay(STAFF_STATUS_OPTIONS, staff.getStatus()));
         salaryField.setText(staff.getBaseSalary() != null ? String.valueOf(staff.getBaseSalary()) : "");
         staffNotesArea.setText(staff.getNotes());
     }
@@ -244,7 +283,7 @@ public class HRController implements Initializable {
         attendanceShiftCombo.setValue(record.getShift());
         checkInField.setText(formatTime(record.getCheckIn()));
         checkOutField.setText(formatTime(record.getCheckOut()));
-        attendanceStatusCombo.setValue(record.getStatus());
+        attendanceStatusCombo.setValue(toDisplay(ATTENDANCE_STATUS_OPTIONS, record.getStatus()));
         attendanceNotesArea.setText(record.getNotes());
     }
 
@@ -263,7 +302,7 @@ public class HRController implements Initializable {
         contractStartDatePicker.setValue(contract.getStartDate());
         contractEndDatePicker.setValue(contract.getEndDate());
         contractSalaryField.setText(contract.getSalary() != null ? String.valueOf(contract.getSalary()) : "");
-        contractStatusCombo.setValue(contract.getStatus());
+        contractStatusCombo.setValue(toDisplay(CONTRACT_STATUS_OPTIONS, contract.getStatus()));
         contractDescriptionArea.setText(contract.getDescription());
     }
 
@@ -330,7 +369,7 @@ public class HRController implements Initializable {
         staff.setPhone(phoneField.getText().trim());
         staff.setEmail(emailField.getText().trim());
         staff.setStartDate(staffStartDatePicker.getValue());
-        staff.setStatus(staffStatusCombo.getValue() != null ? staffStatusCombo.getValue() : "ACTIVE");
+        staff.setStatus(staffStatusCombo.getValue() != null ? toValue(STAFF_STATUS_OPTIONS, staffStatusCombo.getValue()) : "ACTIVE");
         Double salary = parseDoubleField(salaryField.getText().trim(), "Lương cơ bản");
         if (salary == null && !salaryField.getText().trim().isEmpty()) {
             return null;
@@ -362,7 +401,7 @@ public class HRController implements Initializable {
         phoneField.clear();
         emailField.clear();
         staffStartDatePicker.setValue(null);
-        staffStatusCombo.setValue("ACTIVE");
+        staffStatusCombo.setValue(toDisplay(STAFF_STATUS_OPTIONS, "ACTIVE"));
         salaryField.clear();
         staffNotesArea.clear();
     }
@@ -426,7 +465,7 @@ public class HRController implements Initializable {
         if (checkOut == null && !checkOutField.getText().trim().isEmpty()) return null;
         record.setCheckIn(checkIn);
         record.setCheckOut(checkOut);
-        record.setStatus(attendanceStatusCombo.getValue());
+        record.setStatus(attendanceStatusCombo.getValue() != null ? toValue(ATTENDANCE_STATUS_OPTIONS, attendanceStatusCombo.getValue()) : null);
         record.setNotes(attendanceNotesArea.getText().trim());
         return record;
     }
@@ -594,7 +633,7 @@ public class HRController implements Initializable {
         Double salary = parseDoubleField(contractSalaryField.getText().trim(), "Lương hợp đồng");
         if (salary == null && !contractSalaryField.getText().trim().isEmpty()) return null;
         contract.setSalary(salary);
-        contract.setStatus(contractStatusCombo.getValue());
+        contract.setStatus(contractStatusCombo.getValue() != null ? toValue(CONTRACT_STATUS_OPTIONS, contractStatusCombo.getValue()) : null);
         contract.setDescription(contractDescriptionArea.getText().trim());
         return contract;
     }
