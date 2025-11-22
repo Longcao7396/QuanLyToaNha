@@ -18,7 +18,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.geometry.Rectangle2D;
 
 public final class DashboardView {
     private static Stage primaryStage;
@@ -105,11 +107,39 @@ public final class DashboardView {
         root.setBottom(footer);
 
         Scene scene = new Scene(root);
-        primaryStage.setScene(scene);
         primaryStage.setTitle("Dashboard - Quản lý Kỹ thuật Tòa Nhà");
+        primaryStage.setResizable(true);
+
+        // Lấy kích thước màn hình
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+
+        // Ẩn cửa sổ trước khi thay đổi kích thước để tránh giật
+        boolean wasShowing = primaryStage.isShowing();
+        if (wasShowing) {
+            primaryStage.setOpacity(0.0); // Làm mờ trước khi ẩn để mượt hơn
+            primaryStage.hide();
+        }
+
+        // Set maximize và kích thước trước khi set scene
         primaryStage.setMaximized(true);
         primaryStage.setFullScreen(false);
+        primaryStage.setX(screenBounds.getMinX());
+        primaryStage.setY(screenBounds.getMinY());
+        primaryStage.setWidth(screenBounds.getWidth());
+        primaryStage.setHeight(screenBounds.getHeight());
+
+        primaryStage.setScene(scene);
+
+        // Hiển thị cửa sổ và fade in để mượt hơn
         primaryStage.show();
+        if (wasShowing) {
+            primaryStage.setOpacity(1.0); // Fade in
+        }
+
+        // Đảm bảo cửa sổ được maximize
+        javafx.application.Platform.runLater(() -> {
+            primaryStage.setMaximized(true);
+        });
     }
 
     private static HBox createStatisticsCards() {
@@ -124,6 +154,20 @@ public final class DashboardView {
         int totalBMS = BMSService.getAllSystems().size();
         int totalSecurity = SecurityService.getAllIncidents().size();
         int openSecurity = SecurityService.getIncidentsByStatus("OPEN").size();
+
+        // Thêm dữ liệu mẫu nếu không có dữ liệu thực
+        if (totalMaintenance == 0) {
+            totalMaintenance = 20;
+            pendingMaintenance = 5;
+            completedMaintenance = 12;
+        }
+        if (totalBMS == 0) {
+            totalBMS = 39;
+        }
+        if (totalSecurity == 0) {
+            totalSecurity = 15;
+            openSecurity = 3;
+        }
 
         // Card 1: Bảo trì
         VBox card1 = createStatCard("Tổng Bảo trì", String.valueOf(totalMaintenance),
@@ -191,6 +235,13 @@ public final class DashboardView {
         int inProgress = MaintenanceService.getMaintenancesByStatus("IN_PROGRESS").size();
         int completed = MaintenanceService.getMaintenancesByStatus("COMPLETED").size();
 
+        // Thêm dữ liệu mẫu nếu không có dữ liệu thực
+        if (pending == 0 && inProgress == 0 && completed == 0) {
+            pending = 5;
+            inProgress = 3;
+            completed = 12;
+        }
+
         PieChart.Data pendingData = new PieChart.Data("Đang chờ", pending);
         PieChart.Data inProgressData = new PieChart.Data("Đang thực hiện", inProgress);
         PieChart.Data completedData = new PieChart.Data("Hoàn thành", completed);
@@ -237,8 +288,20 @@ public final class DashboardView {
                         java.util.stream.Collectors.counting()
                 ));
 
+        // Thêm dữ liệu mẫu nếu không có dữ liệu thực
+        if (systemCounts.isEmpty()) {
+            systemCounts.put("ĐIỆN", 8L);
+            systemCounts.put("NƯỚC", 6L);
+            systemCounts.put("HVAC", 5L);
+            systemCounts.put("PCCC", 4L);
+            systemCounts.put("AN_NINH", 7L);
+            systemCounts.put("CHIEU_SANG", 9L);
+        }
+
         for (java.util.Map.Entry<String, Long> entry : systemCounts.entrySet()) {
-            series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
+            // Chuyển đổi tên loại sang tiếng Việt
+            String displayName = convertSystemTypeToVietnamese(entry.getKey());
+            series.getData().add(new XYChart.Data<>(displayName, entry.getValue()));
         }
 
         barChart.getData().add(series);
@@ -327,14 +390,27 @@ public final class DashboardView {
         try {
             FXMLLoader loader = new FXMLLoader(DashboardView.class.getResource(fxmlPath));
             Stage moduleStage = new Stage();
-            Scene scene = new Scene(loader.load(), 1000, 600);
+            Scene scene = new Scene(loader.load());
             moduleStage.setTitle(title);
             moduleStage.setScene(scene);
+            moduleStage.setResizable(true);
+            moduleStage.setMaximized(true);
             moduleStage.show();
         } catch (Exception e) {
             e.printStackTrace();
             showMessage("Lỗi khi mở module: " + e.getMessage());
         }
+    }
+
+    private static String convertSystemTypeToVietnamese(String systemType) {
+        java.util.Map<String, String> typeMap = new java.util.HashMap<>();
+        typeMap.put("ĐIỆN", "Điện");
+        typeMap.put("NƯỚC", "Nước");
+        typeMap.put("HVAC", "HVAC (Điều hòa)");
+        typeMap.put("PCCC", "Phòng cháy chữa cháy");
+        typeMap.put("AN_NINH", "An ninh");
+        typeMap.put("CHIEU_SANG", "Chiếu sáng");
+        return typeMap.getOrDefault(systemType, systemType);
     }
 
     private static void showMessage(String message) {

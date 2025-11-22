@@ -34,6 +34,30 @@
             <Button mnemonicParsing="false" onAction="#handleCustomer" prefHeight="40.0" prefWidth="180.0" style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;" text="Chăm sóc khách hàng" />
             <Button mnemonicParsing="false" onAction="#handleAdmin" prefHeight="40.0" prefWidth="180.0" style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;" text="Hành chính &amp; nhân sự" />
             <Button fx:id="hrBtn" mnemonicParsing="false" onAction="#handleHR" prefHeight="40.0" prefWidth="180.0" style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;" text="Nhân sự &amp; chấm công" />
+             <Label style="-fx-text-fill: #9FB3C8; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 10 0 0 0;"
+                    text="QUẢN LÝ CƯ DÂN &amp; CĂN HỘ"/>
+             <Button mnemonicParsing="false" onAction="#handleResident" prefHeight="40.0" prefWidth="180.0"
+                     style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;"
+                     text="Quản lý cư dân"/>
+             <Button mnemonicParsing="false" onAction="#handleApartment" prefHeight="40.0" prefWidth="180.0"
+                     style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;"
+                     text="Quản lý căn hộ"/>
+             <Label style="-fx-text-fill: #9FB3C8; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 10 0 0 0;"
+                    text="TÀI CHÍNH &amp; DỊCH VỤ"/>
+             <Button mnemonicParsing="false" onAction="#handleUtility" prefHeight="40.0" prefWidth="180.0"
+                     style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;"
+                     text="Điện - Nước - Phí DV"/>
+             <Button mnemonicParsing="false" onAction="#handleInvoice" prefHeight="40.0" prefWidth="180.0"
+                     style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;"
+                     text="Hóa đơn &amp; Thanh toán"/>
+             <Label style="-fx-text-fill: #9FB3C8; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 10 0 0 0;"
+                    text="THÔNG BÁO &amp; SỬA CHỮA"/>
+             <Button mnemonicParsing="false" onAction="#handleNotification" prefHeight="40.0" prefWidth="180.0"
+                     style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;"
+                     text="Gửi thông báo"/>
+             <Button mnemonicParsing="false" onAction="#handleRepairRequest" prefHeight="40.0" prefWidth="180.0"
+                     style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;"
+                     text="Yêu cầu sửa chữa"/>
          </children>
       </VBox>
    </left>

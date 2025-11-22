@@ -7,11 +7,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -69,6 +71,10 @@ public class MainController implements Initializable {
         try {
             Stage currentStage = (Stage) topBar.getScene().getWindow();
             String role = UserSession.getCurrentRole();
+
+            // Đảm bảo cửa sổ được maximize và resize
+            currentStage.setResizable(true);
+            
             DashboardView.show(currentStage, role != null ? role : "user");
         } catch (Exception e) {
             e.printStackTrace();
@@ -79,9 +85,17 @@ public class MainController implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Stage moduleStage = new Stage();
-            Scene scene = new Scene(loader.load(), 1000, 600);
+            Scene scene = new Scene(loader.load());
+            
             moduleStage.setTitle(title);
             moduleStage.setScene(scene);
+
+            // Cho phép resize và maximize
+            moduleStage.setResizable(true);
+
+            // Maximize cửa sổ để hiển thị toàn màn hình
+            moduleStage.setMaximized(true);
+            
             moduleStage.show();
         } catch (Exception e) {
             e.printStackTrace();
@@ -136,6 +150,36 @@ public class MainController implements Initializable {
     @FXML
     private void handleHR() {
         openModule("/com/example/quanlytoanhanhom4/fxml/hr.fxml", "Quản lý Nhân sự & Chấm công");
+    }
+
+    @FXML
+    private void handleResident() {
+        openModule("/com/example/quanlytoanhanhom4/fxml/resident.fxml", "Quản lý Cư dân");
+    }
+
+    @FXML
+    private void handleApartment() {
+        openModule("/com/example/quanlytoanhanhom4/fxml/apartment.fxml", "Quản lý Căn hộ");
+    }
+
+    @FXML
+    private void handleUtility() {
+        openModule("/com/example/quanlytoanhanhom4/fxml/utility.fxml", "Quản lý Điện - Nước - Phí dịch vụ");
+    }
+
+    @FXML
+    private void handleInvoice() {
+        openModule("/com/example/quanlytoanhanhom4/fxml/invoice.fxml", "Hóa đơn & Thanh toán");
+    }
+
+    @FXML
+    private void handleNotification() {
+        openModule("/com/example/quanlytoanhanhom4/fxml/notification.fxml", "Gửi thông báo");
+    }
+
+    @FXML
+    private void handleRepairRequest() {
+        openModule("/com/example/quanlytoanhanhom4/fxml/repair_request.fxml", "Quản lý Yêu cầu Sửa chữa");
     }
 
     @FXML
