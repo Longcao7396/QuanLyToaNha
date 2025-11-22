@@ -1,17 +1,25 @@
 package com.example.quanlytoanhanhom4.controller.auth;
 
 import com.example.quanlytoanhanhom4.service.auth.UserService;
+import com.example.quanlytoanhanhom4.ui.BuildingLogo;
 import com.example.quanlytoanhanhom4.ui.auth.RegisterForm;
 import com.example.quanlytoanhanhom4.util.UserSession;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class LoginController {
+import java.net.URL;
+import java.util.ResourceBundle;
+
+public class LoginController implements Initializable {
 
     @FXML
     private TextField usernameField;
@@ -21,6 +29,22 @@ public class LoginController {
 
     @FXML
     private Label statusLabel;
+
+    @FXML
+    private VBox loginVBox;
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        // Thêm logo vào đầu VBox
+        if (loginVBox != null) {
+            BuildingLogo logo = new BuildingLogo(60, 60);
+            StackPane logoContainer = new StackPane(logo);
+            logoContainer.setPadding(new Insets(0, 0, 10, 0));
+            logoContainer.setMaxWidth(70); // Giới hạn kích thước để không vỡ giao diện
+            logoContainer.setMaxHeight(70);
+            loginVBox.getChildren().add(0, logoContainer);
+        }
+    }
 
     @FXML
     protected void handleLogin() {

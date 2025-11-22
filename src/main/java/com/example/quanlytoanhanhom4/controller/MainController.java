@@ -1,14 +1,17 @@
 package com.example.quanlytoanhanhom4.controller;
 
+import com.example.quanlytoanhanhom4.ui.BuildingLogo;
 import com.example.quanlytoanhanhom4.ui.DashboardView;
 import com.example.quanlytoanhanhom4.util.UserSession;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -50,7 +53,16 @@ public class MainController implements Initializable {
         if (adminLabel != null) {
             adminLabel.setText("CHÀO " + (username != null ? username.toUpperCase() : "ADMIN"));
         }
-        
+
+        // Thêm logo vào đầu topBar
+        if (topBar != null) {
+            BuildingLogo logo = new BuildingLogo(60, 60);
+            StackPane logoContainer = new StackPane(logo);
+            logoContainer.setPadding(new Insets(0, 10, 0, 0));
+            logoContainer.setMaxWidth(70); // Giới hạn kích thước để không vỡ giao diện
+            logoContainer.setMaxHeight(70);
+            topBar.getChildren().add(0, logoContainer);
+        }
     }
     
     private void openDashboard() {

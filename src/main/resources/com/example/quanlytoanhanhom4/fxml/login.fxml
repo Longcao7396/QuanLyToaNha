@@ -9,7 +9,7 @@
             prefWidth="400" prefHeight="350"
             style="-fx-background-color: linear-gradient(to bottom right, #7FB3D5, #2874A6);">
 
-    <VBox alignment="CENTER" spacing="15" AnchorPane.topAnchor="30" AnchorPane.bottomAnchor="30"
+    <VBox fx:id="loginVBox" alignment="CENTER" spacing="15" AnchorPane.topAnchor="30" AnchorPane.bottomAnchor="30"
           AnchorPane.leftAnchor="40" AnchorPane.rightAnchor="40"
           style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 25;">
 
