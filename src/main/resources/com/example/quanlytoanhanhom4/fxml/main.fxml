@@ -24,24 +24,14 @@
       <VBox alignment="TOP_LEFT" spacing="12.0" style="-fx-background-color: #1E2735; -fx-padding: 24;" BorderPane.alignment="CENTER">
          <children>
             <Label style="-fx-text-fill: #9FB3C8; -fx-font-size: 12px; -fx-font-weight: bold;" text="DANH MỤC CHÍNH" />
-            <Button fx:id="dashboardBtn" mnemonicParsing="false" onAction="#handleDashboard" prefHeight="40.0" prefWidth="180.0" style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;" text="Dashboard tổng quan" />
-            <Button fx:id="dienBtn" mnemonicParsing="false" onAction="#handleBms" prefHeight="40.0" prefWidth="180.0" style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;" text="Giám sát hệ thống" />
-            <Button fx:id="pcccBtn" mnemonicParsing="false" onAction="#handlePccc" prefHeight="40.0" prefWidth="180.0" style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;" text="PCCC &amp; khẩn cấp" />
-            <Button fx:id="chieuSangBtn" mnemonicParsing="false" onAction="#handleLighting" prefHeight="40.0" prefWidth="180.0" style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;" text="Chiếu sáng &amp; tiện ích" />
-            <Button fx:id="baoTriBtn" mnemonicParsing="false" onAction="#handleMaintenance" prefHeight="40.0" prefWidth="180.0" style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;" text="Bảo trì thiết bị" />
-            <Button mnemonicParsing="false" onAction="#handleSecurity" prefHeight="40.0" prefWidth="180.0" style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;" text="An ninh tòa nhà" />
-            <Button mnemonicParsing="false" onAction="#handleCleaning" prefHeight="40.0" prefWidth="180.0" style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;" text="Vệ sinh &amp; môi trường" />
-            <Button mnemonicParsing="false" onAction="#handleCustomer" prefHeight="40.0" prefWidth="180.0" style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;" text="Chăm sóc khách hàng" />
-            <Button mnemonicParsing="false" onAction="#handleAdmin" prefHeight="40.0" prefWidth="180.0" style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;" text="Hành chính &amp; nhân sự" />
-            <Button fx:id="hrBtn" mnemonicParsing="false" onAction="#handleHR" prefHeight="40.0" prefWidth="180.0" style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;" text="Nhân sự &amp; chấm công" />
              <Label style="-fx-text-fill: #9FB3C8; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 10 0 0 0;"
                     text="QUẢN LÝ CƯ DÂN &amp; CĂN HỘ"/>
              <Button mnemonicParsing="false" onAction="#handleResident" prefHeight="40.0" prefWidth="180.0"
                      style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;"
                      text="Quản lý cư dân"/>
-             <Button mnemonicParsing="false" onAction="#handleApartment" prefHeight="40.0" prefWidth="180.0"
+             <Button mnemonicParsing="false" onAction="#handleResidentCard" prefHeight="40.0" prefWidth="180.0"
                      style="-fx-background-color: #334055; -fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 18; -fx-background-radius: 10;"
-                     text="Quản lý căn hộ"/>
+                     text="Cấp lại thẻ dân cư"/>
              <Label style="-fx-text-fill: #9FB3C8; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 10 0 0 0;"
                     text="TÀI CHÍNH &amp; DỊCH VỤ"/>
              <Button mnemonicParsing="false" onAction="#handleUtility" prefHeight="40.0" prefWidth="180.0"

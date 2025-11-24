@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.quanlytoanhanhom4.controller.ResidentController"
+            prefHeight="480.0" prefWidth="820.0"
+            style="-fx-background-color: #f5f9fe;">
+
+    <children>
+        <VBox spacing="16.0" AnchorPane.topAnchor="12.0" AnchorPane.leftAnchor="12.0" AnchorPane.rightAnchor="12.0" AnchorPane.bottomAnchor="12.0">
+            <children>
+
+                <!-- Header -->
+                <HBox alignment="CENTER_LEFT" style="-fx-background-color: #2874a6; -fx-background-radius:8; -fx-padding:12;">
+                    <children>
+                        <Label text="Resident Information" style="-fx-text-fill: white; -fx-font-size:18px; -fx-font-weight:bold;"/>
+                    </children>
+                </HBox>
+
+                <!-- form -->
+                <GridPane hgap="12" vgap="10" style="-fx-padding:8;">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="RIGHT" percentWidth="24"/>
+                        <ColumnConstraints percentWidth="76"/>
+                    </columnConstraints>
+
+                    <children>
+                        <Label text="ID:" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-text-fill:#f5f7fa; -fx-font-weight:600;"/>
+                        <TextField fx:id="idField" editable="false" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                                   style="-fx-background-color: #ffffff; -fx-background-radius:6; -fx-border-radius:6; -fx-padding:6;"/>
+
+                        <Label text="Username:" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-text-fill:#f5f7fa; -fx-font-weight:600;"/>
+                        <TextField fx:id="usernameField" editable="false" GridPane.rowIndex="1" GridPane.columnIndex="1"
+                                   style="-fx-background-color: #ffffff; -fx-background-radius:6; -fx-border-radius:6; -fx-padding:6;"/>
+
+                        <Label text="Email:" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-text-fill:#f5f7fa; -fx-font-weight:600;"/>
+                        <TextField fx:id="emailField" editable="false" GridPane.rowIndex="2" GridPane.columnIndex="1"
+                                   style="-fx-background-color: #ffffff; -fx-background-radius:6; -fx-border-radius:6; -fx-padding:6;"/>
+
+                        <Label text="Phone:" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-text-fill:#f5f7fa; -fx-font-weight:600;"/>
+                        <TextField fx:id="phoneField" editable="false" GridPane.rowIndex="3" GridPane.columnIndex="1"
+                                   style="-fx-background-color: #ffffff; -fx-background-radius:6; -fx-border-radius:6; -fx-padding:6;"/>
+                    </children>
+                </GridPane>
+
+                <!-- apartments table -->
+                <Label text="Apartments (owned by this resident)" style="-fx-text-fill:black; -fx-font-weight:bold; -fx-padding:4 0 4 0;"/>
+                <TableView fx:id="apartmentsTable" prefHeight="220.0"
+                           style="-fx-control-inner-background: white; -fx-table-cell-border-color: transparent; -fx-selection-bar: #2874a6; -fx-selection-bar-text: white; -fx-font-size:13px;">
+                    <columns>
+                        <TableColumn fx:id="colOwnerId" text="resident_owner_id" prefWidth="110"/>
+                        <TableColumn fx:id="colApartmentNo" text="apartment_no" prefWidth="140"/>
+                        <TableColumn fx:id="colRooms" text="number_of_rooms" prefWidth="120"/>
+                        <TableColumn fx:id="colPeople" text="number_of_people" prefWidth="140"/>
+                        <TableColumn fx:id="colArea" text="area" prefWidth="100"/>
+                        <TableColumn fx:id="colPrice" text="price" prefWidth="130"/>
+                    </columns>
+                </TableView>
+
+                <!-- actions -->
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <children>
+                        <Button text="Refresh" onAction="#handleRefresh"
+                                style="-fx-background-color: #2874a6; -fx-text-fill: white; -fx-background-radius:6; -fx-padding:6 12;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="statusLabel" textFill="#f1f3f6"/>
+                    </children>
+                </HBox>
+
+            </children>
+            <padding>
+                <Insets top="8" right="8" bottom="8" left="8"/>
+            </padding>
+        </VBox>
+    </children>
+
+</AnchorPane>
