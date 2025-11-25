@@ -6,7 +6,7 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.quanlytoanhanhom4.controller.ResidentController"
+            fx:controller="com.example.quanlytoanhanhom4.controller.NonAdminResidentController"
             prefHeight="480.0" prefWidth="820.0"
             style="-fx-background-color: #f5f9fe;">
 
