@@ -3,7 +3,6 @@ package com.example.quanlytoanhanhom4.controller.auth;
 import com.example.quanlytoanhanhom4.service.auth.UserService;
 import com.example.quanlytoanhanhom4.ui.BuildingLogo;
 import com.example.quanlytoanhanhom4.ui.auth.RegisterForm;
-import com.example.quanlytoanhanhom4.util.AlertUtils;
 import com.example.quanlytoanhanhom4.util.UserSession;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,15 +15,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
-
-    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
     @FXML
     private TextField usernameField;
@@ -57,26 +52,32 @@ public class LoginController implements Initializable {
         String password = passwordField.getText().trim();
 
         if (username.isEmpty() || password.isEmpty()) {
-            AlertUtils.showWarning("Vui lòng nhập đầy đủ thông tin!");
+            statusLabel.setText("Vui lòng nhập đầy đủ thông tin!");
             return;
         }
 
-        try {
-            String role = UserService.verifyLogin(username, password);
-            if (role != null) {
-                logger.info("Đăng nhập thành công cho user: {}", username);
-                statusLabel.setStyle("-fx-text-fill: green;");
-                statusLabel.setText("✅ Đăng nhập thành công!");
+        // Attempt to verify login (this sets UserSession inside UserService)
+        String returnedRole = UserService.verifyLogin(username, password);
+
+        // Read role from UserSession as requested
+        String sessionRole = UserSession.getCurrentRole();
+
+        if (returnedRole != null && sessionRole != null) {
+            statusLabel.setStyle("-fx-text-fill: green;");
+            statusLabel.setText("✅ Đăng nhập thành công!");
+
+            // Route based on session role
+            if ("admin".equalsIgnoreCase(sessionRole)) {
+                openAdminView();
+            } else if ("resident".equalsIgnoreCase(sessionRole)) {
                 openMainView();
             } else {
-                logger.warn("Đăng nhập thất bại cho user: {}", username);
-                statusLabel.setStyle("-fx-text-fill: red;");
-                statusLabel.setText("❌ Sai tên đăng nhập hoặc mật khẩu!");
-                AlertUtils.showError("Đăng nhập thất bại", "Sai tên đăng nhập hoặc mật khẩu!");
+                // Fallback: open main view for any other/unknown roles
+                openMainView();
             }
-        } catch (Exception e) {
-            logger.error("Lỗi khi đăng nhập", e);
-            AlertUtils.showError("Lỗi", "Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.");
+        } else {
+            statusLabel.setStyle("-fx-text-fill: red;");
+            statusLabel.setText("❌ Sai tên đăng nhập hoặc mật khẩu!");
         }
     }
 
@@ -85,10 +86,9 @@ public class LoginController implements Initializable {
         try {
             RegisterForm registerForm = new RegisterForm();
             registerForm.start(new Stage());
-            logger.debug("Mở màn hình đăng ký");
         } catch (Exception e) {
-            logger.error("Lỗi khi mở màn hình đăng ký", e);
-            AlertUtils.showError("Lỗi", "Không thể mở màn hình đăng ký: " + e.getMessage());
+            statusLabel.setStyle("-fx-text-fill: red;");
+            statusLabel.setText("Không thể mở màn hình đăng ký: " + e.getMessage());
         }
     }
 
@@ -102,13 +102,28 @@ public class LoginController implements Initializable {
             currentStage.setResizable(true);
             currentStage.setMaximized(true);
             currentStage.show();
-            logger.debug("Đã mở giao diện chính");
         } catch (Exception e) {
-            logger.error("Lỗi khi tải giao diện chính", e);
-            AlertUtils.showError("Lỗi", "Không thể tải giao diện chính: " + e.getMessage());
+            statusLabel.setStyle("-fx-text-fill: red;");
+            statusLabel.setText("Không thể tải giao diện chính: " + e.getMessage());
+            e.printStackTrace();
+            UserSession.clear();
+        }
+    }
+    private void openAdminView() {
+        try {
+            Stage currentStage = (Stage) usernameField.getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/quanlytoanhanhom4/fxml/admin_main.fxml"));
+            Scene scene = new Scene(loader.load(), 1080, 640);
+            currentStage.setTitle("Quản lý kỹ thuật tòa nhà");
+            currentStage.setScene(scene);
+            currentStage.setResizable(true);
+            currentStage.setMaximized(true);
+            currentStage.show();
+        } catch (Exception e) {
+            statusLabel.setStyle("-fx-text-fill: red;");
+            statusLabel.setText("Không thể tải giao diện chính: " + e.getMessage());
+            e.printStackTrace();
             UserSession.clear();
         }
     }
 }
-
-
