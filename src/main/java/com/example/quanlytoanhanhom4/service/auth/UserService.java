@@ -32,17 +32,36 @@ public final class UserService {
                 String role = rs.getString("role");
 
                 if (storedPassword != null) {
+                    // Use PasswordUtils to verify (handles BCrypt, SHA-256 legacy, plain-text fallback)
                     if (PasswordUtils.verifyPassword(password, storedPassword)) {
+                        // On successful verify, set session
                         UserSession.setUser(username, role, userId);
                         logger.debug("Đăng nhập thành công cho user: {}", username);
+
+                        // If stored password is not BCrypt, migrate it to BCrypt for future safety
+                        if (!storedPassword.startsWith("$2")) {
+                            try {
+                                String newHash = PasswordUtils.hashPassword(password);
+                                String updateSql = "UPDATE user SET password = ? WHERE id = ?";
+                                try (PreparedStatement upd = conn.prepareStatement(updateSql)) {
+                                    upd.setString(1, newHash);
+                                    upd.setInt(2, userId);
+                                    int updated = upd.executeUpdate();
+                                    if (updated > 0) {
+                                        logger.info("Migrated password to BCrypt for user id {}", userId);
+                                    } else {
+                                        logger.warn("Failed to migrate password hash for user id {}", userId);
+                                    }
+                                }
+                            } catch (Exception e) {
+                                logger.warn("Unable to migrate legacy password for user {}: {}", username, e.getMessage());
+                                // don't fail login due to migration error
+                            }
+                        }
+
                         return role;
                     }
-                    // Support legacy plain text passwords (for migration)
-                    if (storedPassword.length() < 64 && password.equals(storedPassword)) {
-                        logger.warn("User {} đang sử dụng plain text password - nên migrate sang BCrypt", username);
-                        UserSession.setUser(username, role, userId);
-                        return role;
-                    }
+                    // If verifyPassword returned false, fall through to fail
                 }
             }
             logger.debug("Đăng nhập thất bại cho user: {}", username);
@@ -53,5 +72,3 @@ public final class UserService {
         }
     }
 }
-
-

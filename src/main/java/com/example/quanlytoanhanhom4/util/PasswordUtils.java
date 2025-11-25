@@ -39,8 +39,13 @@ public final class PasswordUtils {
     /**
      * Verifies a password against a stored hash.
      *
+     * Supports:
+     *  - BCrypt hashes (start with "$2")
+     *  - Legacy SHA-256 hex (64 hex chars)
+     *  - Plain-text fallback (not recommended; for backward compatibility)
+     *
      * @param inputPassword The plain text password to verify
-     * @param storedHash    The stored BCrypt hash
+     * @param storedHash    The stored hash (BCrypt / SHA-256 hex / plain)
      * @return true if password matches, false otherwise
      */
     public static boolean verifyPassword(String inputPassword, String storedHash) {
@@ -48,10 +53,18 @@ public final class PasswordUtils {
             return false;
         }
 
-        // Support legacy SHA-256 hashes for migration
-        if (storedHash.length() == 64 && !storedHash.startsWith("$2")) {
-            // This is likely a SHA-256 hash (64 hex characters)
-            // Try to verify with old method for backward compatibility
+        // BCrypt verification (safe to call only when it looks like a BCrypt hash)
+        if (storedHash.startsWith("$2")) {
+            try {
+                return BCrypt.checkpw(inputPassword, storedHash);
+            } catch (Exception e) {
+                logger.warn("BCrypt verification failed (invalid hash?)", e);
+                return false;
+            }
+        }
+
+        // Support legacy SHA-256 hashes for migration (64 hex chars)
+        if (storedHash.length() == 64 && storedHash.matches("[0-9a-fA-F]{64}")) {
             try {
                 java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
                 byte[] hashBytes = md.digest(inputPassword.getBytes());
@@ -59,21 +72,20 @@ public final class PasswordUtils {
                 for (byte b : hashBytes) {
                     sb.append(String.format("%02x", b));
                 }
-                return sb.toString().equals(storedHash);
+                return sb.toString().equalsIgnoreCase(storedHash);
             } catch (Exception e) {
                 logger.warn("Lỗi khi verify password với SHA-256 (legacy)", e);
                 return false;
             }
         }
 
-        // BCrypt verification
+        // Plain-text fallback comparison (legacy DBs). Return true if exact match.
+        // This path prevents calling BCrypt.checkpw on invalid salts which causes the exception.
         try {
-            return BCrypt.checkpw(inputPassword, storedHash);
+            return inputPassword.equals(storedHash);
         } catch (Exception e) {
-            logger.error("Lỗi khi verify password với BCrypt", e);
+            logger.warn("Lỗi khi verify plain-text password (legacy fallback)", e);
             return false;
         }
     }
 }
-
-
