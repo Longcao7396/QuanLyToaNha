@@ -8,13 +8,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -187,8 +185,8 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    private void handleApartment() {
-        openModule("/com/example/quanlytoanhanhom4/fxml/apartment.fxml", "Quản lý Căn hộ");
+    private void handleResidentCard() {
+        openModule("/com/example/quanlytoanhanhom4/fxml/resident_card.fxml", "Trạng thái thẻ dân cư");
     }
 
     @FXML

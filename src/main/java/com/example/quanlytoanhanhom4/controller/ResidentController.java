@@ -423,4 +423,3 @@ public class ResidentController implements Initializable {
                 .orElse(display);
     }
 }
-

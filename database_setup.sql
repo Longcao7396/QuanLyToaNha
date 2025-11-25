@@ -65,6 +65,32 @@ CREATE TABLE IF NOT EXISTS vehicle (
     FOREIGN KEY (resident_id) REFERENCES user(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE resident_card (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    resident_id INT NOT NULL,
+    apartment_id INT NOT NULL,
+    card_number VARCHAR(50) NOT NULL,
+    resident_name VARCHAR(100) NOT NULL,
+    card_type ENUM('guest', 'resident') NOT NULL,
+    date_issued DATE NOT NULL,
+    request_for_renewal BOOLEAN DEFAULT 0,
+
+    -- FK tới user(user_id)
+    CONSTRAINT fk_resident_card_user
+        FOREIGN KEY (resident_id)
+        REFERENCES user(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+
+    -- FK tới apartment(id)
+    CONSTRAINT fk_resident_card_apartment
+        FOREIGN KEY (apartment_id)
+        REFERENCES apartment(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+
+
 -- ======================
 --  Hệ thống BMS
 -- ======================
@@ -246,3 +272,27 @@ INSERT INTO user (username, role, password, email)
 VALUES ('admin', 'admin', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'admin@example.com')
 ON DUPLICATE KEY UPDATE username = VALUES(username);
 
+INSERT INTO apartment (
+    resident_owner_id,
+    apartment_no,
+    number_of_rooms,
+    number_of_people,
+    area,
+    price
+) VALUES
+(2, 'A101', 3, 4, 75.5, 12000000);
+
+INSERT INTO resident_card (
+    resident_id,
+    apartment_id,
+    card_number,
+    resident_name,
+    card_type,
+    date_issued,
+    request_for_renewal
+) VALUES
+(2, 1, 'RC-2024-001', 'Nguyen Van A', 'resident', '2024-03-12', 0),
+(2, 1, 'RC-2024-002', 'Tran Thi B', 'resident', '2024-04-05', 0),
+(2, 1, 'GC-2024-003', 'Pham Hoang C', 'guest',    '2024-06-18', 1),
+(2, 1, 'RC-2024-004', 'Le Minh D',     'resident','2024-07-01', 0),
+(2, 1, 'GC-2024-005', 'Visitor E',     'guest',    '2024-07-20', 1);
