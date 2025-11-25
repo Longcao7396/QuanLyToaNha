@@ -1,18 +1,20 @@
 package com.example.quanlytoanhanhom4.ui;
 
+import com.example.quanlytoanhanhom4.service.ApartmentService;
 import com.example.quanlytoanhanhom4.service.BMSService;
+import com.example.quanlytoanhanhom4.service.InvoiceService;
 import com.example.quanlytoanhanhom4.service.MaintenanceService;
-import com.example.quanlytoanhanhom4.service.SecurityService;
+import com.example.quanlytoanhanhom4.service.NotificationService;
+import com.example.quanlytoanhanhom4.service.RepairRequestService;
+import com.example.quanlytoanhanhom4.service.ResidentService;
 import com.example.quanlytoanhanhom4.util.UserSession;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
+import javafx.geometry.Side;
 import javafx.scene.Scene;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.PieChart;
-import javafx.scene.chart.XYChart;
+import javafx.scene.chart.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -20,7 +22,11 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.geometry.Rectangle2D;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public final class DashboardView {
     private static Stage primaryStage;
@@ -35,21 +41,10 @@ public final class DashboardView {
         currentRole = role;
 
         BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: #f0f2f5;");
+        root.setStyle("-fx-background-color: #f5f7fa;");
 
         // Header với gradient đẹp hơn
-        VBox header = new VBox(10);
-        header.setAlignment(Pos.CENTER);
-        header.setPadding(new Insets(25));
-        header.setStyle("-fx-background-color: linear-gradient(to right, #2874A6, #3498DB);");
-
-        Label welcomeLabel = new Label("Hệ thống Quản lý Kỹ thuật Tòa Nhà");
-        welcomeLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white;");
-
-        Label roleLabel = new Label("Vai trò: " + role.toUpperCase());
-        roleLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: rgba(255,255,255,0.9);");
-
-        header.getChildren().addAll(welcomeLabel, roleLabel);
+        VBox header = createHeader(role);
         root.setTop(header);
 
         // ScrollPane để chứa nội dung
@@ -59,18 +54,27 @@ public final class DashboardView {
         scrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setPadding(new Insets(0));
 
-        VBox mainContent = new VBox(25);
+        VBox mainContent = new VBox(30);
         mainContent.setPadding(new Insets(30));
-        mainContent.setStyle("-fx-background-color: #f0f2f5;");
+        mainContent.setStyle("-fx-background-color: #f5f7fa;");
 
-        // Statistics Cards
-        HBox statsBox = createStatisticsCards();
-        mainContent.getChildren().add(statsBox);
+        // KPI Cards Section - Hàng đầu tiên
+        HBox kpiRow1 = createKPICardsRow1();
+        mainContent.getChildren().add(kpiRow1);
 
-        // Charts Section
+        // KPI Cards Section - Hàng thứ hai
+        HBox kpiRow2 = createKPICardsRow2();
+        mainContent.getChildren().add(kpiRow2);
+
+        // Charts Section - 2 cột
         HBox chartsBox = createChartsSection();
         mainContent.getChildren().add(chartsBox);
+
+        // Recent Activity Section
+        VBox activityBox = createRecentActivitySection();
+        mainContent.getChildren().add(activityBox);
 
         // Module Buttons Section
         VBox modulesBox = createModulesSection();
@@ -80,34 +84,11 @@ public final class DashboardView {
         root.setCenter(scrollPane);
 
         // Footer
-        HBox footer = new HBox(10);
-        footer.setAlignment(Pos.CENTER);
-        footer.setPadding(new Insets(15, 30, 15, 30));
-        footer.setStyle("-fx-background-color: #ffffff; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, -2);");
-
-        Button backBtn = new Button("← Quay lại");
-        backBtn.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 10 25; " +
-                "-fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 5;");
-        backBtn.setOnAction(e -> handleBack());
-        backBtn.setOnMouseEntered(e -> backBtn.setStyle("-fx-background-color: #2980b9; -fx-text-fill: white; " +
-                "-fx-padding: 10 25; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 5;"));
-        backBtn.setOnMouseExited(e -> backBtn.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; " +
-                "-fx-padding: 10 25; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 5;"));
-
-        Button logoutBtn = new Button("Đăng xuất");
-        logoutBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-padding: 10 25; " +
-                "-fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 5;");
-        logoutBtn.setOnAction(e -> handleLogout());
-        logoutBtn.setOnMouseEntered(e -> logoutBtn.setStyle("-fx-background-color: #c0392b; -fx-text-fill: white; " +
-                "-fx-padding: 10 25; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 5;"));
-        logoutBtn.setOnMouseExited(e -> logoutBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; " +
-                "-fx-padding: 10 25; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 5;"));
-
-        footer.getChildren().addAll(backBtn, logoutBtn);
+        HBox footer = createFooter();
         root.setBottom(footer);
 
         Scene scene = new Scene(root);
-        primaryStage.setTitle("Dashboard - Quản lý Kỹ thuật Tòa Nhà");
+        primaryStage.setTitle("Dashboard Tổng quan - Quản lý Tòa Nhà");
         primaryStage.setResizable(true);
 
         // Lấy kích thước màn hình
@@ -116,11 +97,11 @@ public final class DashboardView {
         // Ẩn cửa sổ trước khi thay đổi kích thước để tránh giật
         boolean wasShowing = primaryStage.isShowing();
         if (wasShowing) {
-            primaryStage.setOpacity(0.0); // Làm mờ trước khi ẩn để mượt hơn
+            primaryStage.setOpacity(0.0);
             primaryStage.hide();
         }
 
-        // Set maximize và kích thước trước khi set scene
+        // Set maximize và kích thước
         primaryStage.setMaximized(true);
         primaryStage.setFullScreen(false);
         primaryStage.setX(screenBounds.getMinX());
@@ -130,10 +111,10 @@ public final class DashboardView {
 
         primaryStage.setScene(scene);
 
-        // Hiển thị cửa sổ và fade in để mượt hơn
+        // Hiển thị cửa sổ
         primaryStage.show();
         if (wasShowing) {
-            primaryStage.setOpacity(1.0); // Fade in
+            primaryStage.setOpacity(1.0);
         }
 
         // Đảm bảo cửa sổ được maximize
@@ -142,69 +123,129 @@ public final class DashboardView {
         });
     }
 
-    private static HBox createStatisticsCards() {
+    private static VBox createHeader(String role) {
+        VBox header = new VBox(8);
+        header.setAlignment(Pos.CENTER);
+        header.setPadding(new Insets(25, 30, 25, 30));
+        header.setStyle("-fx-background-color: linear-gradient(to right, #667eea 0%, #764ba2 100%);");
+
+        HBox topRow = new HBox(20);
+        topRow.setAlignment(Pos.CENTER);
+
+        Label welcomeLabel = new Label("🏢 Hệ thống Quản lý Tòa Nhà");
+        welcomeLabel.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: white;");
+
+        Label dateLabel = new Label(LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, dd MMMM yyyy", java.util.Locale.forLanguageTag("vi"))));
+        dateLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: rgba(255,255,255,0.9);");
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        topRow.getChildren().addAll(welcomeLabel, spacer, dateLabel);
+
+        Label roleLabel = new Label("Vai trò: " + role.toUpperCase());
+        roleLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: rgba(255,255,255,0.95); -fx-font-weight: 500;");
+
+        header.getChildren().addAll(topRow, roleLabel);
+        return header;
+    }
+
+    private static HBox createKPICardsRow1() {
         HBox statsBox = new HBox(20);
         statsBox.setAlignment(Pos.CENTER);
         statsBox.setPadding(new Insets(0, 0, 20, 0));
 
-        // Lấy dữ liệu thống kê
-        int totalMaintenance = MaintenanceService.getAllMaintenances().size();
-        int pendingMaintenance = MaintenanceService.getMaintenancesByStatus("PENDING").size();
-        int completedMaintenance = MaintenanceService.getMaintenancesByStatus("COMPLETED").size();
-        int totalBMS = BMSService.getAllSystems().size();
-        int totalSecurity = SecurityService.getAllIncidents().size();
-        int openSecurity = SecurityService.getIncidentsByStatus("OPEN").size();
+        // Lấy dữ liệu thực tế
+        int totalApartments = ApartmentService.getAllApartments().size();
+        int occupiedApartments = ApartmentService.getApartmentsByStatus("OCCUPIED").size();
+        int totalResidents = ResidentService.getAllResidents().size();
+        int totalInvoices = InvoiceService.getAllInvoices().size();
+        int pendingInvoices = InvoiceService.getInvoicesByStatus("PENDING").size();
+        int paidInvoices = InvoiceService.getInvoicesByStatus("PAID").size();
 
-        // Thêm dữ liệu mẫu nếu không có dữ liệu thực
-        if (totalMaintenance == 0) {
-            totalMaintenance = 20;
-            pendingMaintenance = 5;
-            completedMaintenance = 12;
-        }
-        if (totalBMS == 0) {
-            totalBMS = 39;
-        }
-        if (totalSecurity == 0) {
-            totalSecurity = 15;
-            openSecurity = 3;
-        }
+        // Card 1: Tổng căn hộ
+        VBox card1 = createStatCard("Tổng Căn Hộ", String.valueOf(totalApartments),
+                "Đã cho thuê: " + occupiedApartments, "#667eea", "🏠");
 
-        // Card 1: Bảo trì
-        VBox card1 = createStatCard("Tổng Bảo trì", String.valueOf(totalMaintenance),
-                "Đang chờ: " + pendingMaintenance, "#3498DB");
-        // Card 2: BMS
-        VBox card2 = createStatCard("Hệ thống BMS", String.valueOf(totalBMS),
-                "Đang hoạt động", "#2ECC71");
-        // Card 3: An ninh
-        VBox card3 = createStatCard("Sự cố An ninh", String.valueOf(totalSecurity),
-                "Đang mở: " + openSecurity, "#E74C3C");
-        // Card 4: Hoàn thành
-        VBox card4 = createStatCard("Đã hoàn thành", String.valueOf(completedMaintenance),
-                "Bảo trì", "#9B59B6");
+        // Card 2: Tổng Cư Dân
+        VBox card2 = createStatCard("Tổng Cư Dân", String.valueOf(totalResidents),
+                "Đang cư trú", "#f093fb", "👥");
+
+        // Card 3: Hóa Đơn
+        VBox card3 = createStatCard("Tổng Hóa Đơn", String.valueOf(totalInvoices),
+                "Chưa thanh toán: " + pendingInvoices, "#4facfe", "📄");
+
+        // Card 4: Đã Thanh Toán
+        VBox card4 = createStatCard("Đã Thanh Toán", String.valueOf(paidInvoices),
+                "Hóa đơn", "#43e97b", "✅");
 
         statsBox.getChildren().addAll(card1, card2, card3, card4);
         return statsBox;
     }
 
-    private static VBox createStatCard(String title, String value, String subtitle, String color) {
-        VBox card = new VBox(10);
-        card.setAlignment(Pos.CENTER);
-        card.setPadding(new Insets(25));
-        card.setPrefWidth(250);
-        card.setPrefHeight(150);
-        card.setStyle("-fx-background-color: white; -fx-background-radius: 10; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
+    private static HBox createKPICardsRow2() {
+        HBox statsBox = new HBox(20);
+        statsBox.setAlignment(Pos.CENTER);
+        statsBox.setPadding(new Insets(0, 0, 20, 0));
 
+        // Lấy dữ liệu thực tế
+        int totalNotifications = NotificationService.getAllNotifications().size();
+        int sentNotifications = NotificationService.getNotificationsByStatus("SENT").size();
+        int totalRepairs = RepairRequestService.getAllRepairRequests().size();
+        int pendingRepairs = RepairRequestService.getRepairRequestsByStatus("PENDING").size();
+        int completedRepairs = RepairRequestService.getRepairRequestsByStatus("COMPLETED").size();
+        int totalMaintenance = MaintenanceService.getAllMaintenances().size();
+        int pendingMaintenance = MaintenanceService.getMaintenancesByStatus("PENDING").size();
+        int totalBMS = BMSService.getAllSystems().size();
+
+        // Card 5: Thông Báo
+        VBox card5 = createStatCard("Thông Báo", String.valueOf(totalNotifications),
+                "Đã gửi: " + sentNotifications, "#fa709a", "🔔");
+
+        // Card 6: Yêu Cầu Sửa Chữa
+        VBox card6 = createStatCard("Yêu Cầu Sửa Chữa", String.valueOf(totalRepairs),
+                "Đang chờ: " + pendingRepairs, "#fee140", "🔧");
+
+        // Card 7: Bảo Trì
+        VBox card7 = createStatCard("Bảo Trì", String.valueOf(totalMaintenance),
+                "Đang chờ: " + pendingMaintenance, "#30cfd0", "⚙️");
+
+        // Card 8: Hệ Thống BMS
+        VBox card8 = createStatCard("Hệ Thống BMS", String.valueOf(totalBMS),
+                "Đang hoạt động", "#a8edea", "💻");
+
+        statsBox.getChildren().addAll(card5, card6, card7, card8);
+        return statsBox;
+    }
+
+    private static VBox createStatCard(String title, String value, String subtitle, String gradientColor, String icon) {
+        VBox card = new VBox(12);
+        card.setAlignment(Pos.CENTER_LEFT);
+        card.setPadding(new Insets(25));
+        card.setPrefWidth(280);
+        card.setPrefHeight(140);
+        card.setStyle("-fx-background-color: white; -fx-background-radius: 16; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 15, 0, 0, 4);");
+
+        HBox titleBox = new HBox(10);
+        titleBox.setAlignment(Pos.CENTER_LEFT);
+
+        Label iconLabel = new Label(icon);
+        iconLabel.setStyle("-fx-font-size: 24px;");
+        
         Label titleLabel = new Label(title);
-        titleLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #7f8c8d;");
+        titleLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #64748b; -fx-font-weight: 600;");
+
+        titleBox.getChildren().addAll(iconLabel, titleLabel);
 
         Label valueLabel = new Label(value);
-        valueLabel.setStyle("-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: " + color + ";");
+        valueLabel.setStyle("-fx-font-size: 42px; -fx-font-weight: bold; " +
+                "-fx-text-fill: " + gradientColor + ";");
 
         Label subtitleLabel = new Label(subtitle);
-        subtitleLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #95a5a6;");
+        subtitleLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #94a3b8;");
 
-        card.getChildren().addAll(titleLabel, valueLabel, subtitleLabel);
+        card.getChildren().addAll(titleBox, valueLabel, subtitleLabel);
         return card;
     }
 
@@ -213,111 +254,154 @@ public final class DashboardView {
         chartsBox.setAlignment(Pos.CENTER);
         chartsBox.setPadding(new Insets(20, 0, 20, 0));
 
-        // Pie Chart: Trạng thái Bảo trì
-        PieChart maintenanceChart = createMaintenancePieChart();
+        // Pie Chart: Trạng thái Hóa đơn
+        PieChart invoiceChart = createInvoicePieChart();
 
-        // Bar Chart: Hệ thống BMS theo loại
-        BarChart<String, Number> bmsChart = createBMSBarChart();
+        // Bar Chart: Yêu cầu sửa chữa theo tháng
+        BarChart<String, Number> repairChart = createRepairBarChart();
 
-        chartsBox.getChildren().addAll(maintenanceChart, bmsChart);
+        chartsBox.getChildren().addAll(invoiceChart, repairChart);
         return chartsBox;
     }
 
-    private static PieChart createMaintenancePieChart() {
+    private static PieChart createInvoicePieChart() {
         PieChart pieChart = new PieChart();
-        pieChart.setTitle("Trạng thái Bảo trì");
+        pieChart.setTitle("Trạng thái Hóa đơn");
         pieChart.setPrefWidth(500);
         pieChart.setPrefHeight(400);
-        pieChart.setStyle("-fx-background-color: white; -fx-background-radius: 10; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
+        pieChart.setStyle("-fx-background-color: white; -fx-background-radius: 16; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 15, 0, 0, 4);");
+        pieChart.setLabelLineLength(10);
+        pieChart.setLegendSide(Side.BOTTOM);
 
-        int pending = MaintenanceService.getMaintenancesByStatus("PENDING").size();
-        int inProgress = MaintenanceService.getMaintenancesByStatus("IN_PROGRESS").size();
-        int completed = MaintenanceService.getMaintenancesByStatus("COMPLETED").size();
+        int pending = InvoiceService.getInvoicesByStatus("PENDING").size();
+        int paid = InvoiceService.getInvoicesByStatus("PAID").size();
+        int overdue = InvoiceService.getInvoicesByStatus("OVERDUE").size();
 
-        // Thêm dữ liệu mẫu nếu không có dữ liệu thực
-        if (pending == 0 && inProgress == 0 && completed == 0) {
-            pending = 5;
-            inProgress = 3;
-            completed = 12;
+        if (pending == 0 && paid == 0 && overdue == 0) {
+            pending = 15;
+            paid = 45;
+            overdue = 5;
         }
 
-        PieChart.Data pendingData = new PieChart.Data("Đang chờ", pending);
-        PieChart.Data inProgressData = new PieChart.Data("Đang thực hiện", inProgress);
-        PieChart.Data completedData = new PieChart.Data("Hoàn thành", completed);
+        PieChart.Data pendingData = new PieChart.Data("Chưa thanh toán", pending);
+        PieChart.Data paidData = new PieChart.Data("Đã thanh toán", paid);
+        PieChart.Data overdueData = new PieChart.Data("Quá hạn", overdue);
 
-        pieChart.getData().addAll(pendingData, inProgressData, completedData);
+        pieChart.getData().addAll(pendingData, paidData, overdueData);
 
-        // Tùy chỉnh màu sắc sau khi chart được render
+        // Tùy chỉnh màu sắc
         javafx.application.Platform.runLater(() -> {
             if (pieChart.getData().size() > 0 && pieChart.getData().get(0).getNode() != null) {
-                pieChart.getData().get(0).getNode().setStyle("-fx-pie-color: #F39C12;");
+                pieChart.getData().get(0).getNode().setStyle("-fx-pie-color: #f59e0b;");
             }
             if (pieChart.getData().size() > 1 && pieChart.getData().get(1).getNode() != null) {
-                pieChart.getData().get(1).getNode().setStyle("-fx-pie-color: #3498DB;");
+                pieChart.getData().get(1).getNode().setStyle("-fx-pie-color: #10b981;");
             }
             if (pieChart.getData().size() > 2 && pieChart.getData().get(2).getNode() != null) {
-                pieChart.getData().get(2).getNode().setStyle("-fx-pie-color: #2ECC71;");
+                pieChart.getData().get(2).getNode().setStyle("-fx-pie-color: #ef4444;");
             }
         });
 
         return pieChart;
     }
 
-    private static BarChart<String, Number> createBMSBarChart() {
+    private static BarChart<String, Number> createRepairBarChart() {
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
         BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
-        barChart.setTitle("Hệ thống BMS theo Loại");
+        barChart.setTitle("Yêu cầu Sửa chữa theo Trạng thái");
         barChart.setPrefWidth(500);
         barChart.setPrefHeight(400);
-        barChart.setStyle("-fx-background-color: white; -fx-background-radius: 10; " +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
+        barChart.setStyle("-fx-background-color: white; -fx-background-radius: 16; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 15, 0, 0, 4);");
         barChart.setLegendVisible(false);
 
-        xAxis.setLabel("Loại hệ thống");
+        xAxis.setLabel("Trạng thái");
         yAxis.setLabel("Số lượng");
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
 
-        // Đếm hệ thống theo loại
-        java.util.List<com.example.quanlytoanhanhom4.model.BMSSystem> allSystems = BMSService.getAllSystems();
-        java.util.Map<String, Long> systemCounts = allSystems.stream()
-                .collect(java.util.stream.Collectors.groupingBy(
-                        system -> system.getSystemType() != null ? system.getSystemType() : "Khác",
-                        java.util.stream.Collectors.counting()
-                ));
+        int pending = RepairRequestService.getRepairRequestsByStatus("PENDING").size();
+        int inProgress = RepairRequestService.getRepairRequestsByStatus("IN_PROGRESS").size();
+        int completed = RepairRequestService.getRepairRequestsByStatus("COMPLETED").size();
 
-        // Thêm dữ liệu mẫu nếu không có dữ liệu thực
-        if (systemCounts.isEmpty()) {
-            systemCounts.put("ĐIỆN", 8L);
-            systemCounts.put("NƯỚC", 6L);
-            systemCounts.put("HVAC", 5L);
-            systemCounts.put("PCCC", 4L);
-            systemCounts.put("AN_NINH", 7L);
-            systemCounts.put("CHIEU_SANG", 9L);
+        if (pending == 0 && inProgress == 0 && completed == 0) {
+            pending = 3;
+            inProgress = 2;
+            completed = 5;
         }
 
-        for (java.util.Map.Entry<String, Long> entry : systemCounts.entrySet()) {
-            // Chuyển đổi tên loại sang tiếng Việt
-            String displayName = convertSystemTypeToVietnamese(entry.getKey());
-            series.getData().add(new XYChart.Data<>(displayName, entry.getValue()));
-        }
+        series.getData().add(new XYChart.Data<>("Đang chờ", pending));
+        series.getData().add(new XYChart.Data<>("Đang xử lý", inProgress));
+        series.getData().add(new XYChart.Data<>("Hoàn thành", completed));
 
         barChart.getData().add(series);
 
-        // Tùy chỉnh màu cột sau khi chart được render
+        // Tùy chỉnh màu cột
         javafx.application.Platform.runLater(() -> {
             if (!barChart.getData().isEmpty() && !barChart.getData().get(0).getData().isEmpty()) {
-                barChart.getData().get(0).getData().forEach(data -> {
-                    if (data.getNode() != null) {
-                        data.getNode().setStyle("-fx-bar-fill: #3498DB;");
+                int index = 0;
+                String[] colors = {"#f59e0b", "#3b82f6", "#10b981"};
+                for (XYChart.Data<String, Number> data : barChart.getData().get(0).getData()) {
+                    if (data.getNode() != null && index < colors.length) {
+                        data.getNode().setStyle("-fx-bar-fill: " + colors[index] + ";");
+                        index++;
                     }
-                });
+                }
             }
         });
 
         return barChart;
+    }
+
+    private static VBox createRecentActivitySection() {
+        VBox activityBox = new VBox(15);
+        activityBox.setPadding(new Insets(20));
+        activityBox.setStyle("-fx-background-color: white; -fx-background-radius: 16; " +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 15, 0, 0, 4);");
+
+        Label sectionLabel = new Label("📊 Hoạt Động Gần Đây");
+        sectionLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e293b;");
+
+        VBox activityList = new VBox(10);
+
+        // Lấy các thông báo gần đây
+        var recentNotifications = NotificationService.getAllNotifications().stream()
+                .limit(5)
+                .collect(Collectors.toList());
+
+        if (recentNotifications.isEmpty()) {
+            Label noActivity = new Label("Chưa có hoạt động nào");
+            noActivity.setStyle("-fx-text-fill: #94a3b8; -fx-font-size: 14px;");
+            activityList.getChildren().add(noActivity);
+        } else {
+            for (var notification : recentNotifications) {
+                HBox activityItem = new HBox(15);
+                activityItem.setAlignment(Pos.CENTER_LEFT);
+                activityItem.setPadding(new Insets(12));
+                activityItem.setStyle("-fx-background-color: #f8fafc; -fx-background-radius: 8;");
+
+                Label icon = new Label("🔔");
+                icon.setStyle("-fx-font-size: 20px;");
+
+                VBox content = new VBox(4);
+                Label title = new Label(notification.getTitle());
+                title.setStyle("-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #1e293b;");
+
+                Label date = new Label(notification.getSentDate() != null ?
+                        notification.getSentDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) :
+                        "Chưa gửi");
+                date.setStyle("-fx-font-size: 12px; -fx-text-fill: #64748b;");
+
+                content.getChildren().addAll(title, date);
+                activityItem.getChildren().addAll(icon, content);
+                activityList.getChildren().add(activityItem);
+            }
+        }
+
+        activityBox.getChildren().addAll(sectionLabel, activityList);
+        return activityBox;
     }
 
     private static VBox createModulesSection() {
@@ -325,8 +409,8 @@ public final class DashboardView {
         modulesBox.setAlignment(Pos.CENTER);
         modulesBox.setPadding(new Insets(20));
 
-        Label sectionLabel = new Label("Quản lý Hệ thống Kỹ thuật");
-        sectionLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        Label sectionLabel = new Label("🚀 Truy Cập Nhanh Các Module");
+        sectionLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e293b;");
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -334,21 +418,29 @@ public final class DashboardView {
         grid.setVgap(20);
         grid.setPadding(new Insets(20));
 
-        Button bmsBtn = new Button("Giám sát & Điều khiển (BMS)");
-        Button maintenanceBtn = new Button("Bảo trì & Bảo dưỡng");
-        Button securityBtn = new Button("Quản lý An ninh");
-        Button cleaningBtn = new Button("Quản lý Vệ sinh");
-        Button adminBtn = new Button("Quản lý Hành chính & Nhân sự");
-        Button hrBtn = new Button("Nhân sự & Chấm công");
-        Button customerBtn = new Button("Quản lý Khách hàng");
+        Button bmsBtn = new Button("💻 Giám sát & Điều khiển (BMS)");
+        Button maintenanceBtn = new Button("⚙️ Bảo trì & Bảo dưỡng");
+        Button securityBtn = new Button("🔒 Quản lý An ninh");
+        Button cleaningBtn = new Button("🧹 Quản lý Vệ sinh");
+        Button adminBtn = new Button("📋 Hành chính & Nhân sự");
+        Button hrBtn = new Button("👔 Nhân sự & Chấm công");
+        Button customerBtn = new Button("👥 Quản lý Khách hàng");
+        Button apartmentBtn = new Button("🏠 Quản lý Căn hộ");
+        Button invoiceBtn = new Button("💰 Hóa đơn & Thanh toán");
+        Button notificationBtn = new Button("🔔 Gửi thông báo");
+        Button repairBtn = new Button("🔧 Yêu cầu sửa chữa");
 
-        styleButton(bmsBtn);
-        styleButton(maintenanceBtn);
-        styleButton(securityBtn);
-        styleButton(cleaningBtn);
-        styleButton(adminBtn);
-        styleButton(hrBtn);
-        styleButton(customerBtn);
+        styleButton(bmsBtn, "#667eea");
+        styleButton(maintenanceBtn, "#f093fb");
+        styleButton(securityBtn, "#4facfe");
+        styleButton(cleaningBtn, "#43e97b");
+        styleButton(adminBtn, "#fa709a");
+        styleButton(hrBtn, "#fee140");
+        styleButton(customerBtn, "#30cfd0");
+        styleButton(apartmentBtn, "#a8edea");
+        styleButton(invoiceBtn, "#667eea");
+        styleButton(notificationBtn, "#f093fb");
+        styleButton(repairBtn, "#4facfe");
 
         bmsBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/bms.fxml", "Giám sát & Điều khiển BMS"));
         maintenanceBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/maintenance.fxml", "Bảo trì & Bảo dưỡng"));
@@ -357,33 +449,77 @@ public final class DashboardView {
         adminBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/admin.fxml", "Quản lý Hành chính & Nhân sự"));
         hrBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/hr.fxml", "Nhân sự & Chấm công"));
         customerBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/customer.fxml", "Quản lý Khách hàng"));
+        apartmentBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/apartment.fxml", "Quản lý Căn hộ"));
+        invoiceBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/invoice.fxml", "Hóa đơn & Thanh toán"));
+        notificationBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/notification.fxml", "Gửi thông báo"));
+        repairBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/repair_request.fxml", "Yêu cầu sửa chữa"));
 
         grid.add(bmsBtn, 0, 0);
         grid.add(maintenanceBtn, 1, 0);
         grid.add(securityBtn, 2, 0);
-        grid.add(cleaningBtn, 0, 1);
-        grid.add(adminBtn, 1, 1);
-        grid.add(hrBtn, 2, 1);
-        grid.add(customerBtn, 0, 2);
+        grid.add(cleaningBtn, 3, 0);
+        grid.add(adminBtn, 0, 1);
+        grid.add(hrBtn, 1, 1);
+        grid.add(customerBtn, 2, 1);
+        grid.add(apartmentBtn, 3, 1);
+        grid.add(invoiceBtn, 0, 2);
+        grid.add(notificationBtn, 1, 2);
+        grid.add(repairBtn, 2, 2);
 
         modulesBox.getChildren().addAll(sectionLabel, grid);
         return modulesBox;
     }
 
-    private static void styleButton(Button button) {
-        button.setPrefWidth(250);
-        button.setPrefHeight(60);
-        button.setStyle("-fx-background-color: linear-gradient(to bottom, #3498DB, #2874A6); " +
+    private static void styleButton(Button button, String color) {
+        button.setPrefWidth(220);
+        button.setPrefHeight(65);
+        button.setStyle("-fx-background-color: " + color + "; " +
                 "-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; " +
-                "-fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 2);");
+                "-fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 8, 0, 0, 3);");
         button.setOnMouseEntered(e ->
-                button.setStyle("-fx-background-color: linear-gradient(to bottom, #2874A6, #1a5a8a); " +
+                button.setStyle("-fx-background-color: " + darkenColor(color) + "; " +
                         "-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; " +
-                        "-fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0, 0, 3);"));
+                        "-fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 12, 0, 0, 5);"));
         button.setOnMouseExited(e ->
-                button.setStyle("-fx-background-color: linear-gradient(to bottom, #3498DB, #2874A6); " +
+                button.setStyle("-fx-background-color: " + color + "; " +
                         "-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; " +
-                        "-fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 2);"));
+                        "-fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 8, 0, 0, 3);"));
+    }
+
+    private static String darkenColor(String hexColor) {
+        // Đơn giản hóa: trả về màu tối hơn
+        if (hexColor.startsWith("#")) {
+            return hexColor; // Có thể cải thiện logic này
+        }
+        return hexColor;
+    }
+
+    private static HBox createFooter() {
+        HBox footer = new HBox(15);
+        footer.setAlignment(Pos.CENTER);
+        footer.setPadding(new Insets(20, 30, 20, 30));
+        footer.setStyle("-fx-background-color: white; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, -2);");
+
+        Button backBtn = new Button("← Quay lại");
+        backBtn.setStyle("-fx-background-color: #64748b; -fx-text-fill: white; -fx-padding: 12 30; " +
+                "-fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;");
+        backBtn.setOnAction(e -> handleBack());
+        backBtn.setOnMouseEntered(e -> backBtn.setStyle("-fx-background-color: #475569; -fx-text-fill: white; " +
+                "-fx-padding: 12 30; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"));
+        backBtn.setOnMouseExited(e -> backBtn.setStyle("-fx-background-color: #64748b; -fx-text-fill: white; " +
+                "-fx-padding: 12 30; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"));
+
+        Button logoutBtn = new Button("Đăng xuất");
+        logoutBtn.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-padding: 12 30; " +
+                "-fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;");
+        logoutBtn.setOnAction(e -> handleLogout());
+        logoutBtn.setOnMouseEntered(e -> logoutBtn.setStyle("-fx-background-color: #dc2626; -fx-text-fill: white; " +
+                "-fx-padding: 12 30; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"));
+        logoutBtn.setOnMouseExited(e -> logoutBtn.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; " +
+                "-fx-padding: 12 30; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"));
+
+        footer.getChildren().addAll(backBtn, logoutBtn);
+        return footer;
     }
 
     private static void openModule(String fxmlPath, String title) {
@@ -400,17 +536,6 @@ public final class DashboardView {
             e.printStackTrace();
             showMessage("Lỗi khi mở module: " + e.getMessage());
         }
-    }
-
-    private static String convertSystemTypeToVietnamese(String systemType) {
-        java.util.Map<String, String> typeMap = new java.util.HashMap<>();
-        typeMap.put("ĐIỆN", "Điện");
-        typeMap.put("NƯỚC", "Nước");
-        typeMap.put("HVAC", "HVAC (Điều hòa)");
-        typeMap.put("PCCC", "Phòng cháy chữa cháy");
-        typeMap.put("AN_NINH", "An ninh");
-        typeMap.put("CHIEU_SANG", "Chiếu sáng");
-        return typeMap.getOrDefault(systemType, systemType);
     }
 
     private static void showMessage(String message) {
@@ -433,7 +558,6 @@ public final class DashboardView {
     private static void handleBack() {
         try {
             if (primaryStage != null) {
-                // Quay lại màn hình chính (main.fxml)
                 FXMLLoader loader = new FXMLLoader(DashboardView.class.getResource("/com/example/quanlytoanhanhom4/fxml/main.fxml"));
                 Scene scene = new Scene(loader.load(), 1080, 640);
                 primaryStage.setTitle("Quản lý kỹ thuật tòa nhà");

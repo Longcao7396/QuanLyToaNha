@@ -104,6 +104,7 @@ public class HRController implements Initializable {
     private static final LinkedHashMap<String, String> STAFF_STATUS_OPTIONS = new LinkedHashMap<>();
     private static final LinkedHashMap<String, String> ATTENDANCE_STATUS_OPTIONS = new LinkedHashMap<>();
     private static final LinkedHashMap<String, String> CONTRACT_STATUS_OPTIONS = new LinkedHashMap<>();
+    private static final LinkedHashMap<String, String> SHIFT_OPTIONS = new LinkedHashMap<>();
 
     static {
         STAFF_STATUS_OPTIONS.put("ACTIVE", "Đang làm việc");
@@ -119,6 +120,13 @@ public class HRController implements Initializable {
         CONTRACT_STATUS_OPTIONS.put("EXPIRED", "Hết hạn");
         CONTRACT_STATUS_OPTIONS.put("TERMINATED", "Đã chấm dứt");
         CONTRACT_STATUS_OPTIONS.put("ON_HOLD", "Tạm hoãn");
+
+        SHIFT_OPTIONS.put("MORNING", "SÁNG");
+        SHIFT_OPTIONS.put("AFTERNOON", "CHIỀU");
+        SHIFT_OPTIONS.put("NIGHT", "ĐÊM");
+        SHIFT_OPTIONS.put("SÁNG", "SÁNG");
+        SHIFT_OPTIONS.put("CHIỀU", "CHIỀU");
+        SHIFT_OPTIONS.put("ĐÊM", "ĐÊM");
     }
 
     private String toDisplay(LinkedHashMap<String, String> map, String value) {
@@ -133,6 +141,16 @@ public class HRController implements Initializable {
                 return entry.getKey();
             }
         }
+        return display;
+    }
+
+    private String toShiftValue(String display) {
+        if (display == null) return null;
+        // Convert Vietnamese to English
+        if ("SÁNG".equals(display)) return "MORNING";
+        if ("CHIỀU".equals(display)) return "AFTERNOON";
+        if ("ĐÊM".equals(display)) return "NIGHT";
+        // If already in English, return as is
         return display;
     }
 
@@ -154,7 +172,12 @@ public class HRController implements Initializable {
         colStaffPosition.setCellValueFactory(new PropertyValueFactory<>("position"));
         colStaffDepartment.setCellValueFactory(new PropertyValueFactory<>("department"));
         colStaffPhone.setCellValueFactory(new PropertyValueFactory<>("phone"));
-        colStaffStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        colStaffStatus.setCellValueFactory(cell -> {
+            Staff staff = cell.getValue();
+            return javafx.beans.binding.Bindings.createStringBinding(
+                    () -> toDisplay(STAFF_STATUS_OPTIONS, staff != null ? staff.getStatus() : null)
+            );
+        });
         staffTable.setItems(staffData);
 
         staffStatusCombo.setItems(FXCollections.observableArrayList(STAFF_STATUS_OPTIONS.values()));
@@ -171,10 +194,20 @@ public class HRController implements Initializable {
     private void initializeAttendanceTab() {
         colAttendanceStaff.setCellValueFactory(cell -> javafx.beans.binding.Bindings.createObjectBinding(cell.getValue()::getStaffName));
         colAttendanceDate.setCellValueFactory(new PropertyValueFactory<>("attendanceDate"));
-        colAttendanceShift.setCellValueFactory(new PropertyValueFactory<>("shift"));
+        colAttendanceShift.setCellValueFactory(cell -> {
+            AttendanceRecord record = cell.getValue();
+            return javafx.beans.binding.Bindings.createStringBinding(
+                    () -> toDisplay(SHIFT_OPTIONS, record != null ? record.getShift() : null)
+            );
+        });
         colAttendanceCheckIn.setCellValueFactory(cell -> javafx.beans.binding.Bindings.createObjectBinding(() -> formatTime(cell.getValue().getCheckIn())));
         colAttendanceCheckOut.setCellValueFactory(cell -> javafx.beans.binding.Bindings.createObjectBinding(() -> formatTime(cell.getValue().getCheckOut())));
-        colAttendanceStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        colAttendanceStatus.setCellValueFactory(cell -> {
+            AttendanceRecord record = cell.getValue();
+            return javafx.beans.binding.Bindings.createStringBinding(
+                    () -> toDisplay(ATTENDANCE_STATUS_OPTIONS, record != null ? record.getStatus() : null)
+            );
+        });
         attendanceTable.setItems(attendanceData);
 
         attendanceShiftCombo.setItems(FXCollections.observableArrayList("SÁNG", "CHIỀU", "ĐÊM"));
@@ -224,20 +257,44 @@ public class HRController implements Initializable {
     }
 
     private void loadStaff() {
-        staffData.setAll(StaffService.getAllStaff());
-        refreshStaffCombos();
+        try {
+            staffData.setAll(StaffService.getAllStaff());
+            refreshStaffCombos();
+            staffTable.refresh();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Lỗi khi tải dữ liệu nhân viên: " + e.getMessage());
+        }
     }
 
     private void loadAttendance() {
-        attendanceData.setAll(AttendanceService.getAllRecords());
+        try {
+            attendanceData.setAll(AttendanceService.getAllRecords());
+            attendanceTable.refresh();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Lỗi khi tải dữ liệu chấm công: " + e.getMessage());
+        }
     }
 
     private void loadShifts() {
-        shiftData.setAll(ShiftScheduleService.getAllSchedules());
+        try {
+            shiftData.setAll(ShiftScheduleService.getAllSchedules());
+            shiftTable.refresh();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Lỗi khi tải dữ liệu ca làm việc: " + e.getMessage());
+        }
     }
 
     private void loadContracts() {
-        contractData.setAll(ContractService.getAllContracts());
+        try {
+            contractData.setAll(ContractService.getAllContracts());
+            contractTable.refresh();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Lỗi khi tải dữ liệu hợp đồng: " + e.getMessage());
+        }
     }
 
     private void refreshStaffCombos() {
@@ -280,7 +337,8 @@ public class HRController implements Initializable {
     private void loadAttendanceToForm(AttendanceRecord record) {
         attendanceStaffCombo.setValue(findStaffById(record.getStaffId()));
         attendanceDatePicker.setValue(record.getAttendanceDate());
-        attendanceShiftCombo.setValue(record.getShift());
+        // Convert database shift to Vietnamese for display
+        attendanceShiftCombo.setValue(toDisplay(SHIFT_OPTIONS, record.getShift()));
         checkInField.setText(formatTime(record.getCheckIn()));
         checkOutField.setText(formatTime(record.getCheckOut()));
         attendanceStatusCombo.setValue(toDisplay(ATTENDANCE_STATUS_OPTIONS, record.getStatus()));
@@ -458,7 +516,14 @@ public class HRController implements Initializable {
         Staff staff = attendanceStaffCombo.getValue();
         record.setStaffId(staff != null ? staff.getId() : 0);
         record.setAttendanceDate(attendanceDatePicker.getValue());
-        record.setShift(attendanceShiftCombo.getValue());
+        // Convert Vietnamese shift to English for database
+        String shiftValue = attendanceShiftCombo.getValue();
+        if (shiftValue != null) {
+            String dbShift = toShiftValue(shiftValue);
+            record.setShift(dbShift);
+        } else {
+            record.setShift(null);
+        }
         LocalTime checkIn = parseTimeField(checkInField.getText().trim(), "Giờ vào");
         if (checkIn == null && !checkInField.getText().trim().isEmpty()) return null;
         LocalTime checkOut = parseTimeField(checkOutField.getText().trim(), "Giờ ra");

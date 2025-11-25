@@ -19,6 +19,8 @@ public class BuildingManagementApplication extends Application {
 
     public static void main(String[] args) {
         DatabaseInitializer.initialize();
+        // Tự động import dữ liệu mẫu nếu database trống
+        DatabaseInitializer.checkAndImportSampleData();
         launch(args);
     }
 }

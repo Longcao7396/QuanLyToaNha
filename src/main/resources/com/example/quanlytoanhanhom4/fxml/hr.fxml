@@ -9,7 +9,8 @@
     <top>
         <HBox spacing="10" style="-fx-background-color: #1F618D; -fx-padding: 14;">
             <children>
-                <Label text="Quản lý Hành chính - Nhân sự" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+                <Label text="Quản lý Nhân sự &amp; Chấm công"
+                       style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <Button text="Đóng" onAction="#handleBack" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold;"/>
             </children>

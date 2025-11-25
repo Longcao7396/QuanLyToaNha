@@ -3,6 +3,8 @@ package com.example.quanlytoanhanhom4.service.auth;
 import com.example.quanlytoanhanhom4.config.DatabaseConnection;
 import com.example.quanlytoanhanhom4.util.PasswordUtils;
 import com.example.quanlytoanhanhom4.util.UserSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,6 +12,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public final class UserService {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     private UserService() {
         // Utility class
@@ -30,18 +34,21 @@ public final class UserService {
                 if (storedPassword != null) {
                     if (PasswordUtils.verifyPassword(password, storedPassword)) {
                         UserSession.setUser(username, role, userId);
+                        logger.debug("Đăng nhập thành công cho user: {}", username);
                         return role;
                     }
+                    // Support legacy plain text passwords (for migration)
                     if (storedPassword.length() < 64 && password.equals(storedPassword)) {
+                        logger.warn("User {} đang sử dụng plain text password - nên migrate sang BCrypt", username);
                         UserSession.setUser(username, role, userId);
                         return role;
                     }
                 }
             }
+            logger.debug("Đăng nhập thất bại cho user: {}", username);
             return null;
         } catch (SQLException e) {
-            System.err.println("Lỗi khi verify login: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Lỗi khi verify login cho user: {}", username, e);
             return null;
         }
     }

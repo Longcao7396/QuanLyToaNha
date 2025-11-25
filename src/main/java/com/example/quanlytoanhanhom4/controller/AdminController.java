@@ -114,14 +114,22 @@ public class AdminController implements Initializable {
     }
     
     private void loadTasks() {
-        tasks.clear();
-        String filterStatus = filterStatusCombo.getValue();
+        try {
+            tasks.clear();
+            String filterStatus = filterStatusCombo.getValue();
 
-        if (filterStatus == null || filterStatus.equals(ALL_LABEL)) {
-            tasks.addAll(AdminTaskService.getAllTasks());
-        } else {
-            String statusValue = toValue(STATUS_OPTIONS, filterStatus);
-            tasks.addAll(AdminTaskService.getTasksByStatus(statusValue));
+            if (filterStatus == null || filterStatus.equals(ALL_LABEL)) {
+                tasks.addAll(AdminTaskService.getAllTasks());
+            } else {
+                String statusValue = toValue(STATUS_OPTIONS, filterStatus);
+                tasks.addAll(AdminTaskService.getTasksByStatus(statusValue));
+            }
+
+            // Refresh table to ensure data is displayed
+            taskTable.refresh();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Lỗi khi tải dữ liệu nhiệm vụ admin: " + e.getMessage());
         }
     }
     

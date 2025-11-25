@@ -108,14 +108,22 @@ public class CleaningController implements Initializable {
     }
     
     private void loadCleanings() {
-        cleanings.clear();
-        String filterStatus = filterStatusCombo.getValue();
+        try {
+            cleanings.clear();
+            String filterStatus = filterStatusCombo.getValue();
 
-        if (filterStatus == null || filterStatus.equals(ALL_LABEL)) {
-            cleanings.addAll(CleaningService.getAllCleanings());
-        } else {
-            String statusValue = toValue(STATUS_OPTIONS, filterStatus);
-            cleanings.addAll(CleaningService.getCleaningsByStatus(statusValue));
+            if (filterStatus == null || filterStatus.equals(ALL_LABEL)) {
+                cleanings.addAll(CleaningService.getAllCleanings());
+            } else {
+                String statusValue = toValue(STATUS_OPTIONS, filterStatus);
+                cleanings.addAll(CleaningService.getCleaningsByStatus(statusValue));
+            }
+
+            // Refresh table to ensure data is displayed
+            cleaningTable.refresh();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Lỗi khi tải dữ liệu vệ sinh: " + e.getMessage());
         }
     }
     

@@ -118,14 +118,22 @@ public class CustomerController implements Initializable {
     }
     
     private void loadRequests() {
-        requests.clear();
-        String filterStatus = filterStatusCombo.getValue();
+        try {
+            requests.clear();
+            String filterStatus = filterStatusCombo.getValue();
 
-        if (filterStatus == null || filterStatus.equals(ALL_LABEL)) {
-            requests.addAll(CustomerRequestService.getAllRequests());
-        } else {
-            String statusValue = toValue(STATUS_OPTIONS, filterStatus);
-            requests.addAll(CustomerRequestService.getRequestsByStatus(statusValue));
+            if (filterStatus == null || filterStatus.equals(ALL_LABEL)) {
+                requests.addAll(CustomerRequestService.getAllRequests());
+            } else {
+                String statusValue = toValue(STATUS_OPTIONS, filterStatus);
+                requests.addAll(CustomerRequestService.getRequestsByStatus(statusValue));
+            }
+
+            // Refresh table to ensure data is displayed
+            requestTable.refresh();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Lỗi khi tải dữ liệu yêu cầu khách hàng: " + e.getMessage());
         }
     }
     

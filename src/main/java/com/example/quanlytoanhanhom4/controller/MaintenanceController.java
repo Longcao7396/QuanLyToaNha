@@ -124,14 +124,22 @@ public class MaintenanceController implements Initializable {
     }
     
     private void loadMaintenances() {
-        maintenances.clear();
-        String filterStatus = filterStatusCombo.getValue();
+        try {
+            maintenances.clear();
+            String filterStatus = filterStatusCombo.getValue();
 
-        if (filterStatus == null || filterStatus.equals(ALL_LABEL)) {
-            maintenances.addAll(MaintenanceService.getAllMaintenances());
-        } else {
-            String statusValue = toValue(STATUS_OPTIONS, filterStatus);
-            maintenances.addAll(MaintenanceService.getMaintenancesByStatus(statusValue));
+            if (filterStatus == null || filterStatus.equals(ALL_LABEL)) {
+                maintenances.addAll(MaintenanceService.getAllMaintenances());
+            } else {
+                String statusValue = toValue(STATUS_OPTIONS, filterStatus);
+                maintenances.addAll(MaintenanceService.getMaintenancesByStatus(statusValue));
+            }
+
+            // Refresh table to ensure data is displayed
+            maintenanceTable.refresh();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Lỗi khi tải dữ liệu bảo trì: " + e.getMessage());
         }
     }
     

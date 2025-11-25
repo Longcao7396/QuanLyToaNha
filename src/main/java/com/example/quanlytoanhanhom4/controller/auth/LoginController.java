@@ -3,6 +3,7 @@ package com.example.quanlytoanhanhom4.controller.auth;
 import com.example.quanlytoanhanhom4.service.auth.UserService;
 import com.example.quanlytoanhanhom4.ui.BuildingLogo;
 import com.example.quanlytoanhanhom4.ui.auth.RegisterForm;
+import com.example.quanlytoanhanhom4.util.AlertUtils;
 import com.example.quanlytoanhanhom4.util.UserSession;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,11 +16,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
+
+    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
     @FXML
     private TextField usernameField;
@@ -52,18 +57,26 @@ public class LoginController implements Initializable {
         String password = passwordField.getText().trim();
 
         if (username.isEmpty() || password.isEmpty()) {
-            statusLabel.setText("Vui lòng nhập đầy đủ thông tin!");
+            AlertUtils.showWarning("Vui lòng nhập đầy đủ thông tin!");
             return;
         }
 
-        String role = UserService.verifyLogin(username, password);
-        if (role != null) {
-            statusLabel.setStyle("-fx-text-fill: green;");
-            statusLabel.setText("✅ Đăng nhập thành công!");
-            openMainView();
-        } else {
-            statusLabel.setStyle("-fx-text-fill: red;");
-            statusLabel.setText("❌ Sai tên đăng nhập hoặc mật khẩu!");
+        try {
+            String role = UserService.verifyLogin(username, password);
+            if (role != null) {
+                logger.info("Đăng nhập thành công cho user: {}", username);
+                statusLabel.setStyle("-fx-text-fill: green;");
+                statusLabel.setText("✅ Đăng nhập thành công!");
+                openMainView();
+            } else {
+                logger.warn("Đăng nhập thất bại cho user: {}", username);
+                statusLabel.setStyle("-fx-text-fill: red;");
+                statusLabel.setText("❌ Sai tên đăng nhập hoặc mật khẩu!");
+                AlertUtils.showError("Đăng nhập thất bại", "Sai tên đăng nhập hoặc mật khẩu!");
+            }
+        } catch (Exception e) {
+            logger.error("Lỗi khi đăng nhập", e);
+            AlertUtils.showError("Lỗi", "Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.");
         }
     }
 
@@ -72,9 +85,10 @@ public class LoginController implements Initializable {
         try {
             RegisterForm registerForm = new RegisterForm();
             registerForm.start(new Stage());
+            logger.debug("Mở màn hình đăng ký");
         } catch (Exception e) {
-            statusLabel.setStyle("-fx-text-fill: red;");
-            statusLabel.setText("Không thể mở màn hình đăng ký: " + e.getMessage());
+            logger.error("Lỗi khi mở màn hình đăng ký", e);
+            AlertUtils.showError("Lỗi", "Không thể mở màn hình đăng ký: " + e.getMessage());
         }
     }
 
@@ -88,10 +102,10 @@ public class LoginController implements Initializable {
             currentStage.setResizable(true);
             currentStage.setMaximized(true);
             currentStage.show();
+            logger.debug("Đã mở giao diện chính");
         } catch (Exception e) {
-            statusLabel.setStyle("-fx-text-fill: red;");
-            statusLabel.setText("Không thể tải giao diện chính: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Lỗi khi tải giao diện chính", e);
+            AlertUtils.showError("Lỗi", "Không thể tải giao diện chính: " + e.getMessage());
             UserSession.clear();
         }
     }

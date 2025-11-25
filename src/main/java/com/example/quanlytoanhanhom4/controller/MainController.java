@@ -2,6 +2,7 @@ package com.example.quanlytoanhanhom4.controller;
 
 import com.example.quanlytoanhanhom4.ui.BuildingLogo;
 import com.example.quanlytoanhanhom4.ui.DashboardView;
+import com.example.quanlytoanhanhom4.util.AlertUtils;
 import com.example.quanlytoanhanhom4.util.UserSession;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,11 +16,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
+
+    private static final Logger logger = LoggerFactory.getLogger(MainController.class);
     
     @FXML
     private HBox topBar;
@@ -56,9 +61,9 @@ public class MainController implements Initializable {
             adminLabel.setText("CHÀO " + (username != null ? username.toUpperCase() : "ADMIN"));
         }
 
-        // Thêm logo vào đầu topBar
+        // Thêm logo vào đầu topBar - dùng màu cho nền xanh
         if (topBar != null) {
-            BuildingLogo logo = new BuildingLogo(60, 60);
+            BuildingLogo logo = new BuildingLogo(60, 60, true); // true = cho nền xanh
             StackPane logoContainer = new StackPane(logo);
             logoContainer.setPadding(new Insets(0, 10, 0, 0));
             logoContainer.setMaxWidth(70); // Giới hạn kích thước để không vỡ giao diện
@@ -76,16 +81,35 @@ public class MainController implements Initializable {
             currentStage.setResizable(true);
             
             DashboardView.show(currentStage, role != null ? role : "user");
+            logger.debug("Đã mở dashboard cho role: {}", role);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Lỗi khi mở dashboard", e);
+            AlertUtils.showError("Lỗi", "Không thể mở dashboard: " + e.getMessage());
         }
     }
     
     private void openModule(String fxmlPath, String title) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            java.net.URL resource = getClass().getResource(fxmlPath);
+            if (resource == null) {
+                logger.error("Không tìm thấy file FXML: {}", fxmlPath);
+                AlertUtils.showError(
+                        "Lỗi",
+                        "Không tìm thấy file: " + fxmlPath + "\nVui lòng kiểm tra lại đường dẫn."
+                );
+                return;
+            }
+
+            logger.debug("Đang mở module: {} từ {}", title, fxmlPath);
+            FXMLLoader loader = new FXMLLoader(resource);
             Stage moduleStage = new Stage();
             Scene scene = new Scene(loader.load());
+
+            // Nếu là BMS controller, set tiêu đề cho label
+            Object controller = loader.getController();
+            if (controller instanceof BMSController) {
+                ((BMSController) controller).setTitle(title);
+            }
             
             moduleStage.setTitle(title);
             moduleStage.setScene(scene);
@@ -97,8 +121,13 @@ public class MainController implements Initializable {
             moduleStage.setMaximized(true);
             
             moduleStage.show();
+            logger.info("Đã mở cửa sổ: {}", title);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Lỗi khi mở cửa sổ: {}", title, e);
+            AlertUtils.showError(
+                    "Lỗi",
+                    "Không thể mở cửa sổ: " + title + "\n" + e.getMessage()
+            );
         }
     }
     
@@ -109,12 +138,12 @@ public class MainController implements Initializable {
     
     @FXML
     private void handleBms() {
-        openModule("/com/example/quanlytoanhanhom4/fxml/bms.fxml", "Giám sát & Điều khiển (BMS)");
+        openModule("/com/example/quanlytoanhanhom4/fxml/bms.fxml", "Giám sát hệ thống");
     }
     
     @FXML
     private void handlePccc() {
-        openModule("/com/example/quanlytoanhanhom4/fxml/bms.fxml", "Phòng cháy chữa cháy");
+        openModule("/com/example/quanlytoanhanhom4/fxml/bms.fxml", "PCCC & Khẩn cấp");
     }
     
     @FXML
@@ -190,6 +219,7 @@ public class MainController implements Initializable {
             
             // Xóa thông tin session
             UserSession.clear();
+            logger.info("User đã đăng xuất");
             
             // Mở lại màn hình đăng nhập
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/quanlytoanhanhom4/fxml/login.fxml"));
@@ -199,8 +229,10 @@ public class MainController implements Initializable {
             loginStage.setResizable(false);
             loginStage.setScene(scene);
             loginStage.show();
+            logger.debug("Đã mở lại màn hình đăng nhập");
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Lỗi khi đăng xuất", e);
+            AlertUtils.showError("Lỗi", "Không thể đăng xuất: " + e.getMessage());
         }
     }
 }

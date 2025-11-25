@@ -112,14 +112,22 @@ public class SecurityController implements Initializable {
     }
     
     private void loadIncidents() {
-        incidents.clear();
-        String filterStatus = filterStatusCombo.getValue();
+        try {
+            incidents.clear();
+            String filterStatus = filterStatusCombo.getValue();
 
-        if (filterStatus == null || filterStatus.equals(ALL_LABEL)) {
-            incidents.addAll(SecurityService.getAllIncidents());
-        } else {
-            String statusValue = toValue(STATUS_OPTIONS, filterStatus);
-            incidents.addAll(SecurityService.getIncidentsByStatus(statusValue));
+            if (filterStatus == null || filterStatus.equals(ALL_LABEL)) {
+                incidents.addAll(SecurityService.getAllIncidents());
+            } else {
+                String statusValue = toValue(STATUS_OPTIONS, filterStatus);
+                incidents.addAll(SecurityService.getIncidentsByStatus(statusValue));
+            }
+
+            // Refresh table to ensure data is displayed
+            securityTable.refresh();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Lỗi khi tải dữ liệu an ninh: " + e.getMessage());
         }
     }
     

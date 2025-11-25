@@ -8,7 +8,7 @@
    <top>
       <HBox spacing="10" style="-fx-background-color: #2874A6; -fx-padding: 15;">
          <children>
-            <Label text="Bảo trì &amp; Bảo dưỡng" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+             <Label text="Quản lý Bảo trì" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Label text="Lọc theo trạng thái:" style="-fx-text-fill: white;"/>
             <ComboBox fx:id="filterStatusCombo" prefWidth="150" onAction="#handleFilter"/>

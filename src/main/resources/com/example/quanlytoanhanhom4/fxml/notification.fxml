@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.Region?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.quanlytoanhanhom4.controller.NotificationController">
+    <top>
+        <HBox spacing="10" style="-fx-background-color: #2874A6; -fx-padding: 15;">
+            <children>
+                <Label text="Gửi thông báo" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="Lọc theo trạng thái:" style="-fx-text-fill: white;"/>
+                <ComboBox fx:id="filterStatusCombo" prefWidth="150" onAction="#handleFilter"/>
+                <Button text="Quay lại" onAction="#handleBack"
+                        style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
+            </children>
+        </HBox>
+    </top>
+    <center>
+        <VBox spacing="10" style="-fx-padding: 15;">
+            <children>
+                <TableView fx:id="notificationTable" prefHeight="300">
+                    <columns>
+                        <TableColumn fx:id="colTitle" text="Tiêu đề" prefWidth="250"/>
+                        <TableColumn fx:id="colType" text="Loại" prefWidth="120"/>
+                        <TableColumn fx:id="colTarget" text="Đối tượng" prefWidth="120"/>
+                        <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="100"/>
+                    </columns>
+                </TableView>
+                <Label fx:id="statusLabel" style="-fx-text-fill: green;"/>
+            </children>
+        </VBox>
+    </center>
+    <right>
+        <ScrollPane fitToWidth="true">
+            <VBox spacing="10" style="-fx-padding: 15; -fx-min-width: 300;">
+                <children>
+                    <Label text="Thông tin thông báo" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    <Label text="Tiêu đề:"/>
+                    <TextField fx:id="titleField" prefWidth="250"/>
+                    <Label text="Nội dung:"/>
+                    <TextArea fx:id="contentArea" prefWidth="250" prefHeight="100"/>
+                    <Label text="Loại thông báo:"/>
+                    <ComboBox fx:id="notificationTypeCombo" prefWidth="250"/>
+                    <Label text="Đối tượng nhận:"/>
+                    <ComboBox fx:id="targetTypeCombo" prefWidth="250"/>
+                    <Label text="ID đối tượng:"/>
+                    <ComboBox fx:id="targetIdCombo" prefWidth="250"/>
+                    <Label text="Mức độ ưu tiên:"/>
+                    <ComboBox fx:id="priorityCombo" prefWidth="250"/>
+                    <Label text="Trạng thái:"/>
+                    <ComboBox fx:id="statusCombo" prefWidth="250"/>
+                    <Label text="Ngày hết hạn:"/>
+                    <DatePicker fx:id="expiryDatePicker" prefWidth="250"/>
+                    <HBox spacing="10">
+                        <children>
+                            <Button fx:id="addButton" text="Thêm" onAction="#handleAdd"
+                                    style="-fx-background-color: #27AE60; -fx-text-fill: white; -fx-pref-width: 70;"/>
+                            <Button fx:id="updateButton" text="Cập nhật" onAction="#handleUpdate" disable="true"
+                                    style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-pref-width: 70;"/>
+                        </children>
+                    </HBox>
+                    <Button fx:id="sendButton" text="Gửi" onAction="#handleSend" disable="true"
+                            style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-pref-width: 250;"/>
+                    <Button fx:id="deleteButton" text="Xóa" onAction="#handleDelete" disable="true"
+                            style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-pref-width: 250;"/>
+                </children>
+            </VBox>
+        </ScrollPane>
+    </right>
+</BorderPane>
+
+

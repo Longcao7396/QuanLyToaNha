@@ -37,6 +37,8 @@ public class BMSController implements Initializable {
     @FXML private Button updateButton;
     @FXML private Button deleteButton;
     @FXML private Label statusLabel;
+    @FXML
+    private Label titleLabel;
 
     private static final LinkedHashMap<String, String> SYSTEM_TYPE_OPTIONS = new LinkedHashMap<>();
     private static final LinkedHashMap<String, String> STATUS_OPTIONS = new LinkedHashMap<>();
@@ -102,14 +104,22 @@ public class BMSController implements Initializable {
     }
     
     private void loadSystems() {
-        systems.clear();
-        String filterType = filterTypeCombo.getValue();
+        try {
+            systems.clear();
+            String filterType = filterTypeCombo.getValue();
 
-        if (filterType == null || filterType.equals(ALL_LABEL)) {
-            systems.addAll(BMSService.getAllSystems());
-        } else {
-            String systemTypeValue = toValue(SYSTEM_TYPE_OPTIONS, filterType);
-            systems.addAll(BMSService.getSystemsByType(systemTypeValue));
+            if (filterType == null || filterType.equals(ALL_LABEL)) {
+                systems.addAll(BMSService.getAllSystems());
+            } else {
+                String systemTypeValue = toValue(SYSTEM_TYPE_OPTIONS, filterType);
+                systems.addAll(BMSService.getSystemsByType(systemTypeValue));
+            }
+
+            // Refresh table to ensure data is displayed
+            systemTable.refresh();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Lỗi khi tải dữ liệu BMS: " + e.getMessage());
         }
     }
     
@@ -287,6 +297,12 @@ public class BMSController implements Initializable {
                 .map(Map.Entry::getKey)
                 .findFirst()
                 .orElse(display);
+    }
+
+    public void setTitle(String title) {
+        if (titleLabel != null) {
+            titleLabel.setText(title);
+        }
     }
 }
 
