@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.Region?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.quanlytoanhanhom4.controller.InvoiceController">
+    <top>
+        <HBox spacing="10" style="-fx-background-color: #2874A6; -fx-padding: 15;">
+            <children>
+                <Label text="Hóa đơn &amp; Thanh toán"
+                       style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="Lọc theo trạng thái:" style="-fx-text-fill: white;"/>
+                <ComboBox fx:id="filterStatusCombo" prefWidth="150" onAction="#handleFilter"/>
+                <Button text="Quay lại" onAction="#handleBack"
+                        style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
+            </children>
+        </HBox>
+    </top>
+    <center>
+        <VBox spacing="10" style="-fx-padding: 15;">
+            <children>
+                <TableView fx:id="invoiceTable" prefHeight="300">
+                    <columns>
+                        <TableColumn fx:id="colInvoiceNumber" text="Số hóa đơn" prefWidth="150"/>
+                        <TableColumn fx:id="colInvoiceDate" text="Ngày lập" prefWidth="120"/>
+                        <TableColumn fx:id="colTotalAmount" text="Tổng tiền" prefWidth="150"/>
+                        <TableColumn fx:id="colPaidAmount" text="Đã thanh toán" prefWidth="150"/>
+                        <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="120"/>
+                    </columns>
+                </TableView>
+                <Label fx:id="statusLabel" style="-fx-text-fill: green;"/>
+            </children>
+        </VBox>
+    </center>
+    <right>
+        <ScrollPane fitToWidth="true">
+            <VBox spacing="10" style="-fx-padding: 15; -fx-min-width: 300;">
+                <children>
+                    <Label text="Thông tin hóa đơn" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    <Label text="Căn hộ:"/>
+                    <ComboBox fx:id="apartmentIdCombo" prefWidth="250"/>
+                    <Label text="Số hóa đơn:"/>
+                    <TextField fx:id="invoiceNumberField" prefWidth="250"/>
+                    <Label text="Ngày lập:"/>
+                    <DatePicker fx:id="invoiceDatePicker" prefWidth="250"/>
+                    <Label text="Hạn thanh toán:"/>
+                    <DatePicker fx:id="dueDatePicker" prefWidth="250"/>
+                    <Label text="Tổng tiền (VNĐ):"/>
+                    <TextField fx:id="totalAmountField" prefWidth="250"/>
+                    <Label text="Đã thanh toán (VNĐ):"/>
+                    <TextField fx:id="paidAmountField" prefWidth="250"/>
+                    <Label text="Trạng thái:"/>
+                    <ComboBox fx:id="statusCombo" prefWidth="250"/>
+                    <Label text="Phương thức thanh toán:"/>
+                    <ComboBox fx:id="paymentMethodCombo" prefWidth="250"/>
+                    <Label text="Ngày thanh toán:"/>
+                    <DatePicker fx:id="paymentDatePicker" prefWidth="250"/>
+                    <Label text="Ghi chú:"/>
+                    <TextArea fx:id="notesArea" prefWidth="250" prefHeight="60"/>
+                    <HBox spacing="10">
+                        <children>
+                            <Button fx:id="addButton" text="Thêm" onAction="#handleAdd"
+                                    style="-fx-background-color: #27AE60; -fx-text-fill: white; -fx-pref-width: 80;"/>
+                            <Button fx:id="updateButton" text="Cập nhật" onAction="#handleUpdate" disable="true"
+                                    style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-pref-width: 80;"/>
+                        </children>
+                    </HBox>
+                    <Button fx:id="deleteButton" text="Xóa" onAction="#handleDelete" disable="true"
+                            style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-pref-width: 250;"/>
+                </children>
+            </VBox>
+        </ScrollPane>
+    </right>
+</BorderPane>
+
+
