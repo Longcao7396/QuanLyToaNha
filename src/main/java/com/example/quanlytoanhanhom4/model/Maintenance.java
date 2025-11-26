@@ -7,7 +7,7 @@ public class Maintenance {
     private int id;
     private Integer systemId;
     private String systemType;
-    private String maintenanceType; // PREVENTIVE, CORRECTIVE, EMERGENCY
+    private String maintenanceType; // BẢO_TRÌ_ĐỊNH_KỲ, BẢO_TRÌ_SỬA_CHỮA, BẢO_TRÌ_KHẨN_CẤP
     private String description;
     private LocalDate scheduledDate;
     private LocalDate completedDate;

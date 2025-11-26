@@ -41,3 +41,4 @@ Sau khi mở project, bạn sẽ thấy:
 - Nếu vẫn còn lỗi, thử **File** → **Invalidate Caches / Restart...** → **Invalidate and Restart**
 - Đảm bảo JDK đã được cấu hình đúng trong **File** → **Project Structure** → **Project** → **SDK**
 
+

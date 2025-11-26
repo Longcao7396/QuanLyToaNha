@@ -60,9 +60,9 @@ public class MaintenanceService {
             pstmt.setString(3, maintenance.getMaintenanceType());
             pstmt.setString(4, maintenance.getDescription());
             pstmt.setObject(5, maintenance.getScheduledDate());
-            pstmt.setString(6, maintenance.getStatus() != null ? maintenance.getStatus() : "PENDING");
+            pstmt.setString(6, maintenance.getStatus() != null ? maintenance.getStatus() : "CHỜ_XỬ_LÝ");
             pstmt.setObject(7, maintenance.getAssignedTo());
-            pstmt.setString(8, maintenance.getPriority() != null ? maintenance.getPriority() : "MEDIUM");
+            pstmt.setString(8, maintenance.getPriority() != null ? maintenance.getPriority() : "TRUNG_BÌNH");
             pstmt.setObject(9, maintenance.getCreatedBy());
             pstmt.setString(10, maintenance.getNotes());
             
@@ -100,7 +100,7 @@ public class MaintenanceService {
     }
     
     public static boolean completeMaintenance(int id, LocalDate completedDate, String notes) {
-        String sql = "UPDATE maintenance SET status = 'COMPLETED', completed_date = ?, notes = ? WHERE id = ?";
+        String sql = "UPDATE maintenance SET status = 'HOÀN_THÀNH', completed_date = ?, notes = ? WHERE id = ?";
         
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {

@@ -107,19 +107,19 @@ public class HRController implements Initializable {
     private static final LinkedHashMap<String, String> SHIFT_OPTIONS = new LinkedHashMap<>();
 
     static {
-        STAFF_STATUS_OPTIONS.put("ACTIVE", "Đang làm việc");
-        STAFF_STATUS_OPTIONS.put("ON_LEAVE", "Nghỉ phép");
-        STAFF_STATUS_OPTIONS.put("INACTIVE", "Ngừng làm việc");
+        STAFF_STATUS_OPTIONS.put("HOẠT_ĐỘNG", "Đang làm việc");
+        STAFF_STATUS_OPTIONS.put("NGHỈ_PHÉP", "Nghỉ phép");
+        STAFF_STATUS_OPTIONS.put("NGỪNG_HOẠT_ĐỘNG", "Ngừng làm việc");
 
-        ATTENDANCE_STATUS_OPTIONS.put("PRESENT", "Có mặt");
-        ATTENDANCE_STATUS_OPTIONS.put("LATE", "Đi muộn");
-        ATTENDANCE_STATUS_OPTIONS.put("ABSENT", "Vắng mặt");
-        ATTENDANCE_STATUS_OPTIONS.put("REMOTE", "Làm việc từ xa");
+        ATTENDANCE_STATUS_OPTIONS.put("CÓ_MẶT", "Có mặt");
+        ATTENDANCE_STATUS_OPTIONS.put("MUỘN", "Đi muộn");
+        ATTENDANCE_STATUS_OPTIONS.put("VẮNG_MẶT", "Vắng mặt");
+        ATTENDANCE_STATUS_OPTIONS.put("LÀM_VIỆC_TỪ_XA", "Làm việc từ xa");
 
-        CONTRACT_STATUS_OPTIONS.put("ACTIVE", "Đang hiệu lực");
-        CONTRACT_STATUS_OPTIONS.put("EXPIRED", "Hết hạn");
-        CONTRACT_STATUS_OPTIONS.put("TERMINATED", "Đã chấm dứt");
-        CONTRACT_STATUS_OPTIONS.put("ON_HOLD", "Tạm hoãn");
+        CONTRACT_STATUS_OPTIONS.put("HOẠT_ĐỘNG", "Đang hiệu lực");
+        CONTRACT_STATUS_OPTIONS.put("HẾT_HẠN", "Hết hạn");
+        CONTRACT_STATUS_OPTIONS.put("ĐÃ_CHẤM_DỨT", "Đã chấm dứt");
+        CONTRACT_STATUS_OPTIONS.put("TẠM_HOÃN", "Tạm hoãn");
 
         SHIFT_OPTIONS.put("MORNING", "SÁNG");
         SHIFT_OPTIONS.put("AFTERNOON", "CHIỀU");
@@ -181,7 +181,7 @@ public class HRController implements Initializable {
         staffTable.setItems(staffData);
 
         staffStatusCombo.setItems(FXCollections.observableArrayList(STAFF_STATUS_OPTIONS.values()));
-        staffStatusCombo.setValue(toDisplay(STAFF_STATUS_OPTIONS, "ACTIVE"));
+        staffStatusCombo.setValue(toDisplay(STAFF_STATUS_OPTIONS, "HOẠT_ĐỘNG"));
 
         staffTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             selectedStaff = newSelection;
@@ -427,7 +427,7 @@ public class HRController implements Initializable {
         staff.setPhone(phoneField.getText().trim());
         staff.setEmail(emailField.getText().trim());
         staff.setStartDate(staffStartDatePicker.getValue());
-        staff.setStatus(staffStatusCombo.getValue() != null ? toValue(STAFF_STATUS_OPTIONS, staffStatusCombo.getValue()) : "ACTIVE");
+        staff.setStatus(staffStatusCombo.getValue() != null ? toValue(STAFF_STATUS_OPTIONS, staffStatusCombo.getValue()) : "HOẠT_ĐỘNG");
         Double salary = parseDoubleField(salaryField.getText().trim(), "Lương cơ bản");
         if (salary == null && !salaryField.getText().trim().isEmpty()) {
             return null;
@@ -459,7 +459,7 @@ public class HRController implements Initializable {
         phoneField.clear();
         emailField.clear();
         staffStartDatePicker.setValue(null);
-        staffStatusCombo.setValue(toDisplay(STAFF_STATUS_OPTIONS, "ACTIVE"));
+        staffStatusCombo.setValue(toDisplay(STAFF_STATUS_OPTIONS, "HOẠT_ĐỘNG"));
         salaryField.clear();
         staffNotesArea.clear();
     }

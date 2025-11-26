@@ -51,11 +51,12 @@ public class BMSController implements Initializable {
         SYSTEM_TYPE_OPTIONS.put("PCCC", "Phòng cháy chữa cháy");
         SYSTEM_TYPE_OPTIONS.put("AN_NINH", "An ninh");
         SYSTEM_TYPE_OPTIONS.put("CHIEU_SANG", "Chiếu sáng");
+        SYSTEM_TYPE_OPTIONS.put("THANG_MÁY", "Thang máy");
 
-        STATUS_OPTIONS.put("NORMAL", "Bình thường");
-        STATUS_OPTIONS.put("WARNING", "Cảnh báo");
-        STATUS_OPTIONS.put("ERROR", "Lỗi");
-        STATUS_OPTIONS.put("MAINTENANCE", "Đang bảo trì");
+        STATUS_OPTIONS.put("BÌNH_THƯỜNG", "Bình thường");
+        STATUS_OPTIONS.put("CẢNH_BÁO", "Cảnh báo");
+        STATUS_OPTIONS.put("LỖI", "Lỗi");
+        STATUS_OPTIONS.put("ĐANG_BẢO_TRÌ", "Đang bảo trì");
     }
 
     private ObservableList<BMSSystem> systems;
@@ -100,7 +101,7 @@ public class BMSController implements Initializable {
 
         ObservableList<String> statuses = FXCollections.observableArrayList(STATUS_OPTIONS.values());
         statusCombo.setItems(statuses);
-        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "NORMAL"));
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "BÌNH_THƯỜNG"));
     }
     
     private void loadSystems() {
@@ -249,7 +250,7 @@ public class BMSController implements Initializable {
         systemTypeCombo.setValue(null);
         systemNameField.clear();
         locationField.clear();
-        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "NORMAL"));
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "BÌNH_THƯỜNG"));
         valueField.clear();
         unitField.clear();
         descriptionArea.clear();

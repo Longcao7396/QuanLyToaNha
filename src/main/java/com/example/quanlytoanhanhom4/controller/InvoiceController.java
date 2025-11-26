@@ -74,11 +74,11 @@ public class InvoiceController implements Initializable {
     private static final String ALL_LABEL = "Tất cả";
 
     static {
-        STATUS_OPTIONS.put("PENDING", "Chờ thanh toán");
-        STATUS_OPTIONS.put("PARTIAL", "Thanh toán một phần");
-        STATUS_OPTIONS.put("PAID", "Đã thanh toán");
-        STATUS_OPTIONS.put("OVERDUE", "Quá hạn");
-        STATUS_OPTIONS.put("CANCELLED", "Đã hủy");
+        STATUS_OPTIONS.put("CHỜ_THANH_TOÁN", "Chờ thanh toán");
+        STATUS_OPTIONS.put("THANH_TOÁN_MỘT_PHẦN", "Thanh toán một phần");
+        STATUS_OPTIONS.put("ĐÃ_THANH_TOÁN", "Đã thanh toán");
+        STATUS_OPTIONS.put("QUÁ_HẠN", "Quá hạn");
+        STATUS_OPTIONS.put("ĐÃ_HỦY", "Đã hủy");
 
         PAYMENT_METHOD_OPTIONS.put("CASH", "Tiền mặt");
         PAYMENT_METHOD_OPTIONS.put("BANK_TRANSFER", "Chuyển khoản");
@@ -129,7 +129,7 @@ public class InvoiceController implements Initializable {
     private void initializeComboBoxes() {
         ObservableList<String> statuses = FXCollections.observableArrayList(STATUS_OPTIONS.values());
         statusCombo.setItems(statuses);
-        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "PENDING"));
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "CHỜ_THANH_TOÁN"));
 
         ObservableList<String> filterStatuses = FXCollections.observableArrayList(statuses);
         filterStatuses.add(0, ALL_LABEL);
@@ -322,7 +322,7 @@ public class InvoiceController implements Initializable {
         dueDatePicker.setValue(LocalDate.now().plusDays(30));
         totalAmountField.clear();
         paidAmountField.clear();
-        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "PENDING"));
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "CHỜ_THANH_TOÁN"));
         paymentMethodCombo.setValue(null);
         paymentDatePicker.setValue(null);
         notesArea.clear();

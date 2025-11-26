@@ -79,10 +79,10 @@ public class UtilityController implements Initializable {
         UTILITY_TYPE_OPTIONS.put("INTERNET", "Internet");
         UTILITY_TYPE_OPTIONS.put("GARAGE", "Gara");
 
-        STATUS_OPTIONS.put("PENDING", "Chờ thanh toán");
-        STATUS_OPTIONS.put("PAID", "Đã thanh toán");
-        STATUS_OPTIONS.put("OVERDUE", "Quá hạn");
-        STATUS_OPTIONS.put("CANCELLED", "Đã hủy");
+        STATUS_OPTIONS.put("CHỜ_THANH_TOÁN", "Chờ thanh toán");
+        STATUS_OPTIONS.put("ĐÃ_THANH_TOÁN", "Đã thanh toán");
+        STATUS_OPTIONS.put("QUÁ_HẠN", "Quá hạn");
+        STATUS_OPTIONS.put("ĐÃ_HỦY", "Đã hủy");
     }
 
     private ObservableList<Utility> utilities;
@@ -137,7 +137,7 @@ public class UtilityController implements Initializable {
 
         ObservableList<String> statuses = FXCollections.observableArrayList(STATUS_OPTIONS.values());
         statusCombo.setItems(statuses);
-        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "PENDING"));
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "CHỜ_THANH_TOÁN"));
 
         // Load apartment IDs from service
         try {
@@ -356,7 +356,7 @@ public class UtilityController implements Initializable {
         periodMonthSpinner.getValueFactory().setValue(LocalDate.now().getMonthValue());
         periodYearSpinner.getValueFactory().setValue(LocalDate.now().getYear());
         dueDatePicker.setValue(null);
-        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "PENDING"));
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "CHỜ_THANH_TOÁN"));
         notesArea.clear();
         selectedUtility = null;
         utilityTable.getSelectionModel().clearSelection();

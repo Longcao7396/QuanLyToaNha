@@ -12,7 +12,7 @@ public class Invoice {
     private Double totalAmount;
     private Double paidAmount;
     private Double remainingAmount;
-    private String status; // PENDING, PARTIAL, PAID, OVERDUE, CANCELLED
+    private String status; // CHỜ_THANH_TOÁN, THANH_TOÁN_MỘT_PHẦN, ĐÃ_THANH_TOÁN, QUÁ_HẠN, ĐÃ_HỦY
     private String paymentMethod;
     private LocalDate paymentDate;
     private String notes;

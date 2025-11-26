@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 public class AdminTask {
     private int id;
-    private String taskType; // HR, FINANCE, DOCUMENT, MEETING, OTHER
+    private String taskType; // NHÂN_SỰ, TÀI_CHÍNH, TÀI_LIỆU, CUỘC_HỌP, KHÁC
     private String title;
     private String description;
     private Integer assignedTo;

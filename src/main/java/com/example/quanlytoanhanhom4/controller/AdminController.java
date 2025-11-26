@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -46,21 +47,26 @@ public class AdminController implements Initializable {
     private static final String ALL_LABEL = "Tất cả";
 
     static {
-        TASK_TYPE_OPTIONS.put("HR", "Nhân sự");
-        TASK_TYPE_OPTIONS.put("FINANCE", "Tài chính");
-        TASK_TYPE_OPTIONS.put("DOCUMENT", "Tài liệu");
-        TASK_TYPE_OPTIONS.put("MEETING", "Cuộc họp");
-        TASK_TYPE_OPTIONS.put("OTHER", "Khác");
+        TASK_TYPE_OPTIONS.put("NHÂN_SỰ", "Nhân sự");
+        TASK_TYPE_OPTIONS.put("TÀI_CHÍNH", "Tài chính");
+        TASK_TYPE_OPTIONS.put("TÀI_LIỆU", "Tài liệu");
+        TASK_TYPE_OPTIONS.put("CUỘC_HỌP", "Cuộc họp");
+        TASK_TYPE_OPTIONS.put("BÁO_CÁO", "Báo cáo");
+        TASK_TYPE_OPTIONS.put("KIỂM_TRA", "Kiểm tra");
+        TASK_TYPE_OPTIONS.put("ĐÀO_TẠO", "Đào tạo");
+        TASK_TYPE_OPTIONS.put("NGÂN_SÁCH", "Ngân sách");
+        TASK_TYPE_OPTIONS.put("KIỂM_TOÁN", "Kiểm toán");
+        TASK_TYPE_OPTIONS.put("KHÁC", "Khác");
 
-        STATUS_OPTIONS.put("PENDING", "Chờ xử lý");
-        STATUS_OPTIONS.put("IN_PROGRESS", "Đang xử lý");
-        STATUS_OPTIONS.put("COMPLETED", "Hoàn thành");
-        STATUS_OPTIONS.put("CANCELLED", "Đã hủy");
+        STATUS_OPTIONS.put("CHỜ_XỬ_LÝ", "Chờ xử lý");
+        STATUS_OPTIONS.put("ĐANG_XỬ_LÝ", "Đang xử lý");
+        STATUS_OPTIONS.put("HOÀN_THÀNH", "Hoàn thành");
+        STATUS_OPTIONS.put("ĐÃ_HỦY", "Đã hủy");
 
-        PRIORITY_OPTIONS.put("LOW", "Thấp");
-        PRIORITY_OPTIONS.put("MEDIUM", "Trung bình");
-        PRIORITY_OPTIONS.put("HIGH", "Cao");
-        PRIORITY_OPTIONS.put("URGENT", "Khẩn cấp");
+        PRIORITY_OPTIONS.put("THẤP", "Thấp");
+        PRIORITY_OPTIONS.put("TRUNG_BÌNH", "Trung bình");
+        PRIORITY_OPTIONS.put("CAO", "Cao");
+        PRIORITY_OPTIONS.put("KHẨN_CẤP", "Khẩn cấp");
     }
 
     private ObservableList<AdminTask> tasks;
@@ -85,11 +91,29 @@ public class AdminController implements Initializable {
     }
     
     private void initializeTable() {
-        colTaskType.setCellValueFactory(new PropertyValueFactory<>("taskType"));
+        colTaskType.setCellValueFactory(cell -> {
+            AdminTask task = cell.getValue();
+            if (task == null) return new SimpleStringProperty("");
+            String taskType = task.getTaskType();
+            String display = toDisplay(TASK_TYPE_OPTIONS, taskType);
+            return new SimpleStringProperty(display != null ? display : taskType);
+        });
         colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
         colDueDate.setCellValueFactory(new PropertyValueFactory<>("dueDate"));
-        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
-        colPriority.setCellValueFactory(new PropertyValueFactory<>("priority"));
+        colStatus.setCellValueFactory(cell -> {
+            AdminTask task = cell.getValue();
+            if (task == null) return new SimpleStringProperty("");
+            String status = task.getStatus();
+            String display = toDisplay(STATUS_OPTIONS, status);
+            return new SimpleStringProperty(display != null ? display : status);
+        });
+        colPriority.setCellValueFactory(cell -> {
+            AdminTask task = cell.getValue();
+            if (task == null) return new SimpleStringProperty("");
+            String priority = task.getPriority();
+            String display = toDisplay(PRIORITY_OPTIONS, priority);
+            return new SimpleStringProperty(display != null ? display : priority);
+        });
         
         tasks = FXCollections.observableArrayList();
         taskTable.setItems(tasks);
@@ -101,7 +125,7 @@ public class AdminController implements Initializable {
 
         ObservableList<String> statuses = FXCollections.observableArrayList(STATUS_OPTIONS.values());
         statusCombo.setItems(statuses);
-        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "PENDING"));
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "CHỜ_XỬ_LÝ"));
 
         ObservableList<String> filterStatuses = FXCollections.observableArrayList(statuses);
         filterStatuses.add(0, ALL_LABEL);
@@ -110,7 +134,7 @@ public class AdminController implements Initializable {
 
         ObservableList<String> priorities = FXCollections.observableArrayList(PRIORITY_OPTIONS.values());
         priorityCombo.setItems(priorities);
-        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "MEDIUM"));
+        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "TRUNG_BÌNH"));
     }
     
     private void loadTasks() {
@@ -250,8 +274,8 @@ public class AdminController implements Initializable {
         titleField.clear();
         descriptionArea.clear();
         dueDatePicker.setValue(null);
-        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "PENDING"));
-        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "MEDIUM"));
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "CHỜ_XỬ_LÝ"));
+        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "TRUNG_BÌNH"));
         notesArea.clear();
         statusLabel.setText("");
     }

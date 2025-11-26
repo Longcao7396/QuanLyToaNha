@@ -64,10 +64,10 @@ public class ApartmentController implements Initializable {
     private static final String ALL_LABEL = "Tất cả";
 
     static {
-        STATUS_OPTIONS.put("OCCUPIED", "Đã cho thuê");
-        STATUS_OPTIONS.put("VACANT", "Trống");
-        STATUS_OPTIONS.put("RESERVED", "Đã đặt cọc");
-        STATUS_OPTIONS.put("MAINTENANCE", "Đang bảo trì");
+        STATUS_OPTIONS.put("ĐÃ_CHO_THUÊ", "Đã cho thuê");
+        STATUS_OPTIONS.put("TRỐNG", "Trống");
+        STATUS_OPTIONS.put("ĐÃ_ĐẶT_CỌC", "Đã đặt cọc");
+        STATUS_OPTIONS.put("ĐANG_BẢO_TRÌ", "Đang bảo trì");
     }
 
     private ObservableList<Apartment> apartments;
@@ -120,7 +120,7 @@ public class ApartmentController implements Initializable {
     private void initializeComboBoxes() {
         ObservableList<String> statuses = FXCollections.observableArrayList(STATUS_OPTIONS.values());
         statusCombo.setItems(statuses);
-        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "VACANT"));
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "TRỐNG"));
 
         ObservableList<String> filterStatuses = FXCollections.observableArrayList(statuses);
         filterStatuses.add(0, ALL_LABEL);
@@ -322,7 +322,7 @@ public class ApartmentController implements Initializable {
         numberOfPeopleSpinner.getValueFactory().setValue(1);
         areaField.clear();
         priceField.clear();
-        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "VACANT"));
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "TRỐNG"));
         selectedApartment = null;
         apartmentTable.getSelectionModel().clearSelection();
         addButton.setDisable(false);

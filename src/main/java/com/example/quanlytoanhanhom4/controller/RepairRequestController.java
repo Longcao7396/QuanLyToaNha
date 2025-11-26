@@ -79,25 +79,25 @@ public class RepairRequestController implements Initializable {
     private static final String ALL_LABEL = "Tất cả";
 
     static {
-        REPAIR_TYPE_OPTIONS.put("PLUMBING", "Đường ống nước");
-        REPAIR_TYPE_OPTIONS.put("ELECTRICAL", "Điện");
-        REPAIR_TYPE_OPTIONS.put("HVAC", "Điều hòa");
-        REPAIR_TYPE_OPTIONS.put("ELEVATOR", "Thang máy");
-        REPAIR_TYPE_OPTIONS.put("DOOR", "Cửa");
-        REPAIR_TYPE_OPTIONS.put("WINDOW", "Cửa sổ");
-        REPAIR_TYPE_OPTIONS.put("WALL", "Tường");
-        REPAIR_TYPE_OPTIONS.put("FLOOR", "Sàn");
-        REPAIR_TYPE_OPTIONS.put("OTHER", "Khác");
+        REPAIR_TYPE_OPTIONS.put("ĐƯỜNG_ỐNG_NƯỚC", "Đường ống nước");
+        REPAIR_TYPE_OPTIONS.put("ĐIỆN", "Điện");
+        REPAIR_TYPE_OPTIONS.put("ĐIỀU_HÒA", "Điều hòa");
+        REPAIR_TYPE_OPTIONS.put("THANG_MÁY", "Thang máy");
+        REPAIR_TYPE_OPTIONS.put("CỬA", "Cửa");
+        REPAIR_TYPE_OPTIONS.put("CỬA_SỔ", "Cửa sổ");
+        REPAIR_TYPE_OPTIONS.put("TƯỜNG", "Tường");
+        REPAIR_TYPE_OPTIONS.put("SÀN", "Sàn");
+        REPAIR_TYPE_OPTIONS.put("KHÁC", "Khác");
 
-        PRIORITY_OPTIONS.put("LOW", "Thấp");
-        PRIORITY_OPTIONS.put("MEDIUM", "Trung bình");
-        PRIORITY_OPTIONS.put("HIGH", "Cao");
-        PRIORITY_OPTIONS.put("URGENT", "Khẩn cấp");
+        PRIORITY_OPTIONS.put("THẤP", "Thấp");
+        PRIORITY_OPTIONS.put("TRUNG_BÌNH", "Trung bình");
+        PRIORITY_OPTIONS.put("CAO", "Cao");
+        PRIORITY_OPTIONS.put("KHẨN_CẤP", "Khẩn cấp");
 
-        STATUS_OPTIONS.put("PENDING", "Chờ xử lý");
-        STATUS_OPTIONS.put("IN_PROGRESS", "Đang xử lý");
-        STATUS_OPTIONS.put("COMPLETED", "Hoàn thành");
-        STATUS_OPTIONS.put("CANCELLED", "Đã hủy");
+        STATUS_OPTIONS.put("CHỜ_XỬ_LÝ", "Chờ xử lý");
+        STATUS_OPTIONS.put("ĐANG_XỬ_LÝ", "Đang xử lý");
+        STATUS_OPTIONS.put("HOÀN_THÀNH", "Hoàn thành");
+        STATUS_OPTIONS.put("ĐÃ_HỦY", "Đã hủy");
     }
 
     private ObservableList<RepairRequest> repairRequests;
@@ -147,11 +147,11 @@ public class RepairRequestController implements Initializable {
 
         ObservableList<String> priorities = FXCollections.observableArrayList(PRIORITY_OPTIONS.values());
         priorityCombo.setItems(priorities);
-        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "MEDIUM"));
+        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "TRUNG_BÌNH"));
 
         ObservableList<String> statuses = FXCollections.observableArrayList(STATUS_OPTIONS.values());
         statusCombo.setItems(statuses);
-        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "PENDING"));
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "CHỜ_XỬ_LÝ"));
 
         ObservableList<String> filterStatuses = FXCollections.observableArrayList(statuses);
         filterStatuses.add(0, ALL_LABEL);
@@ -352,8 +352,8 @@ public class RepairRequestController implements Initializable {
         titleField.clear();
         descriptionArea.clear();
         repairTypeCombo.setValue(null);
-        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "MEDIUM"));
-        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "PENDING"));
+        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "TRUNG_BÌNH"));
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "CHỜ_XỬ_LÝ"));
         requestedDatePicker.setValue(LocalDate.now());
         scheduledDatePicker.setValue(null);
         completedDatePicker.setValue(null);

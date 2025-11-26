@@ -45,20 +45,23 @@ public class CustomerController implements Initializable {
     private static final String ALL_LABEL = "Tất cả";
 
     static {
-        REQUEST_TYPE_OPTIONS.put("COMPLAINT", "Khiếu nại");
-        REQUEST_TYPE_OPTIONS.put("REQUEST", "Yêu cầu");
-        REQUEST_TYPE_OPTIONS.put("FEEDBACK", "Góp ý");
-        REQUEST_TYPE_OPTIONS.put("EMERGENCY", "Khẩn cấp");
+        REQUEST_TYPE_OPTIONS.put("KHIẾU_NẠI", "Khiếu nại");
+        REQUEST_TYPE_OPTIONS.put("YÊU_CẦU", "Yêu cầu");
+        REQUEST_TYPE_OPTIONS.put("GÓP_Ý", "Góp ý");
+        REQUEST_TYPE_OPTIONS.put("KHẨN_CẤP", "Khẩn cấp");
+        REQUEST_TYPE_OPTIONS.put("SỬA_CHỮA", "Sửa chữa");
+        REQUEST_TYPE_OPTIONS.put("DỊCH_VỤ", "Dịch vụ");
+        REQUEST_TYPE_OPTIONS.put("BẢO_TRÌ", "Bảo trì");
 
-        STATUS_OPTIONS.put("PENDING", "Chờ xử lý");
-        STATUS_OPTIONS.put("IN_PROGRESS", "Đang xử lý");
-        STATUS_OPTIONS.put("RESOLVED", "Đã giải quyết");
-        STATUS_OPTIONS.put("CLOSED", "Đã đóng");
+        STATUS_OPTIONS.put("CHỜ_XỬ_LÝ", "Chờ xử lý");
+        STATUS_OPTIONS.put("ĐANG_XỬ_LÝ", "Đang xử lý");
+        STATUS_OPTIONS.put("ĐÃ_GIẢI_QUYẾT", "Đã giải quyết");
+        STATUS_OPTIONS.put("ĐÃ_ĐÓNG", "Đã đóng");
 
-        PRIORITY_OPTIONS.put("LOW", "Thấp");
-        PRIORITY_OPTIONS.put("MEDIUM", "Trung bình");
-        PRIORITY_OPTIONS.put("HIGH", "Cao");
-        PRIORITY_OPTIONS.put("URGENT", "Khẩn cấp");
+        PRIORITY_OPTIONS.put("THẤP", "Thấp");
+        PRIORITY_OPTIONS.put("TRUNG_BÌNH", "Trung bình");
+        PRIORITY_OPTIONS.put("CAO", "Cao");
+        PRIORITY_OPTIONS.put("KHẨN_CẤP", "Khẩn cấp");
     }
 
     private ObservableList<CustomerRequest> requests;
@@ -84,11 +87,29 @@ public class CustomerController implements Initializable {
     }
     
     private void initializeTable() {
-        colRequestType.setCellValueFactory(new PropertyValueFactory<>("requestType"));
+        colRequestType.setCellValueFactory(cell -> {
+            CustomerRequest request = cell.getValue();
+            if (request == null) return new javafx.beans.property.SimpleStringProperty("");
+            String requestType = request.getRequestType();
+            String display = toDisplay(REQUEST_TYPE_OPTIONS, requestType);
+            return new javafx.beans.property.SimpleStringProperty(display != null ? display : requestType);
+        });
         colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
         colContent.setCellValueFactory(new PropertyValueFactory<>("content"));
-        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
-        colPriority.setCellValueFactory(new PropertyValueFactory<>("priority"));
+        colStatus.setCellValueFactory(cell -> {
+            CustomerRequest request = cell.getValue();
+            if (request == null) return new javafx.beans.property.SimpleStringProperty("");
+            String status = request.getStatus();
+            String display = toDisplay(STATUS_OPTIONS, status);
+            return new javafx.beans.property.SimpleStringProperty(display != null ? display : status);
+        });
+        colPriority.setCellValueFactory(cell -> {
+            CustomerRequest request = cell.getValue();
+            if (request == null) return new javafx.beans.property.SimpleStringProperty("");
+            String priority = request.getPriority();
+            String display = toDisplay(PRIORITY_OPTIONS, priority);
+            return new javafx.beans.property.SimpleStringProperty(display != null ? display : priority);
+        });
         
         requests = FXCollections.observableArrayList();
         requestTable.setItems(requests);
@@ -100,7 +121,7 @@ public class CustomerController implements Initializable {
 
         ObservableList<String> statuses = FXCollections.observableArrayList(STATUS_OPTIONS.values());
         statusCombo.setItems(statuses);
-        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "PENDING"));
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "CHỜ_XỬ_LÝ"));
 
         ObservableList<String> filterStatuses = FXCollections.observableArrayList(statuses);
         filterStatuses.add(0, ALL_LABEL);
@@ -109,7 +130,7 @@ public class CustomerController implements Initializable {
 
         ObservableList<String> priorities = FXCollections.observableArrayList(PRIORITY_OPTIONS.values());
         priorityCombo.setItems(priorities);
-        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "MEDIUM"));
+        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "TRUNG_BÌNH"));
     }
     
     private void initializeSpinner() {
@@ -253,8 +274,8 @@ public class CustomerController implements Initializable {
         requestTypeCombo.setValue(null);
         titleField.clear();
         contentArea.clear();
-        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "PENDING"));
-        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "MEDIUM"));
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "CHỜ_XỬ_LÝ"));
+        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "TRUNG_BÌNH"));
         resolutionArea.clear();
         ratingSpinner.getValueFactory().setValue(3);
         statusLabel.setText("");

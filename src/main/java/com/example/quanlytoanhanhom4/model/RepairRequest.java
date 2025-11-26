@@ -9,8 +9,8 @@ public class RepairRequest {
     private int residentId;
     private String title;
     private String description;
-    private String repairType; // PLUMBING, ELECTRICAL, HVAC, ELEVATOR, DOOR, WINDOW, etc.
-    private String priority; // LOW, MEDIUM, HIGH, URGENT
+    private String repairType; // ĐƯỜNG_ỐNG_NƯỚC, ĐIỆN, ĐIỀU_HÒA, THANG_MÁY, CỬA, CỬA_SỔ, etc.
+    private String priority; // THẤP, TRUNG_BÌNH, CAO, KHẨN_CẤP
     private String status; // PENDING, IN_PROGRESS, COMPLETED, CANCELLED
     private LocalDate requestedDate;
     private LocalDate scheduledDate;

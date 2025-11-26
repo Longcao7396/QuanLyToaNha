@@ -74,9 +74,9 @@ public class ResidentController implements Initializable {
     private static final String ALL_LABEL = "Tất cả";
 
     static {
-        STATUS_OPTIONS.put("ACTIVE", "Đang hoạt động");
-        STATUS_OPTIONS.put("INACTIVE", "Ngừng hoạt động");
-        STATUS_OPTIONS.put("MOVED_OUT", "Đã chuyển đi");
+        STATUS_OPTIONS.put("HOẠT_ĐỘNG", "Đang hoạt động");
+        STATUS_OPTIONS.put("NGỪNG_HOẠT_ĐỘNG", "Ngừng hoạt động");
+        STATUS_OPTIONS.put("ĐÃ_CHUYỂN_ĐI", "Đã chuyển đi");
     }
 
     private ObservableList<Resident> residents;
@@ -121,7 +121,7 @@ public class ResidentController implements Initializable {
     private void initializeComboBoxes() {
         ObservableList<String> statuses = FXCollections.observableArrayList(STATUS_OPTIONS.values());
         statusCombo.setItems(statuses);
-        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "ACTIVE"));
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "HOẠT_ĐỘNG"));
 
         ObservableList<String> filterStatuses = FXCollections.observableArrayList(statuses);
         filterStatuses.add(0, ALL_LABEL);
@@ -372,7 +372,7 @@ public class ResidentController implements Initializable {
         addressArea.clear();
         emergencyContactField.clear();
         emergencyPhoneField.clear();
-        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "ACTIVE"));
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "HOẠT_ĐỘNG"));
         notesArea.clear();
         selectedResident = null;
         residentTable.getSelectionModel().clearSelection();

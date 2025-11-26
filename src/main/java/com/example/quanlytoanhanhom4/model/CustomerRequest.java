@@ -8,7 +8,7 @@ public class CustomerRequest {
     private String requestType; // COMPLAINT, REQUEST, FEEDBACK, EMERGENCY
     private String title;
     private String content;
-    private String status; // PENDING, IN_PROGRESS, RESOLVED, CLOSED
+    private String status; // CHỜ_XỬ_LÝ, ĐANG_XỬ_LÝ, ĐÃ_GIẢI_QUYẾT, ĐÃ_ĐÓNG
     private String priority; // LOW, MEDIUM, HIGH, URGENT
     private LocalDateTime createdDate;
     private LocalDateTime resolvedDate;

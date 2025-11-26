@@ -57,7 +57,7 @@ public class CleaningService {
             pstmt.setString(1, cleaning.getArea());
             pstmt.setString(2, cleaning.getCleaningType());
             pstmt.setObject(3, cleaning.getScheduledDate());
-            pstmt.setString(4, cleaning.getStatus() != null ? cleaning.getStatus() : "PENDING");
+            pstmt.setString(4, cleaning.getStatus() != null ? cleaning.getStatus() : "CHỜ_XỬ_LÝ");
             pstmt.setObject(5, cleaning.getAssignedTo());
             pstmt.setObject(6, cleaning.getCreatedBy());
             pstmt.setString(7, cleaning.getNotes());
@@ -93,7 +93,7 @@ public class CleaningService {
     }
     
     public static boolean completeCleaning(int id, LocalDate completedDate, Integer qualityRating, String notes) {
-        String sql = "UPDATE cleaning SET status = 'COMPLETED', completed_date = ?, quality_rating = ?, notes = ? WHERE id = ?";
+        String sql = "UPDATE cleaning SET status = 'HOÀN_THÀNH', completed_date = ?, quality_rating = ?, notes = ? WHERE id = ?";
         
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {

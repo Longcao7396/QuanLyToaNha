@@ -44,15 +44,15 @@ public class CleaningController implements Initializable {
     private static final String ALL_LABEL = "Tất cả";
 
     static {
-        CLEANING_TYPE_OPTIONS.put("DAILY", "Hàng ngày");
-        CLEANING_TYPE_OPTIONS.put("WEEKLY", "Hàng tuần");
-        CLEANING_TYPE_OPTIONS.put("DEEP_CLEAN", "Tổng vệ sinh");
-        CLEANING_TYPE_OPTIONS.put("SPECIAL", "Đặc biệt");
+        CLEANING_TYPE_OPTIONS.put("HÀNG_NGÀY", "Hàng ngày");
+        CLEANING_TYPE_OPTIONS.put("HÀNG_TUẦN", "Hàng tuần");
+        CLEANING_TYPE_OPTIONS.put("TỔNG_VỆ_SINH", "Tổng vệ sinh");
+        CLEANING_TYPE_OPTIONS.put("ĐẶC_BIỆT", "Đặc biệt");
 
-        STATUS_OPTIONS.put("PENDING", "Chờ xử lý");
-        STATUS_OPTIONS.put("IN_PROGRESS", "Đang thực hiện");
-        STATUS_OPTIONS.put("COMPLETED", "Hoàn thành");
-        STATUS_OPTIONS.put("CANCELLED", "Đã hủy");
+        STATUS_OPTIONS.put("CHỜ_XỬ_LÝ", "Chờ xử lý");
+        STATUS_OPTIONS.put("ĐANG_XỬ_LÝ", "Đang thực hiện");
+        STATUS_OPTIONS.put("HOÀN_THÀNH", "Hoàn thành");
+        STATUS_OPTIONS.put("ĐÃ_HỦY", "Đã hủy");
     }
 
     private ObservableList<Cleaning> cleanings;
@@ -94,7 +94,7 @@ public class CleaningController implements Initializable {
 
         ObservableList<String> statuses = FXCollections.observableArrayList(STATUS_OPTIONS.values());
         statusCombo.setItems(statuses);
-        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "PENDING"));
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "CHỜ_XỬ_LÝ"));
 
         ObservableList<String> filterStatuses = FXCollections.observableArrayList(statuses);
         filterStatuses.add(0, ALL_LABEL);
@@ -234,7 +234,7 @@ public class CleaningController implements Initializable {
         areaField.clear();
         cleaningTypeCombo.setValue(null);
         scheduledDatePicker.setValue(null);
-        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "PENDING"));
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "CHỜ_XỬ_LÝ"));
         notesArea.clear();
         ratingSpinner.getValueFactory().setValue(3);
         statusLabel.setText("");

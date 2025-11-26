@@ -59,7 +59,7 @@ public class SecurityService {
             pstmt.setObject(4, security.getReportedBy());
             pstmt.setString(5, security.getStatus() != null ? security.getStatus() : "OPEN");
             pstmt.setObject(6, security.getAssignedTo());
-            pstmt.setString(7, security.getPriority() != null ? security.getPriority() : "MEDIUM");
+            pstmt.setString(7, security.getPriority() != null ? security.getPriority() : "TRUNG_BÌNH");
             
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -92,7 +92,7 @@ public class SecurityService {
     }
     
     public static boolean resolveIncident(int id, String resolution) {
-        String sql = "UPDATE security SET status = 'RESOLVED', resolved_date = NOW(), resolution = ? WHERE id = ?";
+        String sql = "UPDATE security SET status = 'ĐÃ_GIẢI_QUYẾT', resolved_date = NOW(), resolution = ? WHERE id = ?";
         
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {

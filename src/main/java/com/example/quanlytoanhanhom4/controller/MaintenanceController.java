@@ -53,20 +53,21 @@ public class MaintenanceController implements Initializable {
         SYSTEM_TYPE_OPTIONS.put("PCCC", "Phòng cháy chữa cháy");
         SYSTEM_TYPE_OPTIONS.put("AN_NINH", "An ninh");
         SYSTEM_TYPE_OPTIONS.put("CHIEU_SANG", "Chiếu sáng");
+        SYSTEM_TYPE_OPTIONS.put("THANG_MÁY", "Thang máy");
 
-        MAINTENANCE_TYPE_OPTIONS.put("PREVENTIVE", "Bảo trì định kỳ");
-        MAINTENANCE_TYPE_OPTIONS.put("CORRECTIVE", "Bảo trì sửa chữa");
-        MAINTENANCE_TYPE_OPTIONS.put("EMERGENCY", "Bảo trì khẩn cấp");
+        MAINTENANCE_TYPE_OPTIONS.put("BẢO_TRÌ_ĐỊNH_KỲ", "Bảo trì định kỳ");
+        MAINTENANCE_TYPE_OPTIONS.put("BẢO_TRÌ_SỬA_CHỮA", "Bảo trì sửa chữa");
+        MAINTENANCE_TYPE_OPTIONS.put("BẢO_TRÌ_KHẨN_CẤP", "Bảo trì khẩn cấp");
 
-        STATUS_OPTIONS.put("PENDING", "Chờ xử lý");
-        STATUS_OPTIONS.put("IN_PROGRESS", "Đang thực hiện");
-        STATUS_OPTIONS.put("COMPLETED", "Hoàn thành");
-        STATUS_OPTIONS.put("CANCELLED", "Đã hủy");
+        STATUS_OPTIONS.put("CHỜ_XỬ_LÝ", "Chờ xử lý");
+        STATUS_OPTIONS.put("ĐANG_XỬ_LÝ", "Đang thực hiện");
+        STATUS_OPTIONS.put("HOÀN_THÀNH", "Hoàn thành");
+        STATUS_OPTIONS.put("ĐÃ_HỦY", "Đã hủy");
 
-        PRIORITY_OPTIONS.put("LOW", "Thấp");
-        PRIORITY_OPTIONS.put("MEDIUM", "Trung bình");
-        PRIORITY_OPTIONS.put("HIGH", "Cao");
-        PRIORITY_OPTIONS.put("URGENT", "Khẩn cấp");
+        PRIORITY_OPTIONS.put("THẤP", "Thấp");
+        PRIORITY_OPTIONS.put("TRUNG_BÌNH", "Trung bình");
+        PRIORITY_OPTIONS.put("CAO", "Cao");
+        PRIORITY_OPTIONS.put("KHẨN_CẤP", "Khẩn cấp");
     }
 
     private ObservableList<Maintenance> maintenances;
@@ -111,7 +112,7 @@ public class MaintenanceController implements Initializable {
 
         ObservableList<String> statuses = FXCollections.observableArrayList(STATUS_OPTIONS.values());
         statusCombo.setItems(statuses);
-        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "PENDING"));
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "CHỜ_XỬ_LÝ"));
 
         ObservableList<String> filterStatuses = FXCollections.observableArrayList(statuses);
         filterStatuses.add(0, ALL_LABEL);
@@ -120,7 +121,7 @@ public class MaintenanceController implements Initializable {
 
         ObservableList<String> priorities = FXCollections.observableArrayList(PRIORITY_OPTIONS.values());
         priorityCombo.setItems(priorities);
-        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "MEDIUM"));
+        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "TRUNG_BÌNH"));
     }
     
     private void loadMaintenances() {
@@ -259,8 +260,8 @@ public class MaintenanceController implements Initializable {
         maintenanceTypeCombo.setValue(null);
         descriptionArea.clear();
         scheduledDatePicker.setValue(null);
-        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "PENDING"));
-        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "MEDIUM"));
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "CHỜ_XỬ_LÝ"));
+        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "TRUNG_BÌNH"));
         notesArea.clear();
         statusLabel.setText("");
     }

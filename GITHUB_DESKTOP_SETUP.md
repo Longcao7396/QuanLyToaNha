@@ -34,3 +34,4 @@ Sau khi thêm vào GitHub Desktop, bạn sẽ thấy:
 - Repository đã được push lên GitHub, nên bạn sẽ thấy tất cả commits và files
 - Bạn có thể tiếp tục làm việc và commit/push trực tiếp từ GitHub Desktop
 
+

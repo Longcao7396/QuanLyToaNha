@@ -79,10 +79,10 @@ public class NotificationController implements Initializable {
         TARGET_TYPE_OPTIONS.put("RESIDENT", "Cư dân");
         TARGET_TYPE_OPTIONS.put("STAFF", "Nhân viên");
 
-        PRIORITY_OPTIONS.put("LOW", "Thấp");
-        PRIORITY_OPTIONS.put("NORMAL", "Bình thường");
-        PRIORITY_OPTIONS.put("HIGH", "Cao");
-        PRIORITY_OPTIONS.put("URGENT", "Khẩn cấp");
+        PRIORITY_OPTIONS.put("THẤP", "Thấp");
+        PRIORITY_OPTIONS.put("BÌNH_THƯỜNG", "Bình thường");
+        PRIORITY_OPTIONS.put("CAO", "Cao");
+        PRIORITY_OPTIONS.put("KHẨN_CẤP", "Khẩn cấp");
 
         STATUS_OPTIONS.put("DRAFT", "Nháp");
         STATUS_OPTIONS.put("SENT", "Đã gửi");
@@ -148,7 +148,7 @@ public class NotificationController implements Initializable {
 
         ObservableList<String> priorities = FXCollections.observableArrayList(PRIORITY_OPTIONS.values());
         priorityCombo.setItems(priorities);
-        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "NORMAL"));
+        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "BÌNH_THƯỜNG"));
 
         ObservableList<String> statuses = FXCollections.observableArrayList(STATUS_OPTIONS.values());
         statusCombo.setItems(statuses);
@@ -332,7 +332,7 @@ public class NotificationController implements Initializable {
         notificationTypeCombo.setValue(null);
         targetTypeCombo.setValue(toDisplay(TARGET_TYPE_OPTIONS, "ALL"));
         targetIdCombo.setValue(null);
-        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "NORMAL"));
+        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "BÌNH_THƯỜNG"));
         statusCombo.setValue(toDisplay(STATUS_OPTIONS, "DRAFT"));
         expiryDatePicker.setValue(null);
         selectedNotification = null;

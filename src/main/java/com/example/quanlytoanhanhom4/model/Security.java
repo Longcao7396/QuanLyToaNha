@@ -9,7 +9,7 @@ public class Security {
     private String description;
     private Integer reportedBy;
     private LocalDateTime reportedDate;
-    private String status; // OPEN, IN_PROGRESS, RESOLVED, CLOSED
+    private String status; // MỚI_GHI_NHẬN, ĐANG_XỬ_LÝ, ĐÃ_GIẢI_QUYẾT, ĐÃ_ĐÓNG
     private Integer assignedTo;
     private LocalDateTime resolvedDate;
     private String resolution;

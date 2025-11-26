@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class BMSSystem {
     private int id;
-    private String systemType; // ĐIỆN, NƯỚC, HVAC, PCCC, AN_NINH, CHIEU_SANG
+    private String systemType; // ĐIỆN, NƯỚC, HVAC, PCCC, AN_NINH, CHIEU_SANG, THANG_MÁY
     private String systemName;
     private String location;
     private String status; // NORMAL, WARNING, ERROR, MAINTENANCE

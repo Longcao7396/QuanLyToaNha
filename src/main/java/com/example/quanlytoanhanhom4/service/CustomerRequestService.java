@@ -76,8 +76,8 @@ public class CustomerRequestService {
             pstmt.setString(2, request.getRequestType());
             pstmt.setString(3, request.getTitle());
             pstmt.setString(4, request.getContent());
-            pstmt.setString(5, request.getStatus() != null ? request.getStatus() : "PENDING");
-            pstmt.setString(6, request.getPriority() != null ? request.getPriority() : "MEDIUM");
+            pstmt.setString(5, request.getStatus() != null ? request.getStatus() : "CHỜ_XỬ_LÝ");
+            pstmt.setString(6, request.getPriority() != null ? request.getPriority() : "TRUNG_BÌNH");
             pstmt.setObject(7, request.getAssignedTo());
             
             return pstmt.executeUpdate() > 0;
@@ -112,7 +112,7 @@ public class CustomerRequestService {
     }
     
     public static boolean resolveRequest(int id, String resolution, Integer satisfactionRating) {
-        String sql = "UPDATE customer_request SET status = 'RESOLVED', resolved_date = NOW(), resolution = ?, satisfaction_rating = ? WHERE id = ?";
+        String sql = "UPDATE customer_request SET status = 'ĐÃ_GIẢI_QUYẾT', resolved_date = NOW(), resolution = ?, satisfaction_rating = ? WHERE id = ?";
         
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {

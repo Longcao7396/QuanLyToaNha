@@ -109,7 +109,7 @@ public class UtilityService {
             pstmt.setObject(8, utility.getPeriodMonth());
             pstmt.setObject(9, utility.getPeriodYear());
             pstmt.setObject(10, utility.getDueDate());
-            pstmt.setString(11, utility.getStatus() != null ? utility.getStatus() : "PENDING");
+            pstmt.setString(11, utility.getStatus() != null ? utility.getStatus() : "CHỜ_THANH_TOÁN");
             pstmt.setString(12, utility.getNotes());
 
             return pstmt.executeUpdate() > 0;

@@ -106,7 +106,7 @@ public class InvoiceService {
             pstmt.setDouble(5, invoice.getTotalAmount());
             pstmt.setDouble(6, invoice.getPaidAmount() != null ? invoice.getPaidAmount() : 0.0);
             pstmt.setDouble(7, invoice.getRemainingAmount() != null ? invoice.getRemainingAmount() : invoice.getTotalAmount());
-            pstmt.setString(8, invoice.getStatus() != null ? invoice.getStatus() : "PENDING");
+            pstmt.setString(8, invoice.getStatus() != null ? invoice.getStatus() : "CHỜ_THANH_TOÁN");
             if (invoice.getCreatedBy() != null) {
                 pstmt.setInt(9, invoice.getCreatedBy());
             } else {

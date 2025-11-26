@@ -121,7 +121,7 @@ public class ResidentService {
             pstmt.setString(8, resident.getAddress());
             pstmt.setString(9, resident.getEmergencyContact());
             pstmt.setString(10, resident.getEmergencyPhone());
-            pstmt.setString(11, resident.getStatus() != null ? resident.getStatus() : "ACTIVE");
+            pstmt.setString(11, resident.getStatus() != null ? resident.getStatus() : "HOẠT_ĐỘNG");
             pstmt.setString(12, resident.getNotes());
 
             int rowsAffected = pstmt.executeUpdate();

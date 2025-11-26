@@ -104,8 +104,8 @@ public class RepairRequestService {
             pstmt.setString(3, request.getTitle());
             pstmt.setString(4, request.getDescription());
             pstmt.setString(5, request.getRepairType());
-            pstmt.setString(6, request.getPriority() != null ? request.getPriority() : "MEDIUM");
-            pstmt.setString(7, request.getStatus() != null ? request.getStatus() : "PENDING");
+            pstmt.setString(6, request.getPriority() != null ? request.getPriority() : "TRUNG_BÌNH");
+            pstmt.setString(7, request.getStatus() != null ? request.getStatus() : "CHỜ_XỬ_LÝ");
             pstmt.setDate(8, Date.valueOf(request.getRequestedDate()));
             if (request.getScheduledDate() != null) {
                 pstmt.setDate(9, Date.valueOf(request.getScheduledDate()));

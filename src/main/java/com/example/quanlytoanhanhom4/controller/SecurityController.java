@@ -45,20 +45,20 @@ public class SecurityController implements Initializable {
 
     static {
         INCIDENT_TYPE_OPTIONS.put("CAMERA", "Camera");
-        INCIDENT_TYPE_OPTIONS.put("ACCESS_CONTROL", "Kiểm soát ra vào");
-        INCIDENT_TYPE_OPTIONS.put("EMERGENCY", "Khẩn cấp");
-        INCIDENT_TYPE_OPTIONS.put("THEFT", "Trộm cắp");
-        INCIDENT_TYPE_OPTIONS.put("OTHER", "Khác");
+        INCIDENT_TYPE_OPTIONS.put("KIỂM_SOÁT_RA_VÀO", "Kiểm soát ra vào");
+        INCIDENT_TYPE_OPTIONS.put("KHẨN_CẤP", "Khẩn cấp");
+        INCIDENT_TYPE_OPTIONS.put("TRỘM_CẮP", "Trộm cắp");
+        INCIDENT_TYPE_OPTIONS.put("KHÁC", "Khác");
 
-        STATUS_OPTIONS.put("OPEN", "Mới ghi nhận");
-        STATUS_OPTIONS.put("IN_PROGRESS", "Đang xử lý");
-        STATUS_OPTIONS.put("RESOLVED", "Đã giải quyết");
-        STATUS_OPTIONS.put("CLOSED", "Đã đóng");
+        STATUS_OPTIONS.put("MỚI_GHI_NHẬN", "Mới ghi nhận");
+        STATUS_OPTIONS.put("ĐANG_XỬ_LÝ", "Đang xử lý");
+        STATUS_OPTIONS.put("ĐÃ_GIẢI_QUYẾT", "Đã giải quyết");
+        STATUS_OPTIONS.put("ĐÃ_ĐÓNG", "Đã đóng");
 
-        PRIORITY_OPTIONS.put("LOW", "Thấp");
-        PRIORITY_OPTIONS.put("MEDIUM", "Trung bình");
-        PRIORITY_OPTIONS.put("HIGH", "Cao");
-        PRIORITY_OPTIONS.put("URGENT", "Khẩn cấp");
+        PRIORITY_OPTIONS.put("THẤP", "Thấp");
+        PRIORITY_OPTIONS.put("TRUNG_BÌNH", "Trung bình");
+        PRIORITY_OPTIONS.put("CAO", "Cao");
+        PRIORITY_OPTIONS.put("KHẨN_CẤP", "Khẩn cấp");
     }
 
     private ObservableList<Security> incidents;
@@ -99,7 +99,7 @@ public class SecurityController implements Initializable {
 
         ObservableList<String> statuses = FXCollections.observableArrayList(STATUS_OPTIONS.values());
         statusCombo.setItems(statuses);
-        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "OPEN"));
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "MỚI_GHI_NHẬN"));
 
         ObservableList<String> filterStatuses = FXCollections.observableArrayList(statuses);
         filterStatuses.add(0, ALL_LABEL);
@@ -108,7 +108,7 @@ public class SecurityController implements Initializable {
 
         ObservableList<String> priorities = FXCollections.observableArrayList(PRIORITY_OPTIONS.values());
         priorityCombo.setItems(priorities);
-        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "MEDIUM"));
+        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "TRUNG_BÌNH"));
     }
     
     private void loadIncidents() {
@@ -243,8 +243,8 @@ public class SecurityController implements Initializable {
         incidentTypeCombo.setValue(null);
         locationField.clear();
         descriptionArea.clear();
-        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "OPEN"));
-        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "MEDIUM"));
+        statusCombo.setValue(toDisplay(STATUS_OPTIONS, "MỚI_GHI_NHẬN"));
+        priorityCombo.setValue(toDisplay(PRIORITY_OPTIONS, "TRUNG_BÌNH"));
         resolutionArea.clear();
         statusLabel.setText("");
     }

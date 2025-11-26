@@ -60,8 +60,8 @@ public class AdminTaskService {
             pstmt.setObject(4, task.getAssignedTo());
             pstmt.setObject(5, task.getCreatedBy());
             pstmt.setObject(6, task.getDueDate());
-            pstmt.setString(7, task.getStatus() != null ? task.getStatus() : "PENDING");
-            pstmt.setString(8, task.getPriority() != null ? task.getPriority() : "MEDIUM");
+            pstmt.setString(7, task.getStatus() != null ? task.getStatus() : "CHỜ_XỬ_LÝ");
+            pstmt.setString(8, task.getPriority() != null ? task.getPriority() : "TRUNG_BÌNH");
             pstmt.setString(9, task.getNotes());
             
             return pstmt.executeUpdate() > 0;
@@ -96,7 +96,7 @@ public class AdminTaskService {
     }
     
     public static boolean completeTask(int id, LocalDate completedDate, String notes) {
-        String sql = "UPDATE admin_task SET status = 'COMPLETED', completed_date = ?, notes = ? WHERE id = ?";
+        String sql = "UPDATE admin_task SET status = 'HOÀN_THÀNH', completed_date = ?, notes = ? WHERE id = ?";
         
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
