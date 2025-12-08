@@ -3,15 +3,22 @@ package com.example.quanlytoanhanhom4.controller;
 import com.example.quanlytoanhanhom4.model.Invoice;
 import com.example.quanlytoanhanhom4.service.ApartmentService;
 import com.example.quanlytoanhanhom4.service.InvoiceService;
+import com.example.quanlytoanhanhom4.util.AlertUtils;
+import com.example.quanlytoanhanhom4.util.EmptyStateHelper;
+import com.example.quanlytoanhanhom4.util.PaginationHelper;
 import com.example.quanlytoanhanhom4.util.UserSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -30,16 +37,42 @@ public class InvoiceController implements Initializable {
     @FXML
     private TableColumn<Invoice, String> colInvoiceNumber;
     @FXML
+    private TableColumn<Invoice, String> colApartmentId;
+    @FXML
     private TableColumn<Invoice, LocalDate> colInvoiceDate;
+    @FXML
+    private TableColumn<Invoice, LocalDate> colDueDate;
     @FXML
     private TableColumn<Invoice, Double> colTotalAmount;
     @FXML
     private TableColumn<Invoice, Double> colPaidAmount;
     @FXML
+    private TableColumn<Invoice, String> colPaymentMethod;
+    @FXML
+    private TableColumn<Invoice, LocalDate> colPaidDate;
+    @FXML
     private TableColumn<Invoice, String> colStatus;
 
+    // @FXML - Đã xóa khỏi FXML (top bar đã bị xóa)
+    // private ComboBox<String> filterStatusCombo;
     @FXML
-    private ComboBox<String> filterStatusCombo;
+    private TextField searchField;
+    @FXML
+    private ComboBox<Integer> itemsPerPageCombo;
+    @FXML
+    private Button advancedFilterButton;
+    @FXML
+    private VBox advancedFilterPane;
+    @FXML
+    private TextField filterAmountFromField;
+    @FXML
+    private TextField filterAmountToField;
+    @FXML
+    private ComboBox<String> filterPaymentMethodCombo;
+    @FXML
+    private Pagination pagination;
+    @FXML
+    private Label paginationInfoLabel;
     @FXML
     private ComboBox<Integer> apartmentIdCombo;
     @FXML
@@ -87,12 +120,18 @@ public class InvoiceController implements Initializable {
     }
 
     private ObservableList<Invoice> invoices;
+    private ObservableList<Invoice> allInvoices; // Lưu tất cả invoices (chưa filter)
+    private FilteredList<Invoice> filteredInvoices; // Danh sách đã filter
     private Invoice selectedInvoice;
+    private int itemsPerPage = 20; // Mặc định 20 items/trang
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         initializeTable();
         initializeComboBoxes();
+        initializeSearch();
+        initializePagination();
+        initializeAdvancedFilters();
 
         // Delay nhỏ để đảm bảo UI đã sẵn sàng trước khi load dữ liệu
         javafx.application.Platform.runLater(() -> {
@@ -117,13 +156,69 @@ public class InvoiceController implements Initializable {
 
     private void initializeTable() {
         colInvoiceNumber.setCellValueFactory(new PropertyValueFactory<>("invoiceNumber"));
+        
+        // Format Căn hộ ID
+        colApartmentId.setCellValueFactory(cell -> {
+            Integer apartmentId = cell.getValue().getApartmentId();
+            if (apartmentId != null) {
+                return new javafx.beans.property.SimpleStringProperty(apartmentId.toString());
+            }
+            return new javafx.beans.property.SimpleStringProperty("");
+        });
+        
         colInvoiceDate.setCellValueFactory(new PropertyValueFactory<>("invoiceDate"));
+        
+        // Format Hạn thanh toán
+        colDueDate.setCellValueFactory(cell -> {
+            LocalDate date = cell.getValue().getDueDate();
+            if (date != null) {
+                return new javafx.beans.property.SimpleObjectProperty<>(date);
+            }
+            return new javafx.beans.property.SimpleObjectProperty<>(null);
+        });
+        colDueDate.setCellFactory(column -> new javafx.scene.control.TableCell<Invoice, LocalDate>() {
+            @Override
+            protected void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                if (empty || date == null) {
+                    setText("");
+                } else {
+                    setText(date.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                }
+            }
+        });
+        
         colTotalAmount.setCellValueFactory(new PropertyValueFactory<>("totalAmount"));
         colPaidAmount.setCellValueFactory(new PropertyValueFactory<>("paidAmount"));
+        colPaymentMethod.setCellValueFactory(new PropertyValueFactory<>("paymentMethod"));
+        
+        // Format Ngày thanh toán
+        colPaidDate.setCellValueFactory(cell -> {
+            LocalDate date = cell.getValue().getPaidDate();
+            if (date != null) {
+                return new javafx.beans.property.SimpleObjectProperty<>(date);
+            }
+            return new javafx.beans.property.SimpleObjectProperty<>(null);
+        });
+        colPaidDate.setCellFactory(column -> new javafx.scene.control.TableCell<Invoice, LocalDate>() {
+            @Override
+            protected void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                if (empty || date == null) {
+                    setText("");
+                } else {
+                    setText(date.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                }
+            }
+        });
+        
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
 
         invoices = FXCollections.observableArrayList();
         invoiceTable.setItems(invoices);
+        
+        // Set empty state với nút thêm mới
+        EmptyStateHelper.setInvoiceEmptyState(invoiceTable, this::handleAdd);
     }
 
     private void initializeComboBoxes() {
@@ -133,25 +228,197 @@ public class InvoiceController implements Initializable {
 
         ObservableList<String> filterStatuses = FXCollections.observableArrayList(statuses);
         filterStatuses.add(0, ALL_LABEL);
-        filterStatusCombo.setItems(filterStatuses);
-        filterStatusCombo.setValue(ALL_LABEL);
+        // Đã xóa filterStatusCombo khỏi top bar
+        // filterStatusCombo.setItems(filterStatuses);
+        // filterStatusCombo.setValue(ALL_LABEL);
 
         ObservableList<String> paymentMethods = FXCollections.observableArrayList(PAYMENT_METHOD_OPTIONS.values());
         paymentMethodCombo.setItems(paymentMethods);
 
         // Load apartment IDs from service
         try {
-            List<Integer> apartmentIds = ApartmentService.getAllApartments().stream()
-                    .map(com.example.quanlytoanhanhom4.model.Apartment::getId)
-                    .collect(java.util.stream.Collectors.toList());
-            apartmentIdCombo.setItems(FXCollections.observableArrayList(apartmentIds));
+            List<com.example.quanlytoanhanhom4.model.Apartment> apartments = ApartmentService.getAllApartments();
+            if (apartments != null && !apartments.isEmpty()) {
+                List<Integer> apartmentIds = apartments.stream()
+                        .map(apartment -> apartment.getId())
+                        .collect(java.util.stream.Collectors.toList());
+                apartmentIdCombo.setItems(FXCollections.observableArrayList(apartmentIds));
+                logger.info("Đã load {} căn hộ vào dropdown", apartmentIds.size());
+            } else {
+                apartmentIdCombo.setItems(FXCollections.observableArrayList());
+                logger.warn("Không có căn hộ nào để load");
+            }
         } catch (Exception e) {
-            logger.error("Lỗi khi load apartment IDs: {}", e.getMessage());
+            logger.error("Lỗi khi load apartment IDs: {}", e.getMessage(), e);
             apartmentIdCombo.setItems(FXCollections.observableArrayList());
         }
 
         invoiceDatePicker.setValue(LocalDate.now());
         dueDatePicker.setValue(LocalDate.now().plusDays(30));
+        
+        // Items per page combo
+        if (itemsPerPageCombo != null) {
+            itemsPerPageCombo.setItems(FXCollections.observableArrayList(20, 30, 50, 100));
+            itemsPerPageCombo.setValue(20);
+            itemsPerPageCombo.setOnAction(e -> {
+                itemsPerPage = itemsPerPageCombo.getValue();
+                updatePagination();
+            });
+        }
+        
+        // Filter payment method combo
+        if (filterPaymentMethodCombo != null) {
+            ObservableList<String> filterPaymentMethods = FXCollections.observableArrayList(PAYMENT_METHOD_OPTIONS.values());
+            filterPaymentMethods.add(0, "Tất cả");
+            filterPaymentMethodCombo.setItems(filterPaymentMethods);
+            filterPaymentMethodCombo.setValue("Tất cả");
+            filterPaymentMethodCombo.setOnAction(e -> applyAdvancedFilters());
+        }
+    }
+    
+    private void initializeSearch() {
+        if (searchField != null) {
+            searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+                applyFilters();
+            });
+        }
+    }
+    
+    private void initializePagination() {
+        if (pagination != null) {
+            pagination.setPageCount(1);
+            pagination.setMaxPageIndicatorCount(10);
+        }
+    }
+    
+    private void initializeAdvancedFilters() {
+        if (filterAmountFromField != null) {
+            filterAmountFromField.textProperty().addListener((observable, oldValue, newValue) -> {
+                applyAdvancedFilters();
+            });
+        }
+        
+        if (filterAmountToField != null) {
+            filterAmountToField.textProperty().addListener((observable, oldValue, newValue) -> {
+                applyAdvancedFilters();
+            });
+        }
+    }
+    
+    @FXML
+    private void handleToggleAdvancedFilter() {
+        if (advancedFilterPane != null) {
+            boolean isVisible = advancedFilterPane.isVisible();
+            advancedFilterPane.setVisible(!isVisible);
+            advancedFilterPane.setManaged(!isVisible);
+            advancedFilterButton.setText(isVisible ? "🔽 Bộ lọc nâng cao" : "🔼 Thu gọn bộ lọc");
+        }
+    }
+    
+    @FXML
+    private void handleClearFilters() {
+        if (searchField != null) searchField.clear();
+        if (filterAmountFromField != null) filterAmountFromField.clear();
+        if (filterAmountToField != null) filterAmountToField.clear();
+        if (filterPaymentMethodCombo != null) filterPaymentMethodCombo.setValue("Tất cả");
+        // Đã xóa filterStatusCombo khỏi top bar
+        // if (filterStatusCombo != null) filterStatusCombo.setValue(ALL_LABEL);
+        applyFilters();
+    }
+    
+    private void applyFilters() {
+        if (allInvoices == null) {
+            return;
+        }
+        
+        filteredInvoices = new FilteredList<>(allInvoices, p -> true);
+        
+        filteredInvoices.setPredicate(invoice -> {
+            // Tìm kiếm theo số hóa đơn, căn hộ
+            String searchText = searchField != null ? searchField.getText() : "";
+            if (searchText != null && !searchText.trim().isEmpty()) {
+                String lowerSearchText = searchText.toLowerCase().trim();
+                String invoiceNumber = invoice.getInvoiceNumber() != null ? invoice.getInvoiceNumber().toLowerCase() : "";
+                String apartmentId = invoice.getApartmentId() != null ? invoice.getApartmentId().toString() : "";
+                if (!invoiceNumber.contains(lowerSearchText) && !apartmentId.contains(lowerSearchText)) {
+                    return false;
+                }
+            }
+            
+            // Filter theo status - Đã xóa filterStatusCombo khỏi top bar
+            // String filterStatus = filterStatusCombo != null ? filterStatusCombo.getValue() : ALL_LABEL;
+            String filterStatus = ALL_LABEL; // Tạm thời bỏ qua filter theo status
+            if (filterStatus != null && !filterStatus.equals(ALL_LABEL)) {
+                String statusValue = toValue(STATUS_OPTIONS, filterStatus);
+                if (!statusValue.equals(invoice.getStatus())) {
+                    return false;
+                }
+            }
+            
+            // Filter theo khoảng tiền
+            String amountFrom = filterAmountFromField != null ? filterAmountFromField.getText() : "";
+            if (amountFrom != null && !amountFrom.trim().isEmpty()) {
+                try {
+                    double from = Double.parseDouble(amountFrom.trim());
+                    if (invoice.getTotalAmount() == null || invoice.getTotalAmount() < from) {
+                        return false;
+                    }
+                } catch (NumberFormatException e) {
+                    // Ignore invalid number
+                }
+            }
+            
+            String amountTo = filterAmountToField != null ? filterAmountToField.getText() : "";
+            if (amountTo != null && !amountTo.trim().isEmpty()) {
+                try {
+                    double to = Double.parseDouble(amountTo.trim());
+                    if (invoice.getTotalAmount() == null || invoice.getTotalAmount() > to) {
+                        return false;
+                    }
+                } catch (NumberFormatException e) {
+                    // Ignore invalid number
+                }
+            }
+            
+            // Filter theo phương thức thanh toán
+            String filterPaymentMethod = filterPaymentMethodCombo != null ? filterPaymentMethodCombo.getValue() : "Tất cả";
+            if (filterPaymentMethod != null && !filterPaymentMethod.equals("Tất cả")) {
+                String paymentMethodValue = toValue(PAYMENT_METHOD_OPTIONS, filterPaymentMethod);
+                if (!paymentMethodValue.equals(invoice.getPaymentMethod())) {
+                    return false;
+                }
+            }
+            
+            return true;
+        });
+        
+        updatePagination();
+    }
+    
+    private void applyAdvancedFilters() {
+        applyFilters();
+    }
+    
+    private void updatePagination() {
+        if (filteredInvoices == null || pagination == null) {
+            return;
+        }
+        
+        ObservableList<Invoice> itemsToPaginate = FXCollections.observableArrayList(filteredInvoices);
+        PaginationHelper.updatePagination(pagination, invoiceTable, itemsToPaginate, itemsPerPage);
+        
+        if (paginationInfoLabel != null) {
+            int totalItems = itemsToPaginate.size();
+            int currentPage = pagination.getCurrentPageIndex();
+            int fromIndex = currentPage * itemsPerPage + 1;
+            int toIndex = Math.min((currentPage + 1) * itemsPerPage, totalItems);
+            
+            if (totalItems == 0) {
+                paginationInfoLabel.setText("Không có dữ liệu");
+            } else {
+                paginationInfoLabel.setText(String.format("Hiển thị %d-%d / %d bản ghi", fromIndex, toIndex, totalItems));
+            }
+        }
     }
 
     private void loadInvoices() {
@@ -164,9 +431,10 @@ public class InvoiceController implements Initializable {
                 invoiceTable.setItems(invoices);
             }
 
-            // Đảm bảo filterStatusCombo đã được khởi tạo
-            String filterStatus = (filterStatusCombo != null && filterStatusCombo.getValue() != null)
-                    ? filterStatusCombo.getValue() : ALL_LABEL;
+            // Đảm bảo filterStatusCombo đã được khởi tạo - Đã xóa khỏi top bar
+            // String filterStatus = (filterStatusCombo != null && filterStatusCombo.getValue() != null)
+            //         ? filterStatusCombo.getValue() : ALL_LABEL;
+            String filterStatus = ALL_LABEL; // Tạm thời bỏ qua filter theo status
 
             // Load dữ liệu
             List<Invoice> invoiceList;
@@ -182,22 +450,27 @@ public class InvoiceController implements Initializable {
             // Cập nhật UI trên JavaFX Application Thread
             javafx.application.Platform.runLater(() -> {
                 try {
-                    invoices.clear();
+                    // Lưu tất cả invoices vào allInvoices
+                    if (allInvoices == null) {
+                        allInvoices = FXCollections.observableArrayList();
+                    }
+                    allInvoices.clear();
                     if (invoiceList != null && !invoiceList.isEmpty()) {
-                        invoices.addAll(invoiceList);
+                        allInvoices.addAll(invoiceList);
                         System.out.println("Đã load " + invoiceList.size() + " hóa đơn vào bảng");
                     } else {
                         System.out.println("Không có dữ liệu hóa đơn nào được trả về từ service!");
                     }
 
-                    // Refresh table để đảm bảo hiển thị
-                    if (invoiceTable != null) {
-                        invoiceTable.refresh();
-                        // Force update columns
-                        invoiceTable.getColumns().forEach(col -> col.setVisible(false));
-                        invoiceTable.getColumns().forEach(col -> col.setVisible(true));
-                        System.out.println("Đã refresh bảng hóa đơn, số lượng hiển thị: " + invoiceTable.getItems().size());
+                    // Áp dụng filters và pagination
+                    applyFilters();
+
+                    // Update status label
+                    if (statusLabel != null) {
+                        statusLabel.setText("Đã tải " + allInvoices.size() + " hóa đơn");
                     }
+
+                    System.out.println("Số lượng hóa đơn trong ObservableList: " + allInvoices.size());
                 } catch (Exception e) {
                     System.err.println("Lỗi khi cập nhật UI: " + e.getMessage());
                     e.printStackTrace();
@@ -219,7 +492,7 @@ public class InvoiceController implements Initializable {
         paidAmountField.setText(invoice.getPaidAmount() != null ? invoice.getPaidAmount().toString() : "");
         statusCombo.setValue(toDisplay(STATUS_OPTIONS, invoice.getStatus()));
         paymentMethodCombo.setValue(toDisplay(PAYMENT_METHOD_OPTIONS, invoice.getPaymentMethod()));
-        paymentDatePicker.setValue(invoice.getPaymentDate());
+        paymentDatePicker.setValue(invoice.getPaidDate());
         notesArea.setText(invoice.getNotes());
     }
 
@@ -241,21 +514,20 @@ public class InvoiceController implements Initializable {
                 invoice.setPaidAmount(paidAmountField.getText().isEmpty() ? 0.0 : Double.parseDouble(paidAmountField.getText().trim()));
                 invoice.setRemainingAmount(invoice.getTotalAmount() - invoice.getPaidAmount());
             } catch (NumberFormatException e) {
-                statusLabel.setText("Vui lòng nhập đúng định dạng số!");
+                AlertUtils.showWarning("Vui lòng nhập đúng định dạng số!");
                 return;
             }
             invoice.setStatus(toValue(STATUS_OPTIONS, statusCombo.getValue()));
             invoice.setPaymentMethod(toValue(PAYMENT_METHOD_OPTIONS, paymentMethodCombo.getValue()));
-            invoice.setPaymentDate(paymentDatePicker.getValue());
+            invoice.setPaidDate(paymentDatePicker.getValue());
             invoice.setNotes(notesArea.getText().trim());
-            invoice.setCreatedBy(UserSession.getCurrentUserId() != null ? UserSession.getCurrentUserId() : 1);
 
             if (InvoiceService.addInvoice(invoice)) {
-                statusLabel.setText("Thêm hóa đơn thành công!");
+                AlertUtils.showSuccess("Thêm hóa đơn thành công!");
                 clearForm();
                 loadInvoices();
             } else {
-                statusLabel.setText("Lỗi khi thêm hóa đơn!");
+                AlertUtils.showError("Lỗi khi thêm hóa đơn!");
             }
         }
     }
@@ -272,20 +544,20 @@ public class InvoiceController implements Initializable {
                 selectedInvoice.setPaidAmount(paidAmountField.getText().isEmpty() ? 0.0 : Double.parseDouble(paidAmountField.getText().trim()));
                 selectedInvoice.setRemainingAmount(selectedInvoice.getTotalAmount() - selectedInvoice.getPaidAmount());
             } catch (NumberFormatException e) {
-                statusLabel.setText("Vui lòng nhập đúng định dạng số!");
+                AlertUtils.showWarning("Vui lòng nhập đúng định dạng số!");
                 return;
             }
             selectedInvoice.setStatus(toValue(STATUS_OPTIONS, statusCombo.getValue()));
             selectedInvoice.setPaymentMethod(toValue(PAYMENT_METHOD_OPTIONS, paymentMethodCombo.getValue()));
-            selectedInvoice.setPaymentDate(paymentDatePicker.getValue());
+            selectedInvoice.setPaidDate(paymentDatePicker.getValue());
             selectedInvoice.setNotes(notesArea.getText().trim());
 
             if (InvoiceService.updateInvoice(selectedInvoice)) {
-                statusLabel.setText("Cập nhật hóa đơn thành công!");
+                AlertUtils.showSuccess("Cập nhật hóa đơn thành công!");
                 clearForm();
                 loadInvoices();
             } else {
-                statusLabel.setText("Lỗi khi cập nhật hóa đơn!");
+                AlertUtils.showError("Lỗi khi cập nhật hóa đơn!");
             }
         }
     }
@@ -300,20 +572,20 @@ public class InvoiceController implements Initializable {
 
             if (alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
                 if (InvoiceService.deleteInvoice(selectedInvoice.getId())) {
-                    statusLabel.setText("Xóa hóa đơn thành công!");
+                    AlertUtils.showSuccess("Xóa hóa đơn thành công!");
                     clearForm();
                     loadInvoices();
                 } else {
-                    statusLabel.setText("Lỗi khi xóa hóa đơn!");
+                    AlertUtils.showError("Lỗi khi xóa hóa đơn!");
                 }
             }
         }
     }
 
-    @FXML
-    private void handleBack() {
-        ((Stage) invoiceTable.getScene().getWindow()).close();
-    }
+    // @FXML - Đã xóa nút quay lại khỏi top bar
+    // private void handleBack() {
+    //     ((Stage) invoiceTable.getScene().getWindow()).close();
+    // }
 
     private void clearForm() {
         apartmentIdCombo.setValue(null);
@@ -335,15 +607,15 @@ public class InvoiceController implements Initializable {
 
     private boolean validateInput() {
         if (apartmentIdCombo.getValue() == null) {
-            statusLabel.setText("Vui lòng chọn căn hộ!");
+            AlertUtils.showWarning("Vui lòng chọn căn hộ!");
             return false;
         }
         if (invoiceNumberField.getText().trim().isEmpty()) {
-            statusLabel.setText("Vui lòng nhập số hóa đơn!");
+            AlertUtils.showWarning("Vui lòng nhập số hóa đơn!");
             return false;
         }
         if (totalAmountField.getText().trim().isEmpty()) {
-            statusLabel.setText("Vui lòng nhập tổng tiền!");
+            AlertUtils.showWarning("Vui lòng nhập tổng tiền!");
             return false;
         }
         return true;

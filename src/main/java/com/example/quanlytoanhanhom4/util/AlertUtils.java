@@ -8,6 +8,8 @@ import java.util.Optional;
 
 /**
  * Utility class for displaying user-friendly alerts and dialogs.
+ * Success and error messages use non-blocking notifications (snackbar-style).
+ * Confirmation dialogs remain blocking for user interaction.
  */
 public final class AlertUtils {
 
@@ -16,72 +18,75 @@ public final class AlertUtils {
     }
 
     /**
-     * Shows an error alert dialog.
+     * Shows an error notification (non-blocking snackbar in top-right corner).
      * 
-     * @param title The title of the alert
+     * @param title The title of the notification
      * @param message The error message to display
      */
     public static void showError(String title, String message) {
-        Alert alert = new Alert(AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        NotificationHelper.showError(title, message);
     }
 
     /**
-     * Shows an error alert with default title.
+     * Shows an error notification with default title (non-blocking).
      * 
      * @param message The error message to display
      */
     public static void showError(String message) {
-        showError("Lỗi", message);
+        NotificationHelper.showError(message);
     }
 
     /**
-     * Shows a success/information alert dialog.
+     * Shows a success notification (non-blocking snackbar in top-right corner).
      * 
-     * @param title The title of the alert
+     * @param title The title of the notification
      * @param message The success message to display
      */
     public static void showSuccess(String title, String message) {
-        Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        NotificationHelper.showSuccess(title, message);
     }
 
     /**
-     * Shows a success alert with default title.
+     * Shows a success notification with default title (non-blocking).
      * 
      * @param message The success message to display
      */
     public static void showSuccess(String message) {
-        showSuccess("Thành công", message);
+        NotificationHelper.showSuccess(message);
     }
 
     /**
-     * Shows a warning alert dialog.
+     * Shows a warning notification (non-blocking snackbar in top-right corner).
+     * For critical warnings that require user attention, consider using showWarningDialog instead.
+     * 
+     * @param title The title of the notification
+     * @param message The warning message to display
+     */
+    public static void showWarning(String title, String message) {
+        NotificationHelper.showWarning(title, message);
+    }
+
+    /**
+     * Shows a warning notification with default title (non-blocking).
+     * 
+     * @param message The warning message to display
+     */
+    public static void showWarning(String message) {
+        NotificationHelper.showWarning(message);
+    }
+
+    /**
+     * Shows a blocking warning dialog (for critical warnings that require user acknowledgment).
      * 
      * @param title The title of the alert
      * @param message The warning message to display
      */
-    public static void showWarning(String title, String message) {
+    public static void showWarningDialog(String title, String message) {
         Alert alert = new Alert(AlertType.WARNING);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
-    }
-
-    /**
-     * Shows a warning alert with default title.
-     * 
-     * @param message The warning message to display
-     */
-    public static void showWarning(String message) {
-        showWarning("Cảnh báo", message);
     }
 
     /**
@@ -111,26 +116,22 @@ public final class AlertUtils {
     }
 
     /**
-     * Shows an information alert dialog.
+     * Shows an information notification (non-blocking snackbar in top-right corner).
      * 
-     * @param title The title of the alert
+     * @param title The title of the notification
      * @param message The information message to display
      */
     public static void showInfo(String title, String message) {
-        Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        NotificationHelper.showInfo(title, message);
     }
 
     /**
-     * Shows an information alert with default title.
+     * Shows an information notification with default title (non-blocking).
      * 
      * @param message The information message to display
      */
     public static void showInfo(String message) {
-        showInfo("Thông tin", message);
+        NotificationHelper.showInfo(message);
     }
 }
 

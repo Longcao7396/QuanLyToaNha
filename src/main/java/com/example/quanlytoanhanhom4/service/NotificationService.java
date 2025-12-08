@@ -113,8 +113,8 @@ public class NotificationService {
             } else {
                 pstmt.setNull(5, Types.INTEGER);
             }
-            pstmt.setString(6, notification.getPriority() != null ? notification.getPriority() : "NORMAL");
-            pstmt.setString(7, notification.getStatus() != null ? notification.getStatus() : "DRAFT");
+            pstmt.setString(6, notification.getPriority() != null ? notification.getPriority() : "BÌNH_THƯỜNG");
+            pstmt.setString(7, notification.getStatus() != null ? notification.getStatus() : "NHÁP");
             if (notification.getExpiryDate() != null) {
                 pstmt.setDate(8, Date.valueOf(notification.getExpiryDate()));
             } else {

@@ -20,28 +20,29 @@ public final class UserService {
     }
 
     public static String verifyLogin(String username, String password) {
-        try (Connection conn = DatabaseConnection.getConnection()) {
-            String sql = "SELECT id, role, password FROM user WHERE username = ?";
-            PreparedStatement stmt = conn.prepareStatement(sql);
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT id, role, password FROM user WHERE username = ?")) {
+            
             stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Integer userId = rs.getInt("id");
+                    String storedPassword = rs.getString("password");
+                    String role = rs.getString("role");
 
-            if (rs.next()) {
-                Integer userId = rs.getInt("id");
-                String storedPassword = rs.getString("password");
-                String role = rs.getString("role");
-
-                if (storedPassword != null) {
-                    if (PasswordUtils.verifyPassword(password, storedPassword)) {
-                        UserSession.setUser(username, role, userId);
-                        logger.debug("Đăng nhập thành công cho user: {}", username);
-                        return role;
-                    }
-                    // Support legacy plain text passwords (for migration)
-                    if (storedPassword.length() < 64 && password.equals(storedPassword)) {
-                        logger.warn("User {} đang sử dụng plain text password - nên migrate sang BCrypt", username);
-                        UserSession.setUser(username, role, userId);
-                        return role;
+                    if (storedPassword != null) {
+                        if (PasswordUtils.verifyPassword(password, storedPassword)) {
+                            UserSession.setUser(username, role, userId);
+                            logger.debug("Đăng nhập thành công cho user: {}", username);
+                            return role;
+                        }
+                        // Support legacy plain text passwords (for migration)
+                        if (storedPassword.length() < 64 && password.equals(storedPassword)) {
+                            logger.warn("User {} đang sử dụng plain text password - nên migrate sang BCrypt", username);
+                            UserSession.setUser(username, role, userId);
+                            return role;
+                        }
                     }
                 }
             }
@@ -49,7 +50,7 @@ public final class UserService {
             return null;
         } catch (SQLException e) {
             logger.error("Lỗi khi verify login cho user: {}", username, e);
-            return null;
+            throw new RuntimeException("Không thể kết nối đến database. Vui lòng kiểm tra MySQL server đã chạy chưa.", e);
         }
     }
 }

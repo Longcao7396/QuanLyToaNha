@@ -3,27 +3,44 @@ package com.example.quanlytoanhanhom4.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import java.util.List;
+
+/**
+ * Model cho hóa đơn
+ * Module 2: Quản lý phí – hóa đơn – công nợ
+ * 3. Hóa đơn
+ */
 public class Invoice {
-    private int id;
-    private int apartmentId;
+    private Integer id;
     private String invoiceNumber;
+    private Integer apartmentId;
+    private Integer residentId;
+    private Integer periodMonth; // Tháng áp dụng
+    private Integer periodYear; // Năm áp dụng
     private LocalDate invoiceDate;
     private LocalDate dueDate;
     private Double totalAmount;
     private Double paidAmount;
     private Double remainingAmount;
-    private String status; // CHỜ_THANH_TOÁN, THANH_TOÁN_MỘT_PHẦN, ĐÃ_THANH_TOÁN, QUÁ_HẠN, ĐÃ_HỦY
-    private String paymentMethod;
-    private LocalDate paymentDate;
+    private String status; // CHƯA_THANH_TOÁN, ĐÃ_THANH_TOÁN, THANH_TOÁN_MỘT_PHẦN, QUÁ_HẠN, ĐÃ_HỦY
+    private Boolean isLocked; // Khóa hóa đơn sau khi chốt sổ
+    private Boolean isSent; // Đã gửi hóa đơn cho cư dân
+    private LocalDate sentDate; // Ngày gửi hóa đơn
+    private String paymentMethod; // CASH, BANK_TRANSFER, VNPAY, MOMO, QR_BANKING, OTHER
+    private String paymentReference;
+    private LocalDate paidDate;
+    private String pdfPath;
     private String notes;
-    private Integer createdBy;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    
+    // Danh sách chi tiết hóa đơn (không lưu trong DB, chỉ để hiển thị)
+    private List<InvoiceItem> items;
 
     public Invoice() {
     }
 
-    public Invoice(int apartmentId, String invoiceNumber, LocalDate invoiceDate, LocalDate dueDate, Double totalAmount) {
+    public Invoice(Integer apartmentId, String invoiceNumber, LocalDate invoiceDate, LocalDate dueDate, Double totalAmount) {
         this.apartmentId = apartmentId;
         this.invoiceNumber = invoiceNumber;
         this.invoiceDate = invoiceDate;
@@ -35,20 +52,28 @@ public class Invoice {
     }
 
     // Getters and Setters
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public int getApartmentId() {
+    public Integer getApartmentId() {
         return apartmentId;
     }
 
-    public void setApartmentId(int apartmentId) {
+    public void setApartmentId(Integer apartmentId) {
         this.apartmentId = apartmentId;
+    }
+
+    public Integer getResidentId() {
+        return residentId;
+    }
+
+    public void setResidentId(Integer residentId) {
+        this.residentId = residentId;
     }
 
     public String getInvoiceNumber() {
@@ -115,12 +140,28 @@ public class Invoice {
         this.paymentMethod = paymentMethod;
     }
 
-    public LocalDate getPaymentDate() {
-        return paymentDate;
+    public String getPaymentReference() {
+        return paymentReference;
     }
 
-    public void setPaymentDate(LocalDate paymentDate) {
-        this.paymentDate = paymentDate;
+    public void setPaymentReference(String paymentReference) {
+        this.paymentReference = paymentReference;
+    }
+
+    public LocalDate getPaidDate() {
+        return paidDate;
+    }
+
+    public void setPaidDate(LocalDate paidDate) {
+        this.paidDate = paidDate;
+    }
+
+    public String getPdfPath() {
+        return pdfPath;
+    }
+
+    public void setPdfPath(String pdfPath) {
+        this.pdfPath = pdfPath;
     }
 
     public String getNotes() {
@@ -131,12 +172,75 @@ public class Invoice {
         this.notes = notes;
     }
 
-    public Integer getCreatedBy() {
-        return createdBy;
+    // Helper methods
+    public boolean isOverdue() {
+        if (dueDate == null || "PAID".equals(status) || "CANCELLED".equals(status)) {
+            return false;
+        }
+        return LocalDate.now().isAfter(dueDate);
     }
 
-    public void setCreatedBy(Integer createdBy) {
-        this.createdBy = createdBy;
+    public void updateStatus() {
+        if (remainingAmount == null || totalAmount == null) {
+            return;
+        }
+        if (remainingAmount <= 0) {
+            this.status = "ĐÃ_THANH_TOÁN";
+        } else if (paidAmount > 0 && paidAmount < totalAmount) {
+            this.status = "THANH_TOÁN_MỘT_PHẦN";
+        } else if (isOverdue()) {
+            this.status = "QUÁ_HẠN";
+        } else {
+            this.status = "CHƯA_THANH_TOÁN";
+        }
+    }
+
+    public Integer getPeriodMonth() {
+        return periodMonth;
+    }
+
+    public void setPeriodMonth(Integer periodMonth) {
+        this.periodMonth = periodMonth;
+    }
+
+    public Integer getPeriodYear() {
+        return periodYear;
+    }
+
+    public void setPeriodYear(Integer periodYear) {
+        this.periodYear = periodYear;
+    }
+
+    public Boolean getIsLocked() {
+        return isLocked;
+    }
+
+    public void setIsLocked(Boolean isLocked) {
+        this.isLocked = isLocked;
+    }
+
+    public Boolean getIsSent() {
+        return isSent;
+    }
+
+    public void setIsSent(Boolean isSent) {
+        this.isSent = isSent;
+    }
+
+    public LocalDate getSentDate() {
+        return sentDate;
+    }
+
+    public void setSentDate(LocalDate sentDate) {
+        this.sentDate = sentDate;
+    }
+
+    public List<InvoiceItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<InvoiceItem> items) {
+        this.items = items;
     }
 
     public LocalDateTime getCreatedAt() {

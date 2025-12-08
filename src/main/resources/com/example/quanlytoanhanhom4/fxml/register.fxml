@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.quanlytoanhanhom4.controller.auth.RegisterController"
+            prefWidth="520" prefHeight="800"
+            style="-fx-background-color: linear-gradient(to bottom right, #7FB3D5, #2874A6);">
+
+    <!-- Main Container -->
+    <VBox fx:id="mainVBox" alignment="TOP_CENTER" spacing="0" 
+          AnchorPane.topAnchor="20" AnchorPane.bottomAnchor="20"
+          AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"
+          style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 20, 0, 0, 5);">
+        
+        <!-- Header Section -->
+        <VBox alignment="CENTER" spacing="10" style="-fx-padding: 30 30 20 30;">
+            <Label text="🏢" style="-fx-font-size: 56px;"/>
+            <Label text="ĐĂNG KÝ TÀI KHOẢN" 
+                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #2874A6;"/>
+        </VBox>
+
+        <!-- Scrollable Form Container -->
+        <ScrollPane fitToWidth="true" vbarPolicy="AS_NEEDED" 
+                   style="-fx-background: white; -fx-border-width: 0;">
+            <VBox fx:id="formContainer" spacing="18" alignment="CENTER" 
+                  style="-fx-padding: 10 40 30 40;" 
+                  styleClass="register-form">
+                
+                <!-- Username Field -->
+                <VBox spacing="5" alignment="CENTER_LEFT" prefWidth="420">
+                    <Label text="Tên đăng nhập *" styleClass="form-label"/>
+                    <TextField fx:id="usernameField" promptText="Nhập tên đăng nhập (3-20 ký tự)" 
+                              styleClass="register-input" prefWidth="420" prefHeight="42"/>
+                    <Label fx:id="usernameError" styleClass="error-label" text="" visible="false" prefWidth="420"/>
+                </VBox>
+
+                <!-- Password Field -->
+                <VBox spacing="5" alignment="CENTER_LEFT" prefWidth="420">
+                    <Label text="Mật khẩu *" styleClass="form-label"/>
+                    <PasswordField fx:id="passwordField" promptText="Nhập mật khẩu (tối thiểu 6 ký tự)" 
+                                  styleClass="register-input" prefWidth="420" prefHeight="42"/>
+                    <Label fx:id="passwordError" styleClass="error-label" text="" visible="false" prefWidth="420"/>
+                </VBox>
+
+                <!-- Confirm Password Field -->
+                <VBox spacing="5" alignment="CENTER_LEFT" prefWidth="420">
+                    <Label text="Xác nhận mật khẩu *" styleClass="form-label"/>
+                    <PasswordField fx:id="confirmPasswordField" promptText="Nhập lại mật khẩu" 
+                                  styleClass="register-input" prefWidth="420" prefHeight="42"/>
+                    <Label fx:id="confirmPasswordError" styleClass="error-label" text="" visible="false" prefWidth="420"/>
+                </VBox>
+
+                <!-- Full Name Field -->
+                <VBox spacing="5" alignment="CENTER_LEFT" prefWidth="420">
+                    <Label text="Họ và tên *" styleClass="form-label"/>
+                    <TextField fx:id="fullNameField" promptText="Nhập họ và tên đầy đủ" 
+                              styleClass="register-input" prefWidth="420" prefHeight="42"/>
+                    <Label fx:id="fullNameError" styleClass="error-label" text="" visible="false" prefWidth="420"/>
+                </VBox>
+
+                <!-- Email Field -->
+                <VBox spacing="5" alignment="CENTER_LEFT" prefWidth="420">
+                    <Label text="Email *" styleClass="form-label"/>
+                    <TextField fx:id="emailField" promptText="example@email.com" 
+                              styleClass="register-input" prefWidth="420" prefHeight="42"/>
+                    <Label fx:id="emailError" styleClass="error-label" text="" visible="false" prefWidth="420"/>
+                </VBox>
+
+                <!-- Phone Field -->
+                <VBox spacing="5" alignment="CENTER_LEFT" prefWidth="420">
+                    <Label text="Số điện thoại *" styleClass="form-label"/>
+                    <TextField fx:id="phoneField" promptText="0987654321" 
+                              styleClass="register-input" prefWidth="420" prefHeight="42"/>
+                    <Label fx:id="phoneError" styleClass="error-label" text="" visible="false" prefWidth="420"/>
+                </VBox>
+
+                <!-- Role Field -->
+                <VBox spacing="5" alignment="CENTER_LEFT" prefWidth="420">
+                    <Label text="Vai trò *" styleClass="form-label"/>
+                    <ComboBox fx:id="roleComboBox" promptText="Chọn vai trò" 
+                             styleClass="register-input" prefWidth="420" prefHeight="42"/>
+                    <Label fx:id="roleError" styleClass="error-label" text="" visible="false" prefWidth="420"/>
+                </VBox>
+
+                <!-- Admin Secret Key Field (only visible when Admin role is selected) -->
+                <VBox fx:id="secretKeyContainer" spacing="5" alignment="CENTER_LEFT" prefWidth="420" visible="false" managed="false">
+                    <Label text="Mã bảo mật Admin *" styleClass="form-label"/>
+                    <PasswordField fx:id="secretKeyField" promptText="Nhập mã bảo mật Admin" 
+                                  styleClass="register-input" prefWidth="420" prefHeight="42"/>
+                    <Label fx:id="secretKeyError" styleClass="error-label" text="" visible="false" prefWidth="420"/>
+                </VBox>
+
+                <!-- Status Message -->
+                <VBox spacing="0" alignment="CENTER" prefWidth="420" style="-fx-padding: 10 0;">
+                    <Label fx:id="statusLabel" styleClass="status-label" text="" visible="false" prefWidth="420"/>
+                </VBox>
+
+                <!-- Buttons -->
+                <HBox spacing="15" alignment="CENTER" style="-fx-padding: 15 0 10 0;">
+                    <Button text="Đăng ký" onAction="#handleRegister" 
+                           styleClass="register-button" prefWidth="160" prefHeight="48"/>
+                    <Button text="Hủy" onAction="#handleCancel" 
+                           styleClass="cancel-button" prefWidth="160" prefHeight="48"/>
+                </HBox>
+
+                <!-- Link back to Login -->
+                <VBox alignment="CENTER" style="-fx-padding: 10 0 20 0;">
+                    <Label fx:id="loginLinkLabel" text="Đã có tài khoản? Đăng nhập" 
+                           styleClass="login-link-label"/>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </VBox>
+
+</AnchorPane>

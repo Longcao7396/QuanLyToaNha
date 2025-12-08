@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.quanlytoanhanhom4.controller.TicketController"
+            stylesheets="@../../css/modern-style.css"
+            style="-fx-background-color: linear-gradient(to bottom right, #F7FAFF, #E5ECF6);">
+    
+    <!-- Center: Data Table and Search -->
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" styleClass="scroll-pane-gradient">
+            <content>
+                <VBox spacing="28" style="-fx-padding: 30; -fx-background-color: linear-gradient(to bottom right, #F7FAFF, #E5ECF6); -fx-min-height: 600;">
+            
+            <!-- Search and Filter Section -->
+            <VBox spacing="12" styleClass="card card-ticket">
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <Label text="🔍" style="-fx-font-size: 20px;"/>
+                  <TextField fx:id="searchField" promptText="Tìm kiếm theo số ticket, tiêu đề..." 
+                               prefWidth="450" styleClass="text-field"/>
+                  <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="Số bản ghi/trang:" styleClass="text-sm" style="-fx-text-fill: #6B7280;"/>
+                    <ComboBox fx:id="itemsPerPageCombo" prefWidth="100" styleClass="combo-box"/>
+                  <Button fx:id="advancedFilterButton" text="🔽 Bộ lọc nâng cao" 
+                            styleClass="btn-outline"
+                          onAction="#handleToggleAdvancedFilter"/>
+            </HBox>
+            
+                <!-- Advanced Filter Panel -->
+                <VBox fx:id="advancedFilterPane" spacing="12" styleClass="filter-panel" 
+                      visible="false" managed="false">
+                  <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Bộ lọc nâng cao" styleClass="filter-panel-header"/>
+                     <Region HBox.hgrow="ALWAYS"/>
+                     <Button text="Xóa bộ lọc" onAction="#handleClearFilters"
+                                styleClass="btn-outline" style="-fx-font-size: 12px;"/>
+                  </HBox>
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <VBox spacing="6" styleClass="input-group">
+                            <Label text="Loại" styleClass="form-label"/>
+                            <ComboBox fx:id="filterTypeCombo" prefWidth="150" styleClass="combo-box"/>
+                     </VBox>
+                        <VBox spacing="6" styleClass="input-group">
+                            <Label text="Ưu tiên" styleClass="form-label"/>
+                            <ComboBox fx:id="filterPriorityCombo" prefWidth="150" styleClass="combo-box"/>
+                     </VBox>
+                        <VBox spacing="6" styleClass="input-group">
+                            <Label text="Danh mục" styleClass="form-label"/>
+                            <ComboBox fx:id="filterCategoryCombo" prefWidth="150" styleClass="combo-box"/>
+                     </VBox>
+                  </HBox>
+                </VBox>
+            </VBox>
+            
+            <!-- Table Section -->
+            <VBox spacing="12" styleClass="card card-ticket" VBox.vgrow="ALWAYS">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="📋 Danh sách yêu cầu" styleClass="card-header"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="statusLabel" styleClass="text-sm" style="-fx-text-fill: #10B981;"/>
+                </HBox>
+                
+                <TableView fx:id="ticketTable" prefHeight="500" styleClass="table-view" VBox.vgrow="ALWAYS">
+               <columns>
+                        <TableColumn fx:id="colTicketNumber" text="Số ticket" prefWidth="110">
+                            <style>
+                                -fx-alignment: CENTER;
+                            </style>
+                        </TableColumn>
+                        <TableColumn fx:id="colApartmentId" text="Căn hộ" prefWidth="90">
+                            <style>
+                                -fx-alignment: CENTER;
+                            </style>
+                        </TableColumn>
+                        <TableColumn fx:id="colResidentId" text="Cư dân" prefWidth="100">
+                            <style>
+                                -fx-alignment: CENTER;
+                            </style>
+                        </TableColumn>
+                        <TableColumn fx:id="colTitle" text="Tiêu đề" prefWidth="200">
+                            <style>
+                                -fx-alignment: CENTER_LEFT;
+                            </style>
+                        </TableColumn>
+                        <TableColumn fx:id="colType" text="Loại" prefWidth="100">
+                            <style>
+                                -fx-alignment: CENTER;
+                            </style>
+                        </TableColumn>
+                        <TableColumn fx:id="colCategory" text="Danh mục" prefWidth="110">
+                            <style>
+                                -fx-alignment: CENTER;
+                            </style>
+                        </TableColumn>
+                        <TableColumn fx:id="colPriority" text="Ưu tiên" prefWidth="100">
+                            <style>
+                                -fx-alignment: CENTER;
+                            </style>
+                        </TableColumn>
+                        <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="120">
+                            <style>
+                                -fx-alignment: CENTER;
+                            </style>
+                        </TableColumn>
+                        <TableColumn fx:id="colCreatedDate" text="Ngày tạo" prefWidth="120">
+                            <style>
+                                -fx-alignment: CENTER;
+                            </style>
+                        </TableColumn>
+               </columns>
+            </TableView>
+            
+                <!-- Pagination -->
+                <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 12 0 0 0;">
+                    <Label fx:id="paginationInfoLabel" styleClass="text-sm" style="-fx-text-fill: #6B7280;"/>
+                  <Region HBox.hgrow="ALWAYS"/>
+                    <Pagination fx:id="pagination" styleClass="pagination"/>
+                </HBox>
+            </VBox>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+    
+    <!-- Right: Form Panel -->
+   <right>
+        <VBox spacing="0" styleClass="card card-ticket" style="-fx-min-width: 420; -fx-max-width: 420;">
+            <VBox spacing="8" style="-fx-padding: 24 24 20 24; -fx-background-color: #2874A6;">
+                <Label text="📝 Thông tin Yêu cầu" style="-fx-font-size: 20px; -fx-font-weight: 700; -fx-text-fill: white;"/>
+            </VBox>
+            
+            <ScrollPane fitToWidth="true" style="-fx-background: transparent;">
+                <VBox spacing="18" style="-fx-padding: 24;">
+                    <VBox spacing="6" styleClass="input-group input-group-required">
+                        <Label text="Loại hình căn hộ" styleClass="form-label"/>
+                        <ComboBox fx:id="apartmentTypeCombo" prefWidth="372" styleClass="combo-box"/>
+                    </VBox>
+                    
+                    <VBox spacing="6" styleClass="input-group input-group-required">
+                        <Label text="Căn hộ" styleClass="form-label"/>
+                        <ComboBox fx:id="apartmentIdCombo" prefWidth="372" styleClass="combo-box"/>
+                    </VBox>
+                    
+                    <VBox spacing="6" styleClass="input-group">
+                        <Label text="Cư dân" styleClass="form-label"/>
+                        <ComboBox fx:id="residentIdCombo" prefWidth="372" styleClass="combo-box"/>
+                    </VBox>
+                    
+                    <VBox spacing="6" styleClass="input-group input-group-required">
+                        <Label text="Loại" styleClass="form-label"/>
+                        <ComboBox fx:id="ticketTypeCombo" prefWidth="372" styleClass="combo-box"/>
+                    </VBox>
+                    
+                    <VBox spacing="6" styleClass="input-group">
+                        <Label text="Danh mục" styleClass="form-label"/>
+                        <ComboBox fx:id="categoryCombo" prefWidth="372" styleClass="combo-box"/>
+                    </VBox>
+                    
+                    <VBox spacing="6" styleClass="input-group input-group-required">
+                        <Label text="Tiêu đề" styleClass="form-label"/>
+                        <TextField fx:id="titleField" prefWidth="372" promptText="Nhập tiêu đề yêu cầu"
+                                   styleClass="text-field"/>
+                    </VBox>
+                    
+                    <VBox spacing="6" styleClass="input-group">
+                        <Label text="Mô tả" styleClass="form-label"/>
+                        <TextArea fx:id="descriptionField" prefWidth="372" prefHeight="120" 
+                                  promptText="Nhập mô tả chi tiết"
+                                  styleClass="text-area" wrapText="true"/>
+                    </VBox>
+                    
+                    <HBox spacing="12">
+                        <VBox spacing="6" styleClass="input-group" HBox.hgrow="ALWAYS">
+                            <Label text="Ưu tiên" styleClass="form-label"/>
+                            <ComboBox fx:id="priorityCombo" prefWidth="180" styleClass="combo-box"/>
+                        </VBox>
+                        <VBox spacing="6" styleClass="input-group" HBox.hgrow="ALWAYS">
+                            <Label text="Trạng thái" styleClass="form-label"/>
+                            <ComboBox fx:id="statusCombo" prefWidth="180" styleClass="combo-box"/>
+                        </VBox>
+            </HBox>
+         </VBox>
+      </ScrollPane>
+            
+            <Separator style="-fx-padding: 0;"/>
+            
+            <!-- Action Buttons -->
+            <VBox spacing="12" style="-fx-padding: 24; -fx-background-color: white;">
+                <HBox spacing="12" alignment="CENTER">
+                    <Button fx:id="addButton" text="Thêm mới" onAction="#handleAdd"
+                            styleClass="btn-success" style="-fx-pref-width: 186; -fx-pref-height: 44; -fx-font-size: 14px;"/>
+                    <Button fx:id="updateButton" text="Cập nhật" onAction="#handleUpdate" disable="true"
+                            styleClass="btn-primary" style="-fx-pref-width: 186; -fx-pref-height: 44; -fx-font-size: 14px;"/>
+                </HBox>
+                <Button fx:id="deleteButton" text="Xóa" onAction="#handleDelete" disable="true"
+                        styleClass="btn-danger" style="-fx-pref-width: 384; -fx-pref-height: 44; -fx-font-size: 14px;"/>
+            </VBox>
+        </VBox>
+   </right>
+</BorderPane>

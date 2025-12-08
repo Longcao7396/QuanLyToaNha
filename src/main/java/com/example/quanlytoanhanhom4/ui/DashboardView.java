@@ -1,12 +1,10 @@
 package com.example.quanlytoanhanhom4.ui;
 
 import com.example.quanlytoanhanhom4.service.ApartmentService;
-import com.example.quanlytoanhanhom4.service.BMSService;
 import com.example.quanlytoanhanhom4.service.InvoiceService;
-import com.example.quanlytoanhanhom4.service.MaintenanceService;
 import com.example.quanlytoanhanhom4.service.NotificationService;
-import com.example.quanlytoanhanhom4.service.RepairRequestService;
 import com.example.quanlytoanhanhom4.service.ResidentService;
+import com.example.quanlytoanhanhom4.service.TicketService;
 import com.example.quanlytoanhanhom4.util.UserSession;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -157,7 +155,8 @@ public final class DashboardView {
 
         // Lấy dữ liệu thực tế
         int totalApartments = ApartmentService.getAllApartments().size();
-        int occupiedApartments = ApartmentService.getApartmentsByStatus("OCCUPIED").size();
+        int occupiedApartments = ApartmentService.getApartmentsByStatus("ĐANG_Ở").size() + 
+                                  ApartmentService.getApartmentsByStatus("CHO_THUÊ").size();
         int totalResidents = ResidentService.getAllResidents().size();
         int totalInvoices = InvoiceService.getAllInvoices().size();
         int pendingInvoices = InvoiceService.getInvoicesByStatus("PENDING").size();
@@ -191,28 +190,30 @@ public final class DashboardView {
         // Lấy dữ liệu thực tế
         int totalNotifications = NotificationService.getAllNotifications().size();
         int sentNotifications = NotificationService.getNotificationsByStatus("SENT").size();
-        int totalRepairs = RepairRequestService.getAllRepairRequests().size();
-        int pendingRepairs = RepairRequestService.getRepairRequestsByStatus("PENDING").size();
-        int completedRepairs = RepairRequestService.getRepairRequestsByStatus("COMPLETED").size();
-        int totalMaintenance = MaintenanceService.getAllMaintenances().size();
-        int pendingMaintenance = MaintenanceService.getMaintenancesByStatus("PENDING").size();
-        int totalBMS = BMSService.getAllSystems().size();
+        int totalTickets = TicketService.getAllTickets().size();
+        int openTickets = TicketService.getTicketsByStatus("OPEN").size();
+        int resolvedTickets = TicketService.getTicketsByStatus("RESOLVED").size();
+        
+        // Tính tổng công nợ từ các hóa đơn chưa thanh toán
+        int pendingInvoices = InvoiceService.getInvoicesByStatus("PENDING").size();
+        int overdueInvoices = InvoiceService.getInvoicesByStatus("OVERDUE").size();
+        int totalDebt = pendingInvoices + overdueInvoices;
 
         // Card 5: Thông Báo
         VBox card5 = createStatCard("Thông Báo", String.valueOf(totalNotifications),
                 "Đã gửi: " + sentNotifications, "#fa709a", "🔔");
 
-        // Card 6: Yêu Cầu Sửa Chữa
-        VBox card6 = createStatCard("Yêu Cầu Sửa Chữa", String.valueOf(totalRepairs),
-                "Đang chờ: " + pendingRepairs, "#fee140", "🔧");
+        // Card 6: Yêu Cầu & Sự Cố (Ticket)
+        VBox card6 = createStatCard("Yêu Cầu & Sự Cố", String.valueOf(totalTickets),
+                "Đang mở: " + openTickets, "#fee140", "🎫");
 
-        // Card 7: Bảo Trì
-        VBox card7 = createStatCard("Bảo Trì", String.valueOf(totalMaintenance),
-                "Đang chờ: " + pendingMaintenance, "#30cfd0", "⚙️");
+        // Card 7: Công Nợ
+        VBox card7 = createStatCard("Công Nợ", String.valueOf(totalDebt),
+                "Hóa đơn chưa thanh toán", "#30cfd0", "💰");
 
-        // Card 8: Hệ Thống BMS
-        VBox card8 = createStatCard("Hệ Thống BMS", String.valueOf(totalBMS),
-                "Đang hoạt động", "#a8edea", "💻");
+        // Card 8: Đã Xử Lý
+        VBox card8 = createStatCard("Đã Xử Lý", String.valueOf(resolvedTickets),
+                "Yêu cầu đã giải quyết", "#a8edea", "✅");
 
         statsBox.getChildren().addAll(card5, card6, card7, card8);
         return statsBox;
@@ -310,7 +311,7 @@ public final class DashboardView {
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
         BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
-        barChart.setTitle("Yêu cầu Sửa chữa theo Trạng thái");
+        barChart.setTitle("Yêu cầu & Sự cố theo Trạng thái");
         barChart.setPrefWidth(500);
         barChart.setPrefHeight(400);
         barChart.setStyle("-fx-background-color: white; -fx-background-radius: 16; " +
@@ -322,9 +323,9 @@ public final class DashboardView {
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
 
-        int pending = RepairRequestService.getRepairRequestsByStatus("PENDING").size();
-        int inProgress = RepairRequestService.getRepairRequestsByStatus("IN_PROGRESS").size();
-        int completed = RepairRequestService.getRepairRequestsByStatus("COMPLETED").size();
+        int pending = TicketService.getTicketsByStatus("OPEN").size();
+        int inProgress = TicketService.getTicketsByStatus("IN_PROGRESS").size();
+        int completed = TicketService.getTicketsByStatus("RESOLVED").size();
 
         if (pending == 0 && inProgress == 0 && completed == 0) {
             pending = 3;
@@ -418,53 +419,34 @@ public final class DashboardView {
         grid.setVgap(20);
         grid.setPadding(new Insets(20));
 
-        Button bmsBtn = new Button("💻 Giám sát & Điều khiển (BMS)");
-        Button maintenanceBtn = new Button("⚙️ Bảo trì & Bảo dưỡng");
-        Button securityBtn = new Button("🔒 Quản lý An ninh");
-        Button cleaningBtn = new Button("🧹 Quản lý Vệ sinh");
-        Button adminBtn = new Button("📋 Hành chính & Nhân sự");
-        Button hrBtn = new Button("👔 Nhân sự & Chấm công");
-        Button customerBtn = new Button("👥 Quản lý Khách hàng");
+        // 6 Module bắt buộc
+        Button residentBtn = new Button("👥 Quản lý Cư dân");
         Button apartmentBtn = new Button("🏠 Quản lý Căn hộ");
+        Button serviceFeeBtn = new Button("⚡ Phí dịch vụ & Điện-Nước");
         Button invoiceBtn = new Button("💰 Hóa đơn & Thanh toán");
+        Button ticketBtn = new Button("🎫 Yêu cầu & Sự cố");
         Button notificationBtn = new Button("🔔 Gửi thông báo");
-        Button repairBtn = new Button("🔧 Yêu cầu sửa chữa");
 
-        styleButton(bmsBtn, "#667eea");
-        styleButton(maintenanceBtn, "#f093fb");
-        styleButton(securityBtn, "#4facfe");
-        styleButton(cleaningBtn, "#43e97b");
-        styleButton(adminBtn, "#fa709a");
-        styleButton(hrBtn, "#fee140");
-        styleButton(customerBtn, "#30cfd0");
-        styleButton(apartmentBtn, "#a8edea");
-        styleButton(invoiceBtn, "#667eea");
-        styleButton(notificationBtn, "#f093fb");
-        styleButton(repairBtn, "#4facfe");
+        styleButton(residentBtn, "#667eea");
+        styleButton(apartmentBtn, "#f093fb");
+        styleButton(serviceFeeBtn, "#4facfe");
+        styleButton(invoiceBtn, "#43e97b");
+        styleButton(ticketBtn, "#fa709a");
+        styleButton(notificationBtn, "#fee140");
 
-        bmsBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/bms.fxml", "Giám sát & Điều khiển BMS"));
-        maintenanceBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/maintenance.fxml", "Bảo trì & Bảo dưỡng"));
-        securityBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/security.fxml", "Quản lý An ninh"));
-        cleaningBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/cleaning.fxml", "Quản lý Vệ sinh"));
-        adminBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/admin.fxml", "Quản lý Hành chính & Nhân sự"));
-        hrBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/hr.fxml", "Nhân sự & Chấm công"));
-        customerBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/customer.fxml", "Quản lý Khách hàng"));
+        residentBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/resident.fxml", "Quản lý Cư dân"));
         apartmentBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/apartment.fxml", "Quản lý Căn hộ"));
+        serviceFeeBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/service_fee.fxml", "Phí dịch vụ & Điện-Nước"));
         invoiceBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/invoice.fxml", "Hóa đơn & Thanh toán"));
+        ticketBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/ticket.fxml", "Yêu cầu & Sự cố"));
         notificationBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/notification.fxml", "Gửi thông báo"));
-        repairBtn.setOnAction(e -> openModule("/com/example/quanlytoanhanhom4/fxml/repair_request.fxml", "Yêu cầu sửa chữa"));
 
-        grid.add(bmsBtn, 0, 0);
-        grid.add(maintenanceBtn, 1, 0);
-        grid.add(securityBtn, 2, 0);
-        grid.add(cleaningBtn, 3, 0);
-        grid.add(adminBtn, 0, 1);
-        grid.add(hrBtn, 1, 1);
-        grid.add(customerBtn, 2, 1);
-        grid.add(apartmentBtn, 3, 1);
-        grid.add(invoiceBtn, 0, 2);
-        grid.add(notificationBtn, 1, 2);
-        grid.add(repairBtn, 2, 2);
+        grid.add(residentBtn, 0, 0);
+        grid.add(apartmentBtn, 1, 0);
+        grid.add(serviceFeeBtn, 2, 0);
+        grid.add(invoiceBtn, 0, 1);
+        grid.add(ticketBtn, 1, 1);
+        grid.add(notificationBtn, 2, 1);
 
         modulesBox.getChildren().addAll(sectionLabel, grid);
         return modulesBox;

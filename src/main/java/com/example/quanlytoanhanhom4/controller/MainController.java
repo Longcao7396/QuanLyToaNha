@@ -1,19 +1,22 @@
 package com.example.quanlytoanhanhom4.controller;
 
+import com.example.quanlytoanhanhom4.service.ClockService;
 import com.example.quanlytoanhanhom4.ui.BuildingLogo;
-import com.example.quanlytoanhanhom4.ui.DashboardView;
+import com.example.quanlytoanhanhom4.ui.DashboardCharts;
 import com.example.quanlytoanhanhom4.util.AlertUtils;
 import com.example.quanlytoanhanhom4.util.UserSession;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -33,22 +36,7 @@ public class MainController implements Initializable {
     private Label adminLabel;
     
     @FXML
-    private Button dashboardBtn;
-    
-    @FXML
-    private Button dienBtn;
-    
-    @FXML
-    private Button pcccBtn;
-    
-    @FXML
-    private Button chieuSangBtn;
-    
-    @FXML
-    private Button baoTriBtn;
-
-    @FXML
-    private Button hrBtn;
+    private VBox mainContentVBox;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -69,22 +57,48 @@ public class MainController implements Initializable {
             logoContainer.setMaxWidth(70); // Giới hạn kích thước để không vỡ giao diện
             logoContainer.setMaxHeight(70);
             topBar.getChildren().add(0, logoContainer);
+            
+            // Thêm thông tin thời tiết và giờ vào topBar
+            addWeatherAndClockToTopBar();
+        }
+        
+        // Thêm biểu đồ dashboard vào màn hình chính
+        if (mainContentVBox != null) {
+            DashboardCharts dashboardCharts = new DashboardCharts();
+            mainContentVBox.getChildren().add(dashboardCharts);
         }
     }
     
-    private void openDashboard() {
-        try {
-            Stage currentStage = (Stage) topBar.getScene().getWindow();
-            String role = UserSession.getCurrentRole();
-
-            // Đảm bảo cửa sổ được maximize và resize
-            currentStage.setResizable(true);
-            
-            DashboardView.show(currentStage, role != null ? role : "user");
-            logger.debug("Đã mở dashboard cho role: {}", role);
-        } catch (Exception e) {
-            logger.error("Lỗi khi mở dashboard", e);
-            AlertUtils.showError("Lỗi", "Không thể mở dashboard: " + e.getMessage());
+    /**
+     * Thêm thông tin thời tiết và đồng hồ vào topBar
+     * Sử dụng WeatherWidget component mới - đồng nhất và gọn gàng
+     */
+    private void addWeatherAndClockToTopBar() {
+        if (topBar == null) {
+            logger.warn("topBar is null, không thể thêm thời tiết");
+            return;
+        }
+        
+        // Tạo HBox chứa thời tiết và giờ
+        HBox infoBox = new HBox(15);
+        infoBox.setAlignment(Pos.CENTER);
+        infoBox.setStyle("-fx-padding: 0 10 0 0;");
+        
+        // Tạo đồng hồ trước (luôn hiển thị)
+        Label clockLabel = ClockService.createClockLabel(false);
+        clockLabel.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
+        infoBox.getChildren().add(clockLabel);
+        
+        // Sử dụng WeatherWidget component mới - compact mode cho top bar
+        HBox weatherWidget = com.example.quanlytoanhanhom4.ui.WeatherWidget.create(true);
+        infoBox.getChildren().add(0, weatherWidget);
+        
+        // Thêm vào topBar
+        int lastIndex = topBar.getChildren().size() - 1;
+        if (lastIndex >= 0) {
+            topBar.getChildren().add(lastIndex, infoBox);
+        } else {
+            topBar.getChildren().add(infoBox);
         }
     }
     
@@ -105,12 +119,6 @@ public class MainController implements Initializable {
             Stage moduleStage = new Stage();
             Scene scene = new Scene(loader.load());
 
-            // Nếu là BMS controller, set tiêu đề cho label
-            Object controller = loader.getController();
-            if (controller instanceof BMSController) {
-                ((BMSController) controller).setTitle(title);
-            }
-            
             moduleStage.setTitle(title);
             moduleStage.setScene(scene);
 
@@ -131,56 +139,9 @@ public class MainController implements Initializable {
         }
     }
     
-    @FXML
-    private void handleDashboard() {
-        openDashboard();
-    }
-    
-    @FXML
-    private void handleBms() {
-        openModule("/com/example/quanlytoanhanhom4/fxml/bms.fxml", "Giám sát hệ thống");
-    }
-    
-    @FXML
-    private void handlePccc() {
-        openModule("/com/example/quanlytoanhanhom4/fxml/bms.fxml", "PCCC & Khẩn cấp");
-    }
-    
-    @FXML
-    private void handleLighting() {
-        openModule("/com/example/quanlytoanhanhom4/fxml/bms.fxml", "Chiếu sáng & Tiện ích");
-    }
-    
-    @FXML
-    private void handleMaintenance() {
-        openModule("/com/example/quanlytoanhanhom4/fxml/maintenance.fxml", "Quản lý Bảo trì");
-    }
-    
-    @FXML
-    private void handleSecurity() {
-        openModule("/com/example/quanlytoanhanhom4/fxml/security.fxml", "Quản lý An ninh");
-    }
-    
-    @FXML
-    private void handleCleaning() {
-        openModule("/com/example/quanlytoanhanhom4/fxml/cleaning.fxml", "Quản lý Vệ sinh");
-    }
-    
-    @FXML
-    private void handleCustomer() {
-        openModule("/com/example/quanlytoanhanhom4/fxml/customer.fxml", "Quản lý Khách hàng");
-    }
-    
-    @FXML
-    private void handleAdmin() {
-        openModule("/com/example/quanlytoanhanhom4/fxml/admin.fxml", "Quản lý Hành chính & Nhân sự");
-    }
-
-    @FXML
-    private void handleHR() {
-        openModule("/com/example/quanlytoanhanhom4/fxml/hr.fxml", "Quản lý Nhân sự & Chấm công");
-    }
-
+    // ======================
+    // MODULE 1: QUẢN LÝ CƯ DÂN & CĂN HỘ
+    // ======================
     @FXML
     private void handleResident() {
         openModule("/com/example/quanlytoanhanhom4/fxml/resident.fxml", "Quản lý Cư dân");
@@ -191,24 +152,33 @@ public class MainController implements Initializable {
         openModule("/com/example/quanlytoanhanhom4/fxml/apartment.fxml", "Quản lý Căn hộ");
     }
 
+    // ======================
+    // MODULE 2 & 3: QUẢN LÝ PHÍ & CÔNG NỢ + ĐIỆN - NƯỚC
+    // ======================
     @FXML
-    private void handleUtility() {
-        openModule("/com/example/quanlytoanhanhom4/fxml/utility.fxml", "Quản lý Điện - Nước - Phí dịch vụ");
+    private void handleServiceFee() {
+        openModule("/com/example/quanlytoanhanhom4/fxml/service_fee.fxml", "Quản lý Phí Dịch vụ & Điện Nước");
     }
 
     @FXML
     private void handleInvoice() {
-        openModule("/com/example/quanlytoanhanhom4/fxml/invoice.fxml", "Hóa đơn & Thanh toán");
+        openModule("/com/example/quanlytoanhanhom4/fxml/invoice.fxml", "Quản lý Hóa đơn & Thanh toán");
     }
 
+    // ======================
+    // MODULE 4: QUẢN LÝ YÊU CẦU CƯ DÂN (TICKET)
+    // ======================
+    @FXML
+    private void handleTicket() {
+        openModule("/com/example/quanlytoanhanhom4/fxml/ticket.fxml", "Quản lý Yêu cầu & Sự cố");
+    }
+
+    // ======================
+    // MODULE 5: GỬI THÔNG BÁO CHO CƯ DÂN
+    // ======================
     @FXML
     private void handleNotification() {
-        openModule("/com/example/quanlytoanhanhom4/fxml/notification.fxml", "Gửi thông báo");
-    }
-
-    @FXML
-    private void handleRepairRequest() {
-        openModule("/com/example/quanlytoanhanhom4/fxml/repair_request.fxml", "Quản lý Yêu cầu Sửa chữa");
+        openModule("/com/example/quanlytoanhanhom4/fxml/notification.fxml", "Quản lý Thông báo");
     }
 
     @FXML

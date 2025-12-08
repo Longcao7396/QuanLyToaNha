@@ -18,10 +18,8 @@ public class DatabaseConnection {
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseConnection.class);
     private static HikariDataSource dataSource;
-
-    static {
-        initializeDataSource();
-    }
+    private static volatile boolean initialized = false;
+    private static final Object lock = new Object();
 
     private DatabaseConnection() {
         // Utility class
@@ -29,6 +27,7 @@ public class DatabaseConnection {
 
     /**
      * Initializes the HikariCP connection pool from application.properties
+     * Uses lazy initialization to avoid startup failures
      */
     private static void initializeDataSource() {
         try (InputStream input = DatabaseConnection.class
@@ -76,33 +75,79 @@ public class DatabaseConnection {
             config.addDataSourceProperty("maintainTimeStats", "false");
 
             dataSource = new HikariDataSource(config);
-            logger.info("HikariCP connection pool initialized successfully");
+            // Test connection
+            try (Connection conn = dataSource.getConnection()) {
+                logger.info("HikariCP connection pool initialized successfully");
+            }
+            initialized = true;
 
         } catch (Exception e) {
             logger.error("Không thể khởi tạo connection pool từ application.properties", e);
-            // Fallback to default configuration
-            HikariConfig config = new HikariConfig();
-            config.setJdbcUrl("jdbc:mysql://localhost:3306/quanlytoanha?useUnicode=true&characterEncoding=UTF-8&useSSL=false");
-            config.setUsername("root");
-            config.setPassword("");
-            config.setMaximumPoolSize(10);
-            config.setMinimumIdle(5);
-            dataSource = new HikariDataSource(config);
-            logger.warn("Sử dụng cấu hình mặc định cho connection pool");
+            // Try fallback to default configuration
+            try {
+                HikariConfig fallbackConfig = new HikariConfig();
+                fallbackConfig.setJdbcUrl("jdbc:mysql://localhost:3306/quanlytoanha?useUnicode=true&characterEncoding=UTF-8&useSSL=false");
+                fallbackConfig.setUsername("root");
+                fallbackConfig.setPassword("");
+                fallbackConfig.setMaximumPoolSize(10);
+                fallbackConfig.setMinimumIdle(5);
+                fallbackConfig.setConnectionTimeout(5000); // Shorter timeout for faster failure
+                dataSource = new HikariDataSource(fallbackConfig);
+                // Test fallback connection
+                try (Connection conn = dataSource.getConnection()) {
+                    logger.warn("Sử dụng cấu hình mặc định cho connection pool");
+                    initialized = true;
+                }
+            } catch (Exception fallbackException) {
+                logger.error("Không thể kết nối database với cấu hình mặc định. Vui lòng kiểm tra MySQL server đã chạy chưa.", fallbackException);
+                dataSource = null;
+                initialized = false;
+                // Don't throw exception - allow application to start and show user-friendly error
+            }
         }
     }
 
     /**
      * Gets a connection from the connection pool.
+     * Uses lazy initialization - will attempt to initialize if not already done.
      *
      * @return A database connection
      * @throws SQLException if a database access error occurs
      */
     public static Connection getConnection() throws SQLException {
+        // Lazy initialization - only initialize when first connection is requested
+        if (!initialized) {
+            synchronized (lock) {
+                if (!initialized) {
+                    initializeDataSource();
+                }
+            }
+        }
+        
         if (dataSource == null) {
-            throw new SQLException("Connection pool chưa được khởi tạo");
+            throw new SQLException("Connection pool chưa được khởi tạo. Vui lòng kiểm tra MySQL server đã chạy và cấu hình database trong application.properties.");
         }
         return dataSource.getConnection();
+    }
+    
+    /**
+     * Checks if the database connection is available
+     * @return true if connection pool is initialized and available
+     */
+    public static boolean isAvailable() {
+        if (!initialized) {
+            synchronized (lock) {
+                if (!initialized) {
+                    try {
+                        initializeDataSource();
+                    } catch (Exception e) {
+                        logger.error("Failed to initialize database connection", e);
+                        return false;
+                    }
+                }
+            }
+        }
+        return dataSource != null && !dataSource.isClosed();
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.example.quanlytoanhanhom4.app;
 
 import com.example.quanlytoanhanhom4.config.DatabaseInitializer;
+import com.example.quanlytoanhanhom4.service.ServiceFeeReminderService;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -15,6 +16,16 @@ public class BuildingManagementApplication extends Application {
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();
+        
+        // Khởi động service tự động gửi email thông báo phí dịch vụ
+        ServiceFeeReminderService.startDailyReminder();
+    }
+    
+    @Override
+    public void stop() throws Exception {
+        // Dừng service khi ứng dụng đóng
+        ServiceFeeReminderService.stop();
+        super.stop();
     }
 
     public static void main(String[] args) {

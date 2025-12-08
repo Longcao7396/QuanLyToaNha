@@ -76,7 +76,7 @@ public final class ValidationUtils {
     public static ValidationResult validateRequired(String value, String fieldName) {
         ValidationResult result = new ValidationResult();
         if (value == null || value.trim().isEmpty()) {
-            result.addError(fieldName + " kh├┤ng ─æ╞░ß╗úc ─æß╗â trß╗æng");
+            result.addError(fieldName + " không được để trống");
         }
         return result;
     }
@@ -91,7 +91,7 @@ public final class ValidationUtils {
     public static ValidationResult validateEmail(String email, String fieldName) {
         ValidationResult result = new ValidationResult();
         if (email != null && !email.trim().isEmpty() && !isValidEmail(email)) {
-            result.addError(fieldName + " kh├┤ng hß╗úp lß╗ç");
+            result.addError(fieldName + " không hợp lệ");
         }
         return result;
     }
@@ -106,7 +106,7 @@ public final class ValidationUtils {
     public static ValidationResult validatePhone(String phone, String fieldName) {
         ValidationResult result = new ValidationResult();
         if (phone != null && !phone.trim().isEmpty() && !isValidPhone(phone)) {
-            result.addError(fieldName + " kh├┤ng hß╗úp lß╗ç (10-11 chß╗» sß╗æ)");
+            result.addError(fieldName + " không hợp lệ (10-11 chữ số)");
         }
         return result;
     }
@@ -121,7 +121,7 @@ public final class ValidationUtils {
     public static ValidationResult validateIdentityCard(String identityCard, String fieldName) {
         ValidationResult result = new ValidationResult();
         if (identityCard != null && !identityCard.trim().isEmpty() && !isValidIdentityCard(identityCard)) {
-            result.addError(fieldName + " kh├┤ng hß╗úp lß╗ç (9-12 chß╗» sß╗æ)");
+            result.addError(fieldName + " không hợp lệ (9-12 chữ số)");
         }
         return result;
     }
@@ -140,9 +140,9 @@ public final class ValidationUtils {
         if (value != null) {
             int length = value.trim().length();
             if (length < minLength) {
-                result.addError(fieldName + " phß║úi c├│ ├¡t nhß║Ñt " + minLength + " k├╜ tß╗▒");
+                result.addError(fieldName + " phải có ít nhất " + minLength + " ký tự");
             } else if (length > maxLength) {
-                result.addError(fieldName + " kh├┤ng ─æ╞░ß╗úc v╞░ß╗út qu├í " + maxLength + " k├╜ tß╗▒");
+                result.addError(fieldName + " không được vượt quá " + maxLength + " ký tự");
             }
         }
         return result;

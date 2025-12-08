@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox alignment="CENTER" spacing="20" style="-fx-padding: 40; -fx-background-color: #f5f7fa;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.building.management.controller.LoginController">
+   <children>
+      <!-- Logo/Title -->
+      <VBox alignment="CENTER" spacing="10">
+         <Text fill="#2874A6" style="-fx-font-size: 32px; -fx-font-weight: bold;" text="🏢 Building Management" />
+         <Text fill="#64748b" style="-fx-font-size: 14px;" text="Hệ thống Quản lý Tòa Nhà" />
+      </VBox>
+      
+      <Separator />
+      
+      <!-- Login Form -->
+      <VBox spacing="15" style="-fx-padding: 30; -fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" prefWidth="350">
+         <Label text="Đăng nhập" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" />
+         
+         <VBox spacing="8">
+            <Label text="Tên đăng nhập:" style="-fx-text-fill: #475569; -fx-font-size: 13px;" />
+            <TextField fx:id="usernameField" promptText="Nhập tên đăng nhập" style="-fx-pref-height: 40;" />
+         </VBox>
+         
+         <VBox spacing="8">
+            <Label text="Mật khẩu:" style="-fx-text-fill: #475569; -fx-font-size: 13px;" />
+            <PasswordField fx:id="passwordField" promptText="Nhập mật khẩu" style="-fx-pref-height: 40;" onAction="#handleLogin" />
+         </VBox>
+         
+         <HBox spacing="10" style="-fx-padding: 10 0 0 0;">
+            <Button text="Đăng nhập" onAction="#handleLogin" style="-fx-background-color: #2874A6; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 150; -fx-pref-height: 40; -fx-background-radius: 5;" />
+            <Button text="Hủy" onAction="#handleCancel" style="-fx-background-color: #94a3b8; -fx-text-fill: white; -fx-pref-width: 150; -fx-pref-height: 40; -fx-background-radius: 5;" />
+         </HBox>
+         
+         <Label text="Mặc định: admin / admin123" style="-fx-text-fill: #94a3b8; -fx-font-size: 11px; -fx-padding: 10 0 0 0;" />
+      </VBox>
+   </children>
+</VBox>
+
+

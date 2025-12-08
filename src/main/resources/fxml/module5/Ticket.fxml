@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.quanlytoanhanhom4.controller.TicketController">
+   <top>
+      <VBox spacing="10" style="-fx-padding: 10;">
+         <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="Quản lý Ticket/Yêu cầu &amp; Sự cố" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+         </HBox>
+         <HBox spacing="10">
+            <Label text="Lọc theo trạng thái:"/>
+            <ComboBox fx:id="filterStatusCombo" prefWidth="150" onAction="#handleFilter"/>
+            <Button text="Làm mới" onAction="#handleFilter"/>
+         </HBox>
+      </VBox>
+   </top>
+   <center>
+      <TableView fx:id="ticketTable" VBox.vgrow="ALWAYS">
+         <columns>
+            <TableColumn fx:id="colTicketNumber" prefWidth="120" text="Số ticket"/>
+            <TableColumn fx:id="colTitle" prefWidth="200" text="Tiêu đề"/>
+            <TableColumn fx:id="colType" prefWidth="100" text="Loại"/>
+            <TableColumn fx:id="colCategory" prefWidth="100" text="Danh mục"/>
+            <TableColumn fx:id="colPriority" prefWidth="100" text="Ưu tiên"/>
+            <TableColumn fx:id="colStatus" prefWidth="120" text="Trạng thái"/>
+            <TableColumn fx:id="colCreatedDate" prefWidth="150" text="Ngày tạo"/>
+         </columns>
+      </TableView>
+   </center>
+   <right>
+      <VBox spacing="10" style="-fx-padding: 10;" prefWidth="350">
+         <Label text="Thông tin Ticket" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+         <Separator/>
+         <Label text="Số ticket:"/>
+         <TextField fx:id="ticketNumberField" promptText="Tự động tạo" editable="false"/>
+         <Label text="Tiêu đề *:"/>
+         <TextField fx:id="titleField" promptText="Nhập tiêu đề"/>
+         <Label text="Mô tả *:"/>
+         <TextArea fx:id="descriptionArea" promptText="Nhập mô tả chi tiết" prefRowCount="5" wrapText="true"/>
+         <Label text="Loại ticket:"/>
+         <ComboBox fx:id="ticketTypeCombo" promptText="Chọn loại"/>
+         <Label text="Danh mục:"/>
+         <ComboBox fx:id="categoryCombo" promptText="Chọn danh mục"/>
+         <Label text="Ưu tiên:"/>
+         <ComboBox fx:id="priorityCombo" promptText="Chọn mức độ ưu tiên"/>
+         <Label text="Trạng thái:"/>
+         <ComboBox fx:id="statusCombo" promptText="Chọn trạng thái"/>
+         <Separator/>
+         <HBox spacing="10">
+            <Button fx:id="addButton" text="Thêm" onAction="#handleAdd" prefWidth="100" style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
+            <Button fx:id="updateButton" text="Cập nhật" onAction="#handleUpdate" prefWidth="100" disable="true" style="-fx-background-color: #2196F3; -fx-text-fill: white;"/>
+            <Button fx:id="deleteButton" text="Xóa" onAction="#handleDelete" prefWidth="100" disable="true" style="-fx-background-color: #f44336; -fx-text-fill: white;"/>
+         </HBox>
+         <Label fx:id="statusLabel" wrapText="true" style="-fx-text-fill: #666;"/>
+         <Separator/>
+         <Button text="Quay lại" onAction="#handleBack" prefWidth="320" style="-fx-background-color: #757575; -fx-text-fill: white;"/>
+      </VBox>
+   </right>
+</BorderPane>
+
+
+
+
+
+
+
+
+
+
+
+
+

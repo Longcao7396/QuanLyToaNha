@@ -1,105 +1,58 @@
 package com.example.quanlytoanhanhom4.ui.auth;
 
-import com.example.quanlytoanhanhom4.config.DatabaseConnection;
-import com.example.quanlytoanhanhom4.util.PasswordUtils;
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.Objects;
 
 public class RegisterForm extends Application {
 
+    private static final Logger logger = LoggerFactory.getLogger(RegisterForm.class);
+
     @Override
     public void start(Stage stage) {
-        stage.setTitle("Đăng ký tài khoản");
-
-        Label userLabel = new Label("Tên đăng nhập:");
-        TextField userField = new TextField();
-
-        Label passLabel = new Label("Mật khẩu:");
-        PasswordField passField = new PasswordField();
-
-        Label roleLabel = new Label("Vai trò:");
-        TextField roleField = new TextField();
-        roleField.setPromptText("VD: admin, user...");
-
-        Label phoneLabel = new Label("Số điện thoại:");
-        TextField phoneField = new TextField();
-
-        Label emailLabel = new Label("Email:");
-        TextField emailField = new TextField();
-
-        Label messageLabel = new Label();
-
-        Button registerButton = new Button("Đăng ký");
-        registerButton.setOnAction(e -> {
-            String username = userField.getText();
-            String password = passField.getText();
-            String role = roleField.getText();
-            String phone = phoneField.getText();
-            String email = emailField.getText();
-
-            if (registerUser(username, password, role, phone, email)) {
-                messageLabel.setStyle("-fx-text-fill: green;");
-                messageLabel.setText("✅ Đăng ký thành công!");
-            } else {
-                messageLabel.setStyle("-fx-text-fill: red;");
-                messageLabel.setText("❌ Lỗi: Tên người dùng đã tồn tại hoặc lỗi hệ thống!");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/quanlytoanhanhom4/fxml/register.fxml"));
+            Scene scene = new Scene(loader.load(), 520, 750);
+            
+            // Load CSS files
+            try {
+                String modernCss = Objects.requireNonNull(getClass().getResource("/css/modern-style.css")).toExternalForm();
+                String registerCss = Objects.requireNonNull(getClass().getResource("/css/register-style.css")).toExternalForm();
+                scene.getStylesheets().addAll(modernCss, registerCss);
+                logger.debug("Đã load CSS files thành công");
+            } catch (NullPointerException e) {
+                logger.warn("Không tìm thấy một số CSS files, sẽ tiếp tục không CSS", e);
             }
-        });
-
-        VBox layout = new VBox(10,
-                userLabel, userField,
-                passLabel, passField,
-                roleLabel, roleField,
-                phoneLabel, phoneField,
-                emailLabel, emailField,
-                registerButton, messageLabel
-        );
-        layout.setAlignment(Pos.CENTER);
-        layout.setPadding(new Insets(20));
-
-        Scene scene = new Scene(layout, 350, 450);
-        stage.setScene(scene);
-        stage.show();
-    }
-
-    private boolean registerUser(String username, String password, String role, String phone, String email) {
-        try (Connection conn = DatabaseConnection.getConnection()) {
-            String checkSql = "SELECT * FROM user WHERE username = ?";
-            PreparedStatement checkStmt = conn.prepareStatement(checkSql);
-            checkStmt.setString(1, username);
-            ResultSet rs = checkStmt.executeQuery();
-            if (rs.next()) {
-                return false;
+            
+            // Set application icon
+            try {
+                Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/example/quanlytoanhanhom4/images/building_icon.png")));
+                stage.getIcons().add(icon);
+            } catch (Exception e) {
+                logger.debug("Không tìm thấy icon ứng dụng", e);
             }
-
-            String insertSql = "INSERT INTO user(username, role, password, phone_number, email) VALUES(?, ?, ?, ?, ?)";
-            PreparedStatement insertStmt = conn.prepareStatement(insertSql);
-            insertStmt.setString(1, username);
-            insertStmt.setString(2, role);
-            insertStmt.setString(3, PasswordUtils.hashPassword(password));
-            insertStmt.setString(4, phone);
-            insertStmt.setString(5, email);
-            insertStmt.executeUpdate();
-            return true;
-
-        } catch (SQLException e) {
+            
+            stage.setTitle("Đăng ký tài khoản");
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.centerOnScreen();
+            stage.show();
+            
+            logger.debug("Mở màn hình đăng ký thành công");
+        } catch (Exception e) {
+            logger.error("Lỗi khi mở màn hình đăng ký", e);
             e.printStackTrace();
-            return false;
+            throw new RuntimeException("Không thể mở màn hình đăng ký: " + e.getMessage(), e);
         }
     }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 }
-
-

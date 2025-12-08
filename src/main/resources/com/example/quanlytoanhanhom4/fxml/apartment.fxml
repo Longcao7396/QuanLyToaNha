@@ -1,75 +1,184 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.layout.Region?>
 
 <BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.quanlytoanhanhom4.controller.ApartmentController">
-    <top>
-        <HBox spacing="10" style="-fx-background-color: #2874A6; -fx-padding: 15;">
-            <children>
-                <Label text="Quản lý Căn hộ" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Label text="Lọc theo trạng thái:" style="-fx-text-fill: white;"/>
-                <ComboBox fx:id="filterStatusCombo" prefWidth="150" onAction="#handleFilter"/>
-                <Button text="Quay lại" onAction="#handleBack"
-                        style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
-            </children>
-        </HBox>
-    </top>
+            fx:controller="com.example.quanlytoanhanhom4.controller.ApartmentController"
+            stylesheets="@../../css/modern-style.css"
+            style="-fx-background-color: linear-gradient(to bottom right, #F7FAFF, #E5ECF6);">
+    
+    <!-- Center: Data Table and Search -->
     <center>
-        <VBox spacing="10" style="-fx-padding: 15;">
-            <children>
-                <TableView fx:id="apartmentTable" prefHeight="300">
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" styleClass="scroll-pane-gradient">
+            <content>
+                <VBox spacing="28" style="-fx-padding: 30; -fx-background-color: linear-gradient(to bottom right, #F7FAFF, #E5ECF6); -fx-min-height: 600;">
+            
+            <!-- Search and Filter Section -->
+            <VBox spacing="12" styleClass="card card-apartment">
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <Label text="🔍" style="-fx-font-size: 20px;"/>
+                    <TextField fx:id="searchField" promptText="Tìm kiếm theo số căn hộ, block, tầng..." 
+                               prefWidth="450" styleClass="text-field"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="Số bản ghi/trang:" styleClass="text-sm" style="-fx-text-fill: #6B7280;"/>
+                    <ComboBox fx:id="itemsPerPageCombo" prefWidth="100" styleClass="combo-box"
+                              onAction="#handleItemsPerPageChange"/>
+                    <Button fx:id="advancedFilterButton" text="🔽 Bộ lọc nâng cao" 
+                            styleClass="btn-outline"
+                            onAction="#handleToggleAdvancedFilter"/>
+                </HBox>
+                
+                <!-- Advanced Filter Panel -->
+                <VBox fx:id="advancedFilterPane" spacing="12" styleClass="filter-panel" 
+                      visible="false" managed="false">
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Bộ lọc nâng cao" styleClass="filter-panel-header"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="Xóa bộ lọc" onAction="#handleClearFilters"
+                                styleClass="btn-outline" style="-fx-font-size: 12px;"/>
+                    </HBox>
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <VBox spacing="6" styleClass="input-group">
+                            <Label text="Block/Tòa" styleClass="form-label"/>
+                            <TextField fx:id="filterBlockField" promptText="Lọc theo block..." 
+                                       prefWidth="150" styleClass="text-field"/>
+                        </VBox>
+                        <VBox spacing="6" styleClass="input-group">
+                            <Label text="Tầng" styleClass="form-label"/>
+                            <TextField fx:id="filterFloorField" promptText="Lọc theo tầng..." 
+                                       prefWidth="100" styleClass="text-field"/>
+                        </VBox>
+                        <VBox spacing="6" styleClass="input-group">
+                            <Label text="Loại căn hộ" styleClass="form-label"/>
+                            <ComboBox fx:id="filterApartmentTypeCombo" prefWidth="150" styleClass="combo-box"
+                                      onAction="#handleAdvancedFilterChange"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </VBox>
+            
+            <!-- Table Section -->
+            <VBox spacing="12" styleClass="card card-apartment" VBox.vgrow="ALWAYS">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="📋 Danh sách căn hộ" styleClass="card-header"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="statusLabel" styleClass="text-sm" style="-fx-text-fill: #10B981;"/>
+                </HBox>
+                
+                <TableView fx:id="apartmentTable" prefHeight="500" styleClass="table-view" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colApartmentNo" text="Số căn hộ" prefWidth="120"/>
-                        <TableColumn fx:id="colFloorNumber" text="Tầng" prefWidth="80"/>
-                        <TableColumn fx:id="colBuildingBlock" text="Block/Tòa" prefWidth="100"/>
-                        <TableColumn fx:id="colRooms" text="Số phòng" prefWidth="80"/>
-                        <TableColumn fx:id="colArea" text="Diện tích (m²)" prefWidth="120"/>
-                        <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="120"/>
+                        <TableColumn fx:id="colApartmentNo" text="Số căn hộ" prefWidth="160">
+                            <style>
+                                -fx-alignment: CENTER_LEFT;
+                            </style>
+                        </TableColumn>
+                        <TableColumn fx:id="colFloorNumber" text="Tầng" prefWidth="90">
+                            <style>
+                                -fx-alignment: CENTER;
+                            </style>
+                        </TableColumn>
+                        <TableColumn fx:id="colBuildingBlock" text="Block/Tòa" prefWidth="130">
+                            <style>
+                                -fx-alignment: CENTER;
+                            </style>
+                        </TableColumn>
+                        <TableColumn fx:id="colRooms" text="Số phòng" prefWidth="110">
+                            <style>
+                                -fx-alignment: CENTER;
+                            </style>
+                        </TableColumn>
+                        <TableColumn fx:id="colArea" text="Diện tích (m²)" prefWidth="150">
+                            <style>
+                                -fx-alignment: CENTER_RIGHT;
+                            </style>
+                        </TableColumn>
+                        <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="160">
+                            <style>
+                                -fx-alignment: CENTER;
+                            </style>
+                        </TableColumn>
                     </columns>
                 </TableView>
-                <Label fx:id="statusLabel" style="-fx-text-fill: green;"/>
-            </children>
-        </VBox>
-    </center>
-    <right>
-        <ScrollPane fitToWidth="true">
-            <VBox spacing="10" style="-fx-padding: 15; -fx-min-width: 300;">
-                <children>
-                    <Label text="Thông tin căn hộ" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
-                    <Label text="Số căn hộ:"/>
-                    <TextField fx:id="apartmentNoField" prefWidth="250"/>
-                    <Label text="Tầng:"/>
-                    <Spinner fx:id="floorNumberSpinner" prefWidth="250"/>
-                    <Label text="Block/Tòa:"/>
-                    <TextField fx:id="buildingBlockField" prefWidth="250"/>
-                    <Label text="Số phòng:"/>
-                    <Spinner fx:id="numberOfRoomsSpinner" prefWidth="250"/>
-                    <Label text="Số người:"/>
-                    <Spinner fx:id="numberOfPeopleSpinner" prefWidth="250"/>
-                    <Label text="Diện tích (m²):"/>
-                    <TextField fx:id="areaField" prefWidth="250"/>
-                    <Label text="Giá (VNĐ):"/>
-                    <TextField fx:id="priceField" prefWidth="250"/>
-                    <Label text="Trạng thái:"/>
-                    <ComboBox fx:id="statusCombo" prefWidth="250"/>
-                    <HBox spacing="10">
-                        <children>
-                            <Button fx:id="addButton" text="Thêm" onAction="#handleAdd"
-                                    style="-fx-background-color: #27AE60; -fx-text-fill: white; -fx-pref-width: 80;"/>
-                            <Button fx:id="updateButton" text="Cập nhật" onAction="#handleUpdate" disable="true"
-                                    style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-pref-width: 80;"/>
-                        </children>
-                    </HBox>
-                    <Button fx:id="deleteButton" text="Xóa" onAction="#handleDelete" disable="true"
-                            style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-pref-width: 250;"/>
-                </children>
+                
+                <!-- Pagination -->
+                <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 12 0 0 0;">
+                    <Label fx:id="paginationInfoLabel" styleClass="text-sm" style="-fx-text-fill: #6B7280;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Pagination fx:id="pagination" styleClass="pagination"/>
+                </HBox>
             </VBox>
+                </VBox>
+            </content>
         </ScrollPane>
+    </center>
+    
+    <!-- Right: Form Panel -->
+    <right>
+        <VBox spacing="0" styleClass="card card-apartment" style="-fx-min-width: 420; -fx-max-width: 420;">
+            <VBox spacing="8" style="-fx-padding: 24 24 20 24; -fx-background-color: #2874A6;">
+                <Label text="📝 Thông tin Căn hộ" style="-fx-font-size: 20px; -fx-font-weight: 700; -fx-text-fill: white;"/>
+            </VBox>
+            
+            <ScrollPane fitToWidth="true" style="-fx-background: transparent;">
+                <VBox spacing="18" style="-fx-padding: 24;">
+                    <VBox spacing="6" styleClass="input-group input-group-required">
+                        <Label text="Số căn hộ" styleClass="form-label"/>
+                        <TextField fx:id="apartmentNoField" prefWidth="372" promptText="Ví dụ: A-12.08"
+                                   styleClass="text-field"/>
+                    </VBox>
+                    
+                    <HBox spacing="12">
+                        <VBox spacing="6" styleClass="input-group" HBox.hgrow="ALWAYS">
+                            <Label text="Tầng" styleClass="form-label"/>
+                            <TextField fx:id="floorNumberField" prefWidth="180" promptText="Nhập số tầng"
+                                       styleClass="text-field"/>
+                        </VBox>
+                        <VBox spacing="6" styleClass="input-group" HBox.hgrow="ALWAYS">
+                            <Label text="Block/Tòa" styleClass="form-label"/>
+                            <TextField fx:id="buildingBlockField" prefWidth="180" promptText="A, B, C..."
+                                       styleClass="text-field"/>
+                        </VBox>
+                    </HBox>
+                    
+                    <HBox spacing="12">
+                        <VBox spacing="6" styleClass="input-group" HBox.hgrow="ALWAYS">
+                            <Label text="Số phòng" styleClass="form-label"/>
+                            <TextField fx:id="numberOfRoomsField" prefWidth="180" promptText="Nhập số phòng"
+                                       styleClass="text-field"/>
+                        </VBox>
+                        <VBox spacing="6" styleClass="input-group" HBox.hgrow="ALWAYS">
+                            <Label text="Diện tích (m²)" styleClass="form-label"/>
+                            <TextField fx:id="areaField" prefWidth="180" promptText="Ví dụ: 50.5"
+                                       styleClass="text-field"/>
+                        </VBox>
+                    </HBox>
+                    
+                    <VBox spacing="6" styleClass="input-group">
+                        <Label text="Trạng thái" styleClass="form-label"/>
+                        <ComboBox fx:id="statusCombo" prefWidth="372" styleClass="combo-box"/>
+                    </VBox>
+                </VBox>
+            </ScrollPane>
+            
+            <Separator style="-fx-padding: 0;"/>
+            
+            <!-- Action Buttons -->
+            <VBox spacing="12" style="-fx-padding: 24; -fx-background-color: white;">
+                <HBox spacing="12" alignment="CENTER">
+                    <Button fx:id="addButton" text="Thêm mới" onAction="#handleAdd"
+                            styleClass="btn-success" style="-fx-pref-width: 186; -fx-pref-height: 44; -fx-font-size: 14px;"/>
+                    <Button fx:id="updateButton" text="Cập nhật" onAction="#handleUpdate" 
+                            disable="true"
+                            styleClass="btn-primary" style="-fx-pref-width: 186; -fx-pref-height: 44; -fx-font-size: 14px;"/>
+                </HBox>
+                <Button fx:id="deleteButton" text="Xóa" onAction="#handleDelete" 
+                        disable="true"
+                        styleClass="btn-danger" style="-fx-pref-width: 384; -fx-pref-height: 44; -fx-font-size: 14px;"/>
+                <Button fx:id="clearButton" text="Làm mới" onAction="#handleClear"
+                        styleClass="btn-outline" style="-fx-pref-width: 384; -fx-pref-height: 44; -fx-font-size: 14px;"/>
+            </VBox>
+        </VBox>
     </right>
 </BorderPane>
-
-

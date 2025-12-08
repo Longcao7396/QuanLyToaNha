@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.building.management.controller.DashboardController">
+   <top>
+      <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: #2874A6; -fx-padding: 15;">
+         <children>
+            <Text fill="white" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="🏢 Building Management System" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="welcomeLabel" style="-fx-text-fill: white; -fx-font-size: 14px;" text="Chào mừng" />
+         </children>
+      </HBox>
+   </top>
+   
+   <left>
+      <VBox spacing="10" style="-fx-background-color: #1e293b; -fx-padding: 20;" prefWidth="200">
+         <children>
+            <Label text="MENU" style="-fx-text-fill: #94a3b8; -fx-font-size: 12px; -fx-font-weight: bold;" />
+            <Separator />
+            
+            <Button text="👥 Residents" onAction="#handleResidents" styleClass="sidebar-button" />
+            <Button text="🏠 Apartments" onAction="#handleApartments" styleClass="sidebar-button" />
+            <Button text="💰 Fees" onAction="#handleFees" styleClass="sidebar-button" />
+            <Button text="🔧 Maintenance" onAction="#handleMaintenance" styleClass="sidebar-button" />
+            <Button text="👔 Staff" onAction="#handleStaff" styleClass="sidebar-button" />
+            
+            <Region VBox.vgrow="ALWAYS" />
+            <Separator />
+            <Button text="🚪 Logout" onAction="#handleLogout" styleClass="sidebar-button-logout" />
+         </children>
+      </VBox>
+   </left>
+   
+   <center>
+      <StackPane fx:id="contentArea" style="-fx-background-color: #f8fafc;">
+         <children>
+            <VBox alignment="CENTER" spacing="20">
+               <Text fill="#64748b" style="-fx-font-size: 48px;" text="🏢" />
+               <Text fill="#1e293b" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Building Management System" />
+               <Text fill="#64748b" style="-fx-font-size: 14px;" text="Chọn module từ menu bên trái để bắt đầu" />
+            </VBox>
+         </children>
+      </StackPane>
+   </center>
+</BorderPane>
+
+

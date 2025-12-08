@@ -1,160 +1,236 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<?import javafx.geometry.Insets?>
 
 <BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.example.quanlytoanhanhom4.controller.ResidentController"
-            style="-fx-background-color: #f0f2f5;">
-    <top>
-        <HBox spacing="15" alignment="CENTER_LEFT"
-              style="-fx-background-color: linear-gradient(to right, #2874A6, #3498DB); -fx-padding: 20;">
-            <children>
-                <Label text="Quản lý Cư dân" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <VBox spacing="5" alignment="CENTER_RIGHT">
-                    <Label text="Lọc theo trạng thái:" style="-fx-text-fill: white; -fx-font-size: 14px;"/>
-                    <ComboBox fx:id="filterStatusCombo" prefWidth="180" style="-fx-font-size: 14px;"
-                              onAction="#handleFilter"/>
-                </VBox>
-                <Button text="← Quay lại" onAction="#handleBack"
-                        style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 5; -fx-font-size: 14px;"/>
-            </children>
-        </HBox>
-    </top>
+            stylesheets="@../../css/modern-style.css"
+            style="-fx-background-color: linear-gradient(to bottom right, #F7FAFF, #E5ECF6);">
+    
+    <!-- Center: Data Table and Search -->
     <center>
-        <VBox spacing="15" style="-fx-padding: 20;">
-            <children>
-                <HBox spacing="10" alignment="CENTER_LEFT">
-                    <Label text="Danh sách cư dân"
-                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" styleClass="scroll-pane-gradient">
+            <content>
+                <VBox spacing="28" style="-fx-padding: 30; -fx-background-color: linear-gradient(to bottom right, #F7FAFF, #E5ECF6); -fx-min-height: 600;">
+            
+            <!-- Search and Filter Section -->
+            <VBox spacing="12" styleClass="card card-resident">
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <Label text="🔍" style="-fx-font-size: 20px;"/>
+                    <TextField fx:id="searchField" promptText="Tìm kiếm theo tên, số điện thoại, email..." 
+                               prefWidth="450" styleClass="text-field"/>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="statusLabel" style="-fx-text-fill: #27ae60; -fx-font-size: 14px;"/>
+                    <Label text="Số bản ghi/trang:" styleClass="text-sm" style="-fx-text-fill: #6B7280;"/>
+                    <ComboBox fx:id="itemsPerPageCombo" prefWidth="100" styleClass="combo-box"
+                              onAction="#handleItemsPerPageChange"/>
+                    <Button fx:id="advancedFilterButton" text="🔽 Bộ lọc nâng cao" 
+                            styleClass="btn-outline"
+                            onAction="#handleToggleAdvancedFilter"/>
                 </HBox>
-                <TableView fx:id="residentTable" prefHeight="400"
-                           style="-fx-background-color: white; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
+                
+                <!-- Advanced Filter Panel -->
+                <VBox fx:id="advancedFilterPane" spacing="12" styleClass="filter-panel" 
+                      visible="false" managed="false">
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Bộ lọc nâng cao" styleClass="filter-panel-header"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="Xóa bộ lọc" onAction="#handleClearFilters"
+                                styleClass="btn-outline" style="-fx-font-size: 12px;"/>
+                    </HBox>
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <VBox spacing="6" styleClass="input-group">
+                            <Label text="Email" styleClass="form-label"/>
+                            <TextField fx:id="filterEmailField" promptText="Lọc theo email..." 
+                                       prefWidth="200" styleClass="text-field"/>
+                        </VBox>
+                        <VBox spacing="6" styleClass="input-group">
+                            <Label text="CMND/CCCD" styleClass="form-label"/>
+                            <TextField fx:id="filterIdentityCardField" promptText="Lọc theo CMND/CCCD..." 
+                                       prefWidth="200" styleClass="text-field"/>
+                        </VBox>
+                        <VBox spacing="6" styleClass="input-group">
+                            <Label text="Loại cư dân" styleClass="form-label"/>
+                            <ComboBox fx:id="filterResidentTypeCombo" prefWidth="150" styleClass="combo-box"
+                                      onAction="#handleAdvancedFilterChange"/>
+                        </VBox>
+                        <VBox spacing="6" styleClass="input-group">
+                            <Label text="Giới tính" styleClass="form-label"/>
+                            <ComboBox fx:id="filterGenderCombo" prefWidth="120" styleClass="combo-box"
+                                      onAction="#handleAdvancedFilterChange"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </VBox>
+            
+            <!-- Table Section -->
+            <VBox spacing="12" styleClass="card card-resident" VBox.vgrow="ALWAYS">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="📋 Danh sách cư dân" styleClass="card-header"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="statusLabel" styleClass="text-sm" style="-fx-text-fill: #10B981;"/>
+                </HBox>
+                
+                <TableView fx:id="residentTable" prefHeight="500" styleClass="table-view" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colFullName" text="Họ tên" prefWidth="200" style="-fx-font-size: 14px;">
+                        <TableColumn fx:id="colFullName" text="Họ tên" prefWidth="200">
                             <style>
                                 -fx-alignment: CENTER_LEFT;
                             </style>
                         </TableColumn>
-                        <TableColumn fx:id="colPhone" text="Số điện thoại" prefWidth="150" style="-fx-font-size: 14px;">
+                        <TableColumn fx:id="colIdentityCard" text="CMND/CCCD" prefWidth="130">
                             <style>
                                 -fx-alignment: CENTER;
                             </style>
                         </TableColumn>
-                        <TableColumn fx:id="colEmail" text="Email" prefWidth="250" style="-fx-font-size: 14px;">
+                        <TableColumn fx:id="colDateOfBirth" text="Ngày sinh" prefWidth="120">
+                            <style>
+                                -fx-alignment: CENTER;
+                            </style>
+                        </TableColumn>
+                        <TableColumn fx:id="colGender" text="Giới tính" prefWidth="100">
+                            <style>
+                                -fx-alignment: CENTER;
+                            </style>
+                        </TableColumn>
+                        <TableColumn fx:id="colPhone" text="Số điện thoại" prefWidth="140">
+                            <style>
+                                -fx-alignment: CENTER;
+                            </style>
+                        </TableColumn>
+                        <TableColumn fx:id="colEmail" text="Email" prefWidth="250">
                             <style>
                                 -fx-alignment: CENTER_LEFT;
                             </style>
                         </TableColumn>
-                        <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="150" style="-fx-font-size: 14px;">
+                        <TableColumn fx:id="colAddress" text="Địa chỉ" prefWidth="300">
+                            <style>
+                                -fx-alignment: CENTER_LEFT;
+                            </style>
+                        </TableColumn>
+                        <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="120">
                             <style>
                                 -fx-alignment: CENTER;
                             </style>
                         </TableColumn>
                     </columns>
                 </TableView>
-            </children>
-        </VBox>
-    </center>
-    <right>
-        <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
-            <VBox spacing="15"
-                  style="-fx-padding: 20; -fx-min-width: 350; -fx-background-color: white; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, -2);">
-                <children>
-                    <Label text="📝 Thông tin cư dân"
-                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-padding: 0 0 10 0;"/>
-
-                    <Separator/>
-
-                    <VBox spacing="8">
-                        <Label text="Họ tên *" style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
-                        <TextField fx:id="fullNameField" prefWidth="300" promptText="Nhập họ tên"
-                                   style="-fx-font-size: 14px;"/>
-                    </VBox>
-
-                    <HBox spacing="10">
-                        <VBox spacing="8" HBox.hgrow="ALWAYS">
-                            <Label text="Số điện thoại *" style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
-                            <TextField fx:id="phoneField" prefWidth="145" promptText="10-11 số"
-                                       style="-fx-font-size: 14px;"/>
-                        </VBox>
-                        <VBox spacing="8" HBox.hgrow="ALWAYS">
-                            <Label text="Email" style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
-                            <TextField fx:id="emailField" prefWidth="145" promptText="email@example.com"
-                                       style="-fx-font-size: 14px;"/>
-                        </VBox>
-                    </HBox>
-
-                    <HBox spacing="10">
-                        <VBox spacing="8" HBox.hgrow="ALWAYS">
-                            <Label text="CMND/CCCD" style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
-                            <TextField fx:id="identityCardField" prefWidth="145" promptText="9-12 chữ số"
-                                       style="-fx-font-size: 14px;"/>
-                        </VBox>
-                        <VBox spacing="8" HBox.hgrow="ALWAYS">
-                            <Label text="Ngày sinh" style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
-                            <DatePicker fx:id="dateOfBirthPicker" prefWidth="145" style="-fx-font-size: 14px;"/>
-                        </VBox>
-                    </HBox>
-
-                    <HBox spacing="10">
-                        <VBox spacing="8" HBox.hgrow="ALWAYS">
-                            <Label text="Giới tính" style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
-                            <ComboBox fx:id="genderCombo" prefWidth="145" style="-fx-font-size: 14px;"/>
-                        </VBox>
-                        <VBox spacing="8" HBox.hgrow="ALWAYS">
-                            <Label text="Trạng thái" style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
-                            <ComboBox fx:id="statusCombo" prefWidth="145" style="-fx-font-size: 14px;"/>
-                        </VBox>
-                    </HBox>
-
-                    <VBox spacing="8">
-                        <Label text="Địa chỉ" style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
-                        <TextArea fx:id="addressArea" prefWidth="300" prefHeight="70" promptText="Nhập địa chỉ"
-                                  style="-fx-font-size: 14px;"/>
-                    </VBox>
-
-                    <Separator/>
-
-                    <Label text="📞 Liên hệ khẩn cấp"
-                           style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
-
-                    <HBox spacing="10">
-                        <VBox spacing="8" HBox.hgrow="ALWAYS">
-                            <Label text="Họ tên" style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
-                            <TextField fx:id="emergencyContactField" prefWidth="145" promptText="Tên người liên hệ"
-                                       style="-fx-font-size: 14px;"/>
-                        </VBox>
-                        <VBox spacing="8" HBox.hgrow="ALWAYS">
-                            <Label text="Số điện thoại" style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
-                            <TextField fx:id="emergencyPhoneField" prefWidth="145" promptText="10-11 số"
-                                       style="-fx-font-size: 14px;"/>
-                        </VBox>
-                    </HBox>
-
-                    <VBox spacing="8">
-                        <Label text="Ghi chú" style="-fx-font-weight: bold; -fx-text-fill: #34495e;"/>
-                        <TextArea fx:id="notesArea" prefWidth="300" prefHeight="80" promptText="Nhập ghi chú (nếu có)"
-                                  style="-fx-font-size: 14px;"/>
-                    </VBox>
-
-                    <Separator/>
-
-                    <HBox spacing="10" alignment="CENTER">
-                        <Button fx:id="addButton" text="➕ Thêm mới" onAction="#handleAdd"
-                                style="-fx-background-color: #27AE60; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 140; -fx-pref-height: 40; -fx-background-radius: 5; -fx-font-size: 14px;"/>
-                        <Button fx:id="updateButton" text="✏️ Cập nhật" onAction="#handleUpdate" disable="true"
-                                style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 140; -fx-pref-height: 40; -fx-background-radius: 5; -fx-font-size: 14px;"/>
-                    </HBox>
-                    <Button fx:id="deleteButton" text="🗑️ Xóa" onAction="#handleDelete" disable="true"
-                            style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 300; -fx-pref-height: 40; -fx-background-radius: 5; -fx-font-size: 14px;"/>
-                </children>
+                
+                <!-- Pagination -->
+                <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 12 0 0 0;">
+                    <Label fx:id="paginationInfoLabel" styleClass="text-sm" style="-fx-text-fill: #6B7280;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Pagination fx:id="pagination" styleClass="pagination"/>
+                </HBox>
             </VBox>
+                </VBox>
+            </content>
         </ScrollPane>
+    </center>
+    
+    <!-- Right: Form Panel -->
+    <right>
+        <VBox spacing="0" styleClass="card card-resident" style="-fx-min-width: 420; -fx-max-width: 420;">
+            <!-- Header -->
+            <VBox spacing="8" style="-fx-padding: 24 24 20 24; -fx-background-color: #2874A6;">
+                <Label text="📝 Thông tin Cư dân" style="-fx-font-size: 20px; -fx-font-weight: 700; -fx-text-fill: white;"/>
+            </VBox>
+            
+            <!-- Form Content -->
+            <ScrollPane fitToWidth="true" vbarPolicy="AS_NEEDED" style="-fx-background: transparent; -fx-border-width: 0;">
+                <VBox spacing="20" style="-fx-padding: 24;">
+                    <!-- Thông tin cơ bản -->
+                    <VBox spacing="12">
+                        <Label text="Thông tin cơ bản" style="-fx-font-size: 16px; -fx-font-weight: 600; -fx-text-fill: #2874A6; -fx-padding: 0 0 8 0;"/>
+                            <VBox spacing="6" styleClass="input-group input-group-required">
+                            <Label text="Họ tên *" styleClass="form-label"/>
+                            <TextField fx:id="fullNameField" prefWidth="372" promptText="Nhập họ tên đầy đủ" styleClass="text-field"/>
+                            </VBox>
+                            <HBox spacing="12">
+                                <VBox spacing="6" styleClass="input-group" HBox.hgrow="ALWAYS">
+                                    <Label text="CMND/CCCD" styleClass="form-label"/>
+                                <TextField fx:id="identityCardField" prefWidth="180" promptText="9-12 chữ số" styleClass="text-field" style="-fx-text-fill: #000000;"/>
+                                </VBox>
+                                <VBox spacing="6" styleClass="input-group" HBox.hgrow="ALWAYS">
+                                    <Label text="Ngày sinh" styleClass="form-label"/>
+                                <DatePicker fx:id="dateOfBirthPicker" prefWidth="180" styleClass="combo-box" style="-fx-text-fill: #000000;"/>
+                                </VBox>
+                            </HBox>
+                            <HBox spacing="12">
+                                <VBox spacing="6" styleClass="input-group" HBox.hgrow="ALWAYS">
+                                    <Label text="Giới tính" styleClass="form-label"/>
+                                <ComboBox fx:id="genderCombo" prefWidth="180" styleClass="combo-box" style="-fx-text-fill: #000000;"/>
+                                </VBox>
+                                <VBox spacing="6" styleClass="input-group" HBox.hgrow="ALWAYS">
+                                    <Label text="Trạng thái" styleClass="form-label"/>
+                                <ComboBox fx:id="statusCombo" prefWidth="180" styleClass="combo-box" style="-fx-text-fill: #000000;"/>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+                    
+                    <!-- Thông tin liên lạc -->
+                    <VBox spacing="12">
+                        <Label text="Thông tin liên lạc" style="-fx-font-size: 16px; -fx-font-weight: 600; -fx-text-fill: #2874A6; -fx-padding: 0 0 8 0;"/>
+                            <HBox spacing="12">
+                                <VBox spacing="6" styleClass="input-group input-group-required" HBox.hgrow="ALWAYS">
+                                <Label text="Số điện thoại *" styleClass="form-label"/>
+                                <TextField fx:id="phoneField" prefWidth="180" promptText="10-11 chữ số" styleClass="text-field"/>
+                                </VBox>
+                                <VBox spacing="6" styleClass="input-group" HBox.hgrow="ALWAYS">
+                                    <Label text="Email" styleClass="form-label"/>
+                                <TextField fx:id="emailField" prefWidth="180" promptText="email@example.com" styleClass="text-field"/>
+                                </VBox>
+                            </HBox>
+                            <VBox spacing="6" styleClass="input-group">
+                                <Label text="Địa chỉ" styleClass="form-label"/>
+                            <TextArea fx:id="addressArea" prefWidth="372" prefHeight="100" promptText="Nhập địa chỉ đầy đủ" styleClass="text-area"/>
+                        </VBox>
+                    </VBox>
+                    
+                    <!-- Liên hệ khẩn cấp -->
+                    <VBox spacing="12">
+                        <Label text="Liên hệ khẩn cấp" style="-fx-font-size: 16px; -fx-font-weight: 600; -fx-text-fill: #2874A6; -fx-padding: 0 0 8 0;"/>
+                            <HBox spacing="12">
+                                <VBox spacing="6" styleClass="input-group" HBox.hgrow="ALWAYS">
+                                    <Label text="Họ tên" styleClass="form-label"/>
+                                <TextField fx:id="emergencyContactField" prefWidth="180" promptText="Tên người liên hệ" styleClass="text-field"/>
+                                </VBox>
+                                <VBox spacing="6" styleClass="input-group" HBox.hgrow="ALWAYS">
+                                    <Label text="Số điện thoại" styleClass="form-label"/>
+                                <TextField fx:id="emergencyPhoneField" prefWidth="180" promptText="10-11 chữ số" styleClass="text-field"/>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+                    
+                    <!-- Ghi chú -->
+                    <VBox spacing="12">
+                        <Label text="Ghi chú" style="-fx-font-size: 16px; -fx-font-weight: 600; -fx-text-fill: #2874A6; -fx-padding: 0 0 8 0;"/>
+                            <VBox spacing="6" styleClass="input-group">
+                                <Label text="Ghi chú" styleClass="form-label"/>
+                            <TextArea fx:id="notesArea" prefWidth="372" prefHeight="100" promptText="Nhập ghi chú (nếu có)" styleClass="text-area"/>
+                        </VBox>
+                    </VBox>
+                        </VBox>
+                    </ScrollPane>
+            
+            <Separator style="-fx-padding: 0;"/>
+            
+            <!-- Action Buttons -->
+            <VBox spacing="12" style="-fx-padding: 24; -fx-background-color: white;">
+                <HBox spacing="12" alignment="CENTER">
+                    <Button fx:id="addButton" text="Thêm mới" onAction="#handleAdd"
+                            styleClass="btn-success" style="-fx-pref-width: 186; -fx-pref-height: 44; -fx-font-size: 14px;"/>
+                    <Button fx:id="updateButton" text="Cập nhật" onAction="#handleUpdate" 
+                            disable="true"
+                            styleClass="btn-primary" style="-fx-pref-width: 186; -fx-pref-height: 44; -fx-font-size: 14px;"/>
+                </HBox>
+                <Button fx:id="deleteButton" text="Xóa" onAction="#handleDelete" 
+                        disable="true"
+                        styleClass="btn-danger" style="-fx-pref-width: 384; -fx-pref-height: 44; -fx-font-size: 14px;"/>
+                <Button fx:id="clearButton" text="Làm mới" onAction="#handleClear"
+                        styleClass="btn-outline" style="-fx-pref-width: 384; -fx-pref-height: 44; -fx-font-size: 14px;"/>
+            </VBox>
+        </VBox>
     </right>
 </BorderPane>

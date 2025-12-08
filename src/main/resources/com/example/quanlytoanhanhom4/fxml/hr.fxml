@@ -6,16 +6,6 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.example.quanlytoanhanhom4.controller.HRController">
-    <top>
-        <HBox spacing="10" style="-fx-background-color: #1F618D; -fx-padding: 14;">
-            <children>
-                <Label text="Quản lý Nhân sự &amp; Chấm công"
-                       style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button text="Đóng" onAction="#handleBack" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold;"/>
-            </children>
-        </HBox>
-    </top>
     <center>
         <TabPane tabClosingPolicy="UNAVAILABLE">
             <tabs>

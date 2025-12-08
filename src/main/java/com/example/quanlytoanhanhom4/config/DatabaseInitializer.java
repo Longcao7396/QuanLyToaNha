@@ -252,7 +252,6 @@ public final class DatabaseInitializer {
             throw new RuntimeException("Không thể tải Flyway", e);
         } catch (Exception e) {
             logger.error("❌ Lỗi khi chạy Flyway migrations", e);
-            e.printStackTrace();
             throw new RuntimeException("Không thể chạy database migrations", e);
         }
     }
@@ -284,37 +283,39 @@ public final class DatabaseInitializer {
         }
     }
 
-    private static String getDatabaseUrl() {
+    /**
+     * Loads database configuration from application.properties.
+     * 
+     * @return Properties object containing database configuration
+     */
+    private static Properties loadDatabaseProperties() {
+        Properties props = new Properties();
         try (InputStream input = DatabaseInitializer.class
                 .getResourceAsStream("/application.properties")) {
-            Properties props = new Properties();
-            props.load(input);
-            return props.getProperty("database.url", "jdbc:mysql://localhost:3306/quanlytoanha");
+            if (input != null) {
+                props.load(input);
+            } else {
+                logger.warn("Không tìm thấy application.properties, sử dụng giá trị mặc định");
+            }
         } catch (Exception e) {
-            return "jdbc:mysql://localhost:3306/quanlytoanha";
+            logger.warn("Lỗi khi đọc application.properties, sử dụng giá trị mặc định: {}", e.getMessage());
         }
+        return props;
+    }
+
+    private static String getDatabaseUrl() {
+        Properties props = loadDatabaseProperties();
+        return props.getProperty("database.url", "jdbc:mysql://localhost:3306/quanlytoanha");
     }
 
     private static String getDatabaseUser() {
-        try (InputStream input = DatabaseInitializer.class
-                .getResourceAsStream("/application.properties")) {
-            Properties props = new Properties();
-            props.load(input);
-            return props.getProperty("database.user", "root");
-        } catch (Exception e) {
-            return "root";
-        }
+        Properties props = loadDatabaseProperties();
+        return props.getProperty("database.user", "root");
     }
 
     private static String getDatabasePassword() {
-        try (InputStream input = DatabaseInitializer.class
-                .getResourceAsStream("/application.properties")) {
-            Properties props = new Properties();
-            props.load(input);
-            return props.getProperty("database.password", "");
-        } catch (Exception e) {
-            return "";
-        }
+        Properties props = loadDatabaseProperties();
+        return props.getProperty("database.password", "");
     }
 
     public static void main(String[] args) {

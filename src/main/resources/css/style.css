@@ -1,0 +1,280 @@
+/* Building Management System - Modern Blue & White Theme */
+
+.root {
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-font-size: 14px;
+    -fx-focus-color: #2874A6;
+    -fx-faint-focus-color: rgba(40, 116, 166, 0.2);
+}
+
+/* ==================== BUTTONS ==================== */
+
+.button {
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    -fx-font-weight: 500;
+    -fx-padding: 10 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);
+}
+
+.button:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3);
+}
+
+.button:pressed {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 3, 0, 0, 1);
+}
+
+/* Sidebar Buttons */
+.sidebar-button {
+    -fx-background-color: #334155;
+    -fx-text-fill: white;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 12 20;
+    -fx-pref-width: 180;
+    -fx-background-radius: 5px;
+}
+
+.sidebar-button:hover {
+    -fx-background-color: #475569;
+}
+
+.sidebar-button:pressed {
+    -fx-background-color: #1e293b;
+}
+
+.sidebar-button-logout {
+    -fx-background-color: #dc2626;
+    -fx-text-fill: white;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 12 20;
+    -fx-pref-width: 180;
+    -fx-background-radius: 5px;
+}
+
+.sidebar-button-logout:hover {
+    -fx-background-color: #ef4444;
+}
+
+/* Primary Buttons */
+.primary-button {
+    -fx-background-color: #2874A6;
+    -fx-text-fill: white;
+}
+
+.primary-button:hover {
+    -fx-background-color: #3498db;
+}
+
+/* Success Buttons */
+.success-button {
+    -fx-background-color: #27ae60;
+    -fx-text-fill: white;
+}
+
+.success-button:hover {
+    -fx-background-color: #2ecc71;
+}
+
+/* Danger Buttons */
+.danger-button {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+}
+
+.danger-button:hover {
+    -fx-background-color: #c0392b;
+}
+
+/* ==================== TABLE VIEW ==================== */
+
+.table-view {
+    -fx-background-color: white;
+    -fx-background-radius: 5px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #2874A6;
+    -fx-background-radius: 5px 5px 0 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: #2874A6;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10;
+}
+
+.table-view .table-cell {
+    -fx-padding: 10;
+    -fx-border-color: #e2e8f0;
+}
+
+.table-row-cell:even {
+    -fx-background-color: #f8fafc;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: white;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #dbeafe;
+    -fx-text-fill: #1e293b;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #f1f5f9;
+}
+
+/* ==================== TEXT FIELD ==================== */
+.text-field, .password-field, .text-area {
+    -fx-background-color: white;
+    -fx-text-fill: #000000;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 12 16;
+    -fx-font-size: 16px;
+    -fx-font-weight: normal;
+    -fx-effect: none;
+    -fx-focus-color: #2874A6;
+    -fx-faint-focus-color: rgba(40, 116, 166, 0.2);
+    -fx-background-insets: 0;
+}
+
+.text-field:focused, .password-field:focused, .text-area:focused {
+    -fx-border-color: #2874A6;
+    -fx-border-width: 2px;
+    -fx-background-color: white;
+    -fx-text-fill: #000000;
+    -fx-effect: dropshadow(gaussian, rgba(40, 116, 166, 0.3), 4, 0, 0, 1);
+}
+
+.text-field {
+    -fx-prompt-text-fill: #9CA3AF;
+}
+
+.password-field {
+    -fx-prompt-text-fill: #9CA3AF;
+}
+
+.text-area {
+    -fx-prompt-text-fill: #9CA3AF;
+}
+
+/* ==================== COMBO BOX ==================== */
+
+.combo-box {
+    -fx-background-color: white;
+    -fx-text-fill: #000000;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 12 16;
+    -fx-font-size: 16px;
+    -fx-effect: none;
+    -fx-focus-color: #2874A6;
+    -fx-faint-focus-color: rgba(40, 116, 166, 0.2);
+    -fx-background-insets: 0;
+}
+
+.combo-box:focused {
+    -fx-border-color: #2874A6;
+    -fx-border-width: 2px;
+    -fx-background-color: white;
+    -fx-text-fill: #000000;
+    -fx-effect: dropshadow(gaussian, rgba(40, 116, 166, 0.3), 4, 0, 0, 1);
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: #000000;
+    -fx-background-color: white;
+    -fx-font-size: 16px;
+    -fx-padding: 12 16;
+}
+
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: #f1f5f9;
+}
+
+.combo-box-popup .list-view .list-cell:selected {
+    -fx-background-color: #e2e8f0;
+    -fx-text-fill: #000000;
+}
+
+/* ==================== LABELS ==================== */
+/* Tất cả label trong form - chữ đen, to, rõ ràng */
+.label {
+    -fx-text-fill: #000000;
+    -fx-font-size: 16px;
+}
+
+/* Đảm bảo label trong form containers đều màu đen */
+.card .label, VBox .label, HBox .label, GridPane .label {
+    -fx-text-fill: #000000;
+    -fx-font-size: 16px;
+    -fx-font-weight: 600;
+}
+
+.label-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #000000;
+}
+
+.label-subtitle {
+    -fx-font-size: 16px;
+    -fx-text-fill: #374151;
+}
+
+/* ==================== CARDS ==================== */
+
+.card {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);
+    -fx-padding: 20;
+}
+
+/* ==================== SCROLL PANE ==================== */
+
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: #f1f5f9;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #cbd5e1;
+    -fx-background-radius: 5px;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #94a3b8;
+}
+
+/* ==================== ALERT DIALOG ==================== */
+
+.dialog-pane {
+    -fx-background-color: white;
+}
+
+.dialog-pane .header-panel {
+    -fx-background-color: #2874A6;
+}
+
+.dialog-pane .header-panel .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+

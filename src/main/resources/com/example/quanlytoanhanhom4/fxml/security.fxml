@@ -5,17 +5,6 @@
 <?import javafx.scene.layout.Region?>
 
 <BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.quanlytoanhanhom4.controller.SecurityController">
-   <top>
-      <HBox spacing="10" style="-fx-background-color: #2874A6; -fx-padding: 15;">
-         <children>
-            <Label text="Quản lý An ninh" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Label text="Lọc theo trạng thái:" style="-fx-text-fill: white;"/>
-            <ComboBox fx:id="filterStatusCombo" prefWidth="150" onAction="#handleFilter"/>
-            <Button text="Quay lại" onAction="#handleBack" style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
-         </children>
-      </HBox>
-   </top>
    <center>
       <VBox spacing="10" style="-fx-padding: 15;">
          <children>

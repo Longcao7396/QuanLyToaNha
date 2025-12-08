@@ -67,12 +67,25 @@ public class LoginController implements Initializable {
                 logger.info("Đăng nhập thành công cho user: {}", username);
                 statusLabel.setStyle("-fx-text-fill: green;");
                 statusLabel.setText("✅ Đăng nhập thành công!");
+                AlertUtils.showSuccess("Đăng nhập thành công!");
                 openMainView();
             } else {
                 logger.warn("Đăng nhập thất bại cho user: {}", username);
                 statusLabel.setStyle("-fx-text-fill: red;");
                 statusLabel.setText("❌ Sai tên đăng nhập hoặc mật khẩu!");
                 AlertUtils.showError("Đăng nhập thất bại", "Sai tên đăng nhập hoặc mật khẩu!");
+            }
+        } catch (RuntimeException e) {
+            logger.error("Lỗi khi đăng nhập", e);
+            if (e.getMessage() != null && e.getMessage().contains("database")) {
+                AlertUtils.showError("Lỗi kết nối database", 
+                    "Không thể kết nối đến database.\n\n" +
+                    "Vui lòng kiểm tra:\n" +
+                    "1. MySQL server đã được khởi động chưa?\n" +
+                    "2. Cấu hình database trong application.properties có đúng không?\n" +
+                    "3. Database 'quanlytoanha' đã được tạo chưa?");
+            } else {
+                AlertUtils.showError("Lỗi", "Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.");
             }
         } catch (Exception e) {
             logger.error("Lỗi khi đăng nhập", e);

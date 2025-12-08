@@ -104,14 +104,35 @@ public class ResidentService {
         return null;
     }
 
-    public static boolean addResident(Resident resident) {
-        String sql = "INSERT INTO resident (user_id, full_name, phone, email, identity_card, " +
-                "date_of_birth, gender, address, emergency_contact, emergency_phone, status, notes) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    public static Resident getResidentByApartmentId(Integer apartmentId) {
+        String sql = "SELECT * FROM resident WHERE apartment_id = ? AND is_household_head = TRUE LIMIT 1";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, resident.getUserId());
+            pstmt.setInt(1, apartmentId);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                logger.debug("Đã lấy chủ hộ cho căn hộ ID: {}", apartmentId);
+                return mapResultSetToResident(rs);
+            }
+        } catch (SQLException e) {
+            logger.error("Lỗi khi lấy chủ hộ cho căn hộ ID: {}", apartmentId, e);
+        }
+        return null;
+    }
+
+    public static boolean addResident(Resident resident) {
+        String sql = "INSERT INTO resident (user_id, full_name, phone, email, identity_card, " +
+                "date_of_birth, gender, address, emergency_contact, emergency_phone, " +
+                "resident_type, relationship_type, apartment_id, is_household_head, " +
+                "move_in_date, expected_move_out_date, vehicle_license_plate, profile_photo, " +
+                "status, notes) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setObject(1, resident.getUserId());
             pstmt.setString(2, resident.getFullName());
             pstmt.setString(3, resident.getPhone());
             pstmt.setString(4, resident.getEmail());
@@ -121,8 +142,16 @@ public class ResidentService {
             pstmt.setString(8, resident.getAddress());
             pstmt.setString(9, resident.getEmergencyContact());
             pstmt.setString(10, resident.getEmergencyPhone());
-            pstmt.setString(11, resident.getStatus() != null ? resident.getStatus() : "HOẠT_ĐỘNG");
-            pstmt.setString(12, resident.getNotes());
+            pstmt.setString(11, resident.getResidentType());
+            pstmt.setString(12, resident.getRelationshipType());
+            pstmt.setObject(13, resident.getApartmentId());
+            pstmt.setObject(14, resident.getIsHouseholdHead());
+            pstmt.setObject(15, resident.getMoveInDate());
+            pstmt.setObject(16, resident.getExpectedMoveOutDate());
+            pstmt.setString(17, resident.getVehicleLicensePlate());
+            pstmt.setString(18, resident.getProfilePhoto());
+            pstmt.setString(19, resident.getStatus() != null ? resident.getStatus() : "ĐANG_Ở");
+            pstmt.setString(20, resident.getNotes());
 
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
@@ -138,7 +167,9 @@ public class ResidentService {
     public static boolean updateResident(Resident resident) {
         String sql = "UPDATE resident SET full_name = ?, phone = ?, email = ?, identity_card = ?, " +
                 "date_of_birth = ?, gender = ?, address = ?, emergency_contact = ?, " +
-                "emergency_phone = ?, status = ?, notes = ? WHERE id = ?";
+                "emergency_phone = ?, resident_type = ?, relationship_type = ?, apartment_id = ?, " +
+                "is_household_head = ?, move_in_date = ?, expected_move_out_date = ?, " +
+                "vehicle_license_plate = ?, profile_photo = ?, status = ?, notes = ? WHERE id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -151,9 +182,17 @@ public class ResidentService {
             pstmt.setString(7, resident.getAddress());
             pstmt.setString(8, resident.getEmergencyContact());
             pstmt.setString(9, resident.getEmergencyPhone());
-            pstmt.setString(10, resident.getStatus());
-            pstmt.setString(11, resident.getNotes());
-            pstmt.setInt(12, resident.getId());
+            pstmt.setString(10, resident.getResidentType());
+            pstmt.setString(11, resident.getRelationshipType());
+            pstmt.setObject(12, resident.getApartmentId());
+            pstmt.setObject(13, resident.getIsHouseholdHead());
+            pstmt.setObject(14, resident.getMoveInDate());
+            pstmt.setObject(15, resident.getExpectedMoveOutDate());
+            pstmt.setString(16, resident.getVehicleLicensePlate());
+            pstmt.setString(17, resident.getProfilePhoto());
+            pstmt.setString(18, resident.getStatus());
+            pstmt.setString(19, resident.getNotes());
+            pstmt.setInt(20, resident.getId());
 
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
@@ -204,14 +243,64 @@ public class ResidentService {
         resident.setStatus(rs.getString("status"));
         resident.setNotes(rs.getString("notes"));
 
+        // Đọc resident_type nếu có, nếu không thì dùng relationship_type
+        String residentType = null;
+        try {
+            residentType = rs.getString("resident_type");
+        } catch (SQLException e) {
+            // Column không tồn tại, bỏ qua
+        }
+        if (residentType == null) {
+            try {
+                residentType = rs.getString("relationship_type");
+            } catch (SQLException e) {
+                // Column không tồn tại, bỏ qua
+            }
+        }
+        resident.setResidentType(residentType);
+        
+        // Đọc relationship_type nếu có
+        try {
+            resident.setRelationshipType(rs.getString("relationship_type"));
+        } catch (SQLException e) {
+            // Column không tồn tại, bỏ qua
+        }
+        
+        Integer householdId = rs.getObject("household_id", Integer.class);
+        if (householdId != null) {
+            resident.setHouseholdId(householdId);
+        }
+        Integer apartmentId = rs.getObject("apartment_id", Integer.class);
+        if (apartmentId != null) {
+            resident.setApartmentId(apartmentId);
+        }
+        Boolean isHouseholdHead = rs.getObject("is_household_head", Boolean.class);
+        if (isHouseholdHead != null) {
+            resident.setIsHouseholdHead(isHouseholdHead);
+        }
+
+        // Đọc các trường mới
+        Date moveInDate = rs.getDate("move_in_date");
+        if (moveInDate != null) {
+            resident.setMoveInDate(moveInDate.toLocalDate());
+        }
+        
+        Date expectedMoveOutDate = rs.getDate("expected_move_out_date");
+        if (expectedMoveOutDate != null) {
+            resident.setExpectedMoveOutDate(expectedMoveOutDate.toLocalDate());
+        }
+        
+        resident.setVehicleLicensePlate(rs.getString("vehicle_license_plate"));
+        resident.setProfilePhoto(rs.getString("profile_photo"));
+
         Timestamp createdAt = rs.getTimestamp("created_at");
         if (createdAt != null) {
-            resident.setCreatedAt(createdAt.toLocalDateTime());
+            resident.setCreatedAt(createdAt.toLocalDateTime().toLocalDate());
         }
 
         Timestamp updatedAt = rs.getTimestamp("updated_at");
         if (updatedAt != null) {
-            resident.setUpdatedAt(updatedAt.toLocalDateTime());
+            resident.setUpdatedAt(updatedAt.toLocalDateTime().toLocalDate());
         }
 
         return resident;

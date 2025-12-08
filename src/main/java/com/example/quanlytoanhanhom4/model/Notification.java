@@ -26,8 +26,8 @@ public class Notification {
         this.content = content;
         this.notificationType = notificationType;
         this.targetType = targetType;
-        this.priority = "NORMAL";
-        this.status = "DRAFT";
+        this.priority = "BÌNH_THƯỜNG";
+        this.status = "NHÁP";
     }
 
     // Getters and Setters

@@ -1,75 +1,182 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.layout.Region?>
 
 <BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.quanlytoanhanhom4.controller.NotificationController">
-    <top>
-        <HBox spacing="10" style="-fx-background-color: #2874A6; -fx-padding: 15;">
-            <children>
-                <Label text="Gửi thông báo" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Label text="Lọc theo trạng thái:" style="-fx-text-fill: white;"/>
-                <ComboBox fx:id="filterStatusCombo" prefWidth="150" onAction="#handleFilter"/>
-                <Button text="Quay lại" onAction="#handleBack"
-                        style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
-            </children>
-        </HBox>
-    </top>
+            fx:controller="com.example.quanlytoanhanhom4.controller.NotificationController"
+            stylesheets="@../../css/modern-style.css"
+            style="-fx-background-color: linear-gradient(to bottom right, #F7FAFF, #E5ECF6);">
+    
+    <!-- Center: Data Table and Search -->
     <center>
-        <VBox spacing="10" style="-fx-padding: 15;">
-            <children>
-                <TableView fx:id="notificationTable" prefHeight="300">
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" styleClass="scroll-pane-gradient">
+            <content>
+                <VBox spacing="28" style="-fx-padding: 30; -fx-background-color: linear-gradient(to bottom right, #F7FAFF, #E5ECF6); -fx-min-height: 600;">
+            
+            <!-- Search and Filter Section -->
+            <VBox spacing="12" styleClass="card card-notification">
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <Label text="🔍" style="-fx-font-size: 20px;"/>
+                    <TextField fx:id="searchField" promptText="Tìm kiếm theo tiêu đề, nội dung..." 
+                               prefWidth="450" styleClass="text-field"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="Số bản ghi/trang:" styleClass="text-sm" style="-fx-text-fill: #6B7280;"/>
+                    <ComboBox fx:id="itemsPerPageCombo" prefWidth="100" styleClass="combo-box"/>
+                    <Button fx:id="advancedFilterButton" text="🔽 Bộ lọc nâng cao" 
+                            styleClass="btn-outline"
+                            onAction="#handleToggleAdvancedFilter"/>
+                </HBox>
+                
+                <!-- Advanced Filter Panel -->
+                <VBox fx:id="advancedFilterPane" spacing="12" styleClass="filter-panel" 
+                      visible="false" managed="false">
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Bộ lọc nâng cao" styleClass="filter-panel-header"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="Xóa bộ lọc" onAction="#handleClearFilters"
+                                styleClass="btn-outline" style="-fx-font-size: 12px;"/>
+                    </HBox>
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <VBox spacing="6" styleClass="input-group">
+                            <Label text="Loại thông báo" styleClass="form-label"/>
+                            <ComboBox fx:id="filterTypeCombo" prefWidth="150" styleClass="combo-box"/>
+                        </VBox>
+                        <VBox spacing="6" styleClass="input-group">
+                            <Label text="Ưu tiên" styleClass="form-label"/>
+                            <ComboBox fx:id="filterPriorityCombo" prefWidth="150" styleClass="combo-box"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </VBox>
+            
+            <!-- Table Section -->
+            <VBox spacing="12" styleClass="card card-notification" VBox.vgrow="ALWAYS">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="📋 Danh sách thông báo" styleClass="card-header"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="statusLabel" styleClass="text-sm" style="-fx-text-fill: #10B981;"/>
+                </HBox>
+                
+                <TableView fx:id="notificationTable" prefHeight="500" styleClass="table-view" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colTitle" text="Tiêu đề" prefWidth="250"/>
-                        <TableColumn fx:id="colType" text="Loại" prefWidth="120"/>
-                        <TableColumn fx:id="colTarget" text="Đối tượng" prefWidth="120"/>
-                        <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="100"/>
+                        <TableColumn fx:id="colTitle" text="Tiêu đề" prefWidth="250">
+                            <style>
+                                -fx-alignment: CENTER_LEFT;
+                            </style>
+                        </TableColumn>
+                        <TableColumn fx:id="colType" text="Loại thông báo" prefWidth="120">
+                            <style>
+                                -fx-alignment: CENTER;
+                            </style>
+                        </TableColumn>
+                        <TableColumn fx:id="colTarget" text="Đối tượng" prefWidth="100">
+                            <style>
+                                -fx-alignment: CENTER;
+                            </style>
+                        </TableColumn>
+                        <TableColumn fx:id="colPriority" text="Ưu tiên" prefWidth="100">
+                            <style>
+                                -fx-alignment: CENTER;
+                            </style>
+                        </TableColumn>
+                        <TableColumn fx:id="colExpiryDate" text="Ngày hết hạn" prefWidth="120">
+                            <style>
+                                -fx-alignment: CENTER;
+                            </style>
+                        </TableColumn>
+                        <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="120">
+                            <style>
+                                -fx-alignment: CENTER;
+                            </style>
+                        </TableColumn>
                     </columns>
                 </TableView>
-                <Label fx:id="statusLabel" style="-fx-text-fill: green;"/>
-            </children>
-        </VBox>
-    </center>
-    <right>
-        <ScrollPane fitToWidth="true">
-            <VBox spacing="10" style="-fx-padding: 15; -fx-min-width: 300;">
-                <children>
-                    <Label text="Thông tin thông báo" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
-                    <Label text="Tiêu đề:"/>
-                    <TextField fx:id="titleField" prefWidth="250"/>
-                    <Label text="Nội dung:"/>
-                    <TextArea fx:id="contentArea" prefWidth="250" prefHeight="100"/>
-                    <Label text="Loại thông báo:"/>
-                    <ComboBox fx:id="notificationTypeCombo" prefWidth="250"/>
-                    <Label text="Đối tượng nhận:"/>
-                    <ComboBox fx:id="targetTypeCombo" prefWidth="250"/>
-                    <Label text="ID đối tượng:"/>
-                    <ComboBox fx:id="targetIdCombo" prefWidth="250"/>
-                    <Label text="Mức độ ưu tiên:"/>
-                    <ComboBox fx:id="priorityCombo" prefWidth="250"/>
-                    <Label text="Trạng thái:"/>
-                    <ComboBox fx:id="statusCombo" prefWidth="250"/>
-                    <Label text="Ngày hết hạn:"/>
-                    <DatePicker fx:id="expiryDatePicker" prefWidth="250"/>
-                    <HBox spacing="10">
-                        <children>
-                            <Button fx:id="addButton" text="Thêm" onAction="#handleAdd"
-                                    style="-fx-background-color: #27AE60; -fx-text-fill: white; -fx-pref-width: 70;"/>
-                            <Button fx:id="updateButton" text="Cập nhật" onAction="#handleUpdate" disable="true"
-                                    style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-pref-width: 70;"/>
-                        </children>
-                    </HBox>
-                    <Button fx:id="sendButton" text="Gửi" onAction="#handleSend" disable="true"
-                            style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-pref-width: 250;"/>
-                    <Button fx:id="deleteButton" text="Xóa" onAction="#handleDelete" disable="true"
-                            style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-pref-width: 250;"/>
-                </children>
+                
+                <!-- Pagination -->
+                <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 12 0 0 0;">
+                    <Label fx:id="paginationInfoLabel" styleClass="text-sm" style="-fx-text-fill: #6B7280;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Pagination fx:id="pagination" styleClass="pagination"/>
+                </HBox>
             </VBox>
+                </VBox>
+            </content>
         </ScrollPane>
+    </center>
+    
+    <!-- Right: Form Panel -->
+    <right>
+        <VBox spacing="0" styleClass="card card-notification" style="-fx-min-width: 420; -fx-max-width: 420;">
+            <!-- Header -->
+            <VBox spacing="8" style="-fx-padding: 24 24 20 24; -fx-background-color: #2874A6;">
+                <Label text="📝 Thông tin Thông báo" style="-fx-font-size: 20px; -fx-font-weight: 700; -fx-text-fill: white;"/>
+            </VBox>
+            
+            <!-- Form Content -->
+            <ScrollPane fitToWidth="true" vbarPolicy="AS_NEEDED" style="-fx-background: transparent; -fx-border-width: 0;">
+                <VBox spacing="20" style="-fx-padding: 24;">
+                    <!-- Thông tin cơ bản -->
+                    <VBox spacing="12">
+                        <Label text="Thông tin cơ bản" style="-fx-font-size: 16px; -fx-font-weight: 600; -fx-text-fill: #2874A6; -fx-padding: 0 0 8 0;"/>
+                        <VBox spacing="6" styleClass="input-group input-group-required">
+                            <Label text="Tiêu đề *" styleClass="form-label"/>
+                            <TextField fx:id="titleField" prefWidth="372" promptText="Nhập tiêu đề thông báo" styleClass="text-field"/>
+                        </VBox>
+                        <VBox spacing="6" styleClass="input-group">
+                            <Label text="Loại thông báo" styleClass="form-label"/>
+                            <ComboBox fx:id="notificationTypeCombo" prefWidth="372" styleClass="combo-box"/>
+                        </VBox>
+                        <VBox spacing="6" styleClass="input-group input-group-required">
+                            <Label text="Nội dung *" styleClass="form-label"/>
+                            <TextArea fx:id="contentArea" prefWidth="372" prefHeight="150" promptText="Nhập nội dung thông báo" styleClass="text-area" wrapText="true"/>
+                        </VBox>
+                    </VBox>
+                    
+                    <!-- Đối tượng nhận -->
+                    <VBox spacing="12">
+                        <Label text="Đối tượng nhận" style="-fx-font-size: 16px; -fx-font-weight: 600; -fx-text-fill: #2874A6; -fx-padding: 0 0 8 0;"/>
+                        <VBox spacing="6" styleClass="input-group">
+                            <Label text="Đối tượng" styleClass="form-label"/>
+                            <ComboBox fx:id="targetTypeCombo" prefWidth="372" styleClass="combo-box"/>
+                        </VBox>
+                    </VBox>
+                    
+                    <!-- Cài đặt khác -->
+                    <VBox spacing="12">
+                        <Label text="Cài đặt" style="-fx-font-size: 16px; -fx-font-weight: 600; -fx-text-fill: #2874A6; -fx-padding: 0 0 8 0;"/>
+                        <VBox spacing="6" styleClass="input-group">
+                            <Label text="Ưu tiên" styleClass="form-label"/>
+                            <ComboBox fx:id="priorityCombo" prefWidth="372" styleClass="combo-box"/>
+                        </VBox>
+                        <VBox spacing="6" styleClass="input-group">
+                            <Label text="Trạng thái" styleClass="form-label"/>
+                            <ComboBox fx:id="statusCombo" prefWidth="372" styleClass="combo-box"/>
+                        </VBox>
+                        <VBox spacing="6" styleClass="input-group">
+                            <Label text="Ngày hết hạn" styleClass="form-label"/>
+                            <DatePicker fx:id="expiryDatePicker" prefWidth="372" styleClass="combo-box"/>
+                        </VBox>
+                    </VBox>
+                </VBox>
+            </ScrollPane>
+            
+            <Separator style="-fx-padding: 0;"/>
+            
+            <!-- Action Buttons -->
+            <VBox spacing="12" style="-fx-padding: 24; -fx-background-color: white;">
+                <HBox spacing="12" alignment="CENTER">
+                    <Button fx:id="addButton" text="Thêm mới" onAction="#handleAdd"
+                            styleClass="btn-success" style="-fx-pref-width: 186; -fx-pref-height: 44; -fx-font-size: 14px;"/>
+                    <Button fx:id="updateButton" text="Cập nhật" onAction="#handleUpdate" disable="true"
+                            styleClass="btn-primary" style="-fx-pref-width: 186; -fx-pref-height: 44; -fx-font-size: 14px;"/>
+                </HBox>
+                <Button fx:id="sendButton" text="Gửi thông báo" onAction="#handleSend" disable="true"
+                        styleClass="btn-primary" style="-fx-pref-width: 384; -fx-pref-height: 44; -fx-font-size: 14px;"/>
+                <Button fx:id="deleteButton" text="Xóa" onAction="#handleDelete" disable="true"
+                        styleClass="btn-danger" style="-fx-pref-width: 384; -fx-pref-height: 44; -fx-font-size: 14px;"/>
+            </VBox>
+        </VBox>
     </right>
 </BorderPane>
-
-

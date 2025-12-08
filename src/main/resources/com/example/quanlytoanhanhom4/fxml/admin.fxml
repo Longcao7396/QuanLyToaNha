@@ -14,17 +14,6 @@
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.quanlytoanhanhom4.controller.AdminController">
-   <top>
-      <HBox spacing="10" style="-fx-background-color: #2874A6; -fx-padding: 15;">
-         <children>
-            <Label style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;" text="Quản lý Hành chính &amp; Nhân sự" />
-            <Region HBox.hgrow="ALWAYS" />
-            <Label style="-fx-text-fill: white;" text="Lọc theo trạng thái:" />
-            <ComboBox fx:id="filterStatusCombo" onAction="#handleFilter" prefWidth="150" />
-            <Button onAction="#handleBack" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" text="Quay lại" />
-         </children>
-      </HBox>
-   </top>
    <center>
       <VBox spacing="10" style="-fx-padding: 15;">
          <children>
